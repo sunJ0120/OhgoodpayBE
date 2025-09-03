@@ -1,0 +1,63 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Cursor ###
+.cursor/
+
+### 환경 설정 ###
+*.env
+application.properties
+/src/main/resources/application.properties
+
+### 배포 파일 ###
+release/
+
+### 로그 파일 ###
+logs/
+
+### 백업 파일 ###
+backup/
+
+### build toos ###
+*.jar
+*.war
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
