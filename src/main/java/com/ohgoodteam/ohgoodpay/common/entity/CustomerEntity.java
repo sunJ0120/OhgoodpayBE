@@ -64,5 +64,5 @@ public class CustomerEntity {
     private int extensionCnt;
 
     @Column(nullable = false)
-    private LocalDateTime joiniDate;
+    private LocalDateTime joinDate;
 }
