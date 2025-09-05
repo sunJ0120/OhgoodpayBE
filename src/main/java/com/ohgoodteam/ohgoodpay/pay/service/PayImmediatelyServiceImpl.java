@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.pay.service;
 
+import java.beans.Transient;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -7,9 +8,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
+import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
-import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
+import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
+import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;   
+import com.ohgoodteam.ohgoodpay.pay.repository.GradeRepository;
 
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,7 +24,16 @@ import lombok.RequiredArgsConstructor;
 public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     
     private final PaymentRepository paymentRepository;
+    private final CustomerRepository customerRepository;
+    private final GradeRepository gradeRepository;
+
+    // 전체 결제건 조회
+    @Override
+    public List<PaymentEntity> getAllPayment(Long customerId) {
+        return paymentRepository.findByCustomerCustomerId(customerId);
+    }
     
+    // 미납부건 월별 분류
     @Override
     public List<List<PaymentEntity>> classifyUnpaidBills(Long customerId) {
         // 고객의 미납부건 조회
@@ -36,5 +52,78 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
             .collect(Collectors.toList());
         
         return result;
+    }
+
+    // 고객 수동 연장 신청
+    @Override
+    public boolean requestCustomerExtension(Long customerId) {
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+
+        // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
+        if(customer.isExtension() || !checkUnpaidBills(customerId, YearMonth.now().minusMonths(1))) {
+            return false;
+        }
+        int result = customerRepository.updateCustomerIsExtension(true, customerId);
+        return result > 0;
+    }
+
+    // 고객 자동 연장 신청
+    @Override
+    @Transactional
+    public boolean requestCustomerAutoExtension(Long customerId) {
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+
+        // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
+        if(customer.isExtension() || !checkUnpaidBills(customerId, YearMonth.now().minusMonths(1))) {
+            return false;
+        }
+        customerRepository.updateCustomerIsExtension(true, customerId);
+        customerRepository.updateCustomerIsAuto(true, customerId);
+        return true;
+    }
+
+    // 고객 등급 및 한도 조회
+    @Override
+    public GradeEntity findbyCustomerGradeName(Long customerId) {
+        String gradeName = customerRepository.findByCustomerId(customerId).getGrade().getGradeName();
+        return gradeRepository.findByGradeName(gradeName);
+    }
+
+    // 결제건 납부 처리
+    @Override
+    public boolean payImmediately(Long customerId, Long[] lists) {
+        int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, lists);
+        if(result > 0) {
+            int gradePoint = paymentRepository.sumPriceByPaymentId(lists) / 10000;
+            customerRepository.updateCustomerGradePoint(gradePoint, customerId);
+        }
+        PaymentEntity payment = paymentRepository.findByPaymentId(lists[0]);
+        YearMonth yearMonth = YearMonth.from(payment.getDate());
+        //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
+        if (!yearMonth.equals(YearMonth.now())) {
+            if (checkUnpaidBills(customerId, yearMonth)) {
+                releaseExtension(customerId);
+            } 
+        }
+        return result > 0;
+    }
+
+    // 미납건이 있는지 확인. 확인 후 미납건이 있으면 false 없으면 true
+    public boolean checkUnpaidBills(Long customerId, YearMonth yearMonth) {
+        List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseAndYearMonth(customerId, yearMonth.getYear(), yearMonth.getMonthValue());
+        if(unpaidBills.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 고객이 연장 상태면 해제
+    public void releaseExtension(Long customerId) {
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        if(customer.isExtension()) {
+            customerRepository.updateCustomerIsExtension(false, customerId);
+            customerRepository.updateCustomerIsAuto(false, customerId);
+        }
     }
 }

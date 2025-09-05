@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 
 @SpringBootTest
@@ -21,6 +22,38 @@ public class PayImmediatelyServiceTests {
         for (List<PaymentEntity> unpaidBill : unpaidBills) {
             System.out.println(unpaidBill);
         }
+        System.out.println("--------------------------------");
+    }
+
+    @Test   
+    public void testRequestCustomerExtension() {
+        boolean isExtension = payImmediatelyService.requestCustomerExtension(1L);
+        System.out.println("--------------------------------");
+        System.out.println(isExtension);
+        System.out.println("--------------------------------");
+    }
+
+    @Test
+    public void testRequestCustomerAutoExtension() {
+        boolean isAutoExtension = payImmediatelyService.requestCustomerAutoExtension(1L);
+        System.out.println("--------------------------------");
+        System.out.println(isAutoExtension);
+        System.out.println("--------------------------------");
+    }
+
+    @Test
+    public void testFindbyCustomerGradeName() {
+        GradeEntity grade = payImmediatelyService.findbyCustomerGradeName(1L);
+        System.out.println("--------------------------------");
+        System.out.println(grade);
+        System.out.println("--------------------------------");
+    }
+
+    @Test
+    public void testPayImmediately() {
+        boolean isPayImmediately = payImmediatelyService.payImmediately(1L, new Long[] { 10L });
+        System.out.println("--------------------------------");
+        System.out.println(isPayImmediately);
         System.out.println("--------------------------------");
     }
 }

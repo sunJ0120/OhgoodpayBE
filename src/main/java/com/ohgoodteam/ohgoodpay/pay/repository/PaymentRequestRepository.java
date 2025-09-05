@@ -6,4 +6,5 @@ import com.ohgoodteam.ohgoodpay.common.entity.PaymentRequestEntity;
 
 public interface PaymentRequestRepository extends JpaRepository<PaymentRequestEntity, Long> {
     
+    PaymentRequestEntity findByPaymentRequestId(Long paymentRequestId);
 }

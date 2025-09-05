@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.pay.repository;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -78,20 +79,31 @@ public class PayImmediatelyRepositoryTests {
     }
 
     // 회원 수동 연장 업데이트
-    @Test
-    public void testUpdateCustomerIsExtension() {
-        int result = customerRepository.updateCustomerIsExtension(true, 1L);
-        System.out.println("--------------------------------");
-        System.out.println(result);
-        System.out.println("--------------------------------");
-    }
+    // @Test
+    // public void testUpdateCustomerIsExtension() {
+    //     int result = customerRepository.updateCustomerIsExtension(true, 1L);
+    //     System.out.println("--------------------------------");
+    //     System.out.println(result);
+    //     System.out.println("--------------------------------");
+    // }
 
     // 회원 자동 연장 업데이트
+    // @Test
+    // public void testUpdateCustomerIsAuto() {
+    //     int result = customerRepository.updateCustomerIsAuto(true, 1L);
+    //     System.out.println("--------------------------------");
+    //     System.out.println(result);
+    //     System.out.println("--------------------------------");
+    // }
+
+    // 해당 월 미납부 결제 조회
     @Test
-    public void testUpdateCustomerIsAuto() {
-        int result = customerRepository.updateCustomerIsAuto(true, 1L);
+    public void testFindByCustomerIdAndIsExpiredFalseAndDate() {
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseAndYearMonth(1L, 2024, 8);
         System.out.println("--------------------------------");
-        System.out.println(result);
+        for (PaymentEntity payment : payments) {
+            System.out.println(payment.getDate());
+        }
         System.out.println("--------------------------------");
     }
 }
