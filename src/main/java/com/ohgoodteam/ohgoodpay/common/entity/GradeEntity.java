@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 @Entity
@@ -14,15 +15,16 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class GradeEntity {
     @Id
-    private Long gradeId;
+    private String gradeName;
 
     @Column(nullable = false)
-    private String name;
+    private int upgrade;
 
     @Column(nullable = false)
-    private int limit;
+    private int limitPrice;
 
     @Column(nullable = false)
     private float pointPercent;

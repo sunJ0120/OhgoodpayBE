@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -53,7 +56,7 @@ public class CustomerEntity {
 
     private String hobby;
 
-    private boolean isExtenstion;
+    private boolean isExtension;
 
     private boolean isAuto;
 
@@ -64,5 +67,10 @@ public class CustomerEntity {
     private int extensionCnt;
 
     @Column(nullable = false)
-    private LocalDateTime joiniDate;
+    private LocalDateTime joinDate;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "grade_name")
+    @ToString.Exclude
+    private GradeEntity grade;
 }
