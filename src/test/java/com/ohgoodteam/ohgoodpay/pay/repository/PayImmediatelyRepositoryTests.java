@@ -68,14 +68,14 @@ public class PayImmediatelyRepositoryTests {
         System.out.println("--------------------------------");
     }
 
-    // 결제건 납부 업데이트
-    // @Test
-    // public void testUpdatePaymentIsExpired() {
-    //     int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, new Long[] { 19L,20L });
-    //     System.out.println("--------------------------------");
-    //     System.out.println(result);
-    //     System.out.println("--------------------------------");
-    // }
+    //결제건 납부 업데이트
+    @Test
+    public void testUpdatePaymentIsExpired() {
+        int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, new Long[] { 19L,20L });
+        System.out.println("--------------------------------");
+        System.out.println(result);
+        System.out.println("--------------------------------");
+    }
 
     // 회원 수동 연장 업데이트
     @Test
