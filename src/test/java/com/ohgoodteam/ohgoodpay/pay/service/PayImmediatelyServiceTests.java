@@ -51,7 +51,7 @@ public class PayImmediatelyServiceTests {
 
     @Test
     public void testPayImmediately() {
-        boolean isPayImmediately = payImmediatelyService.payImmediately(1L, new Long[] { 10L });
+        boolean isPayImmediately = payImmediatelyService.payImmediately(1L, new Long[] { 21L });
         System.out.println("--------------------------------");
         System.out.println(isPayImmediately);
         System.out.println("--------------------------------");

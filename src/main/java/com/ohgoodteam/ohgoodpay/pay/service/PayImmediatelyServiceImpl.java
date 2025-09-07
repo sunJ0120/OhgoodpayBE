@@ -93,15 +93,24 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     @Override
     public boolean payImmediately(Long customerId, Long[] lists) {
         int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, lists);
+        // 들어온 결제건이 이번 달인지 확인
+        PaymentEntity payment = paymentRepository.findByPaymentId(lists[0]);
+        YearMonth paymentYearMonth = YearMonth.from(payment.getDate());
+        YearMonth nowYearMonth = YearMonth.now();
+        int sumPrice = paymentRepository.sumPriceByPaymentId(lists);
+        // payment의 년월과 현재 년월이 같은지 체크
+        if (paymentYearMonth.equals(nowYearMonth)) {
+            // 이번 달 결제건이면 balance 업데이트 (한도 풀어줌)
+            customerRepository.plusCustomerBalance(sumPrice, customerId);
+        }
+        
         if(result > 0) {
-            int gradePoint = paymentRepository.sumPriceByPaymentId(lists) / 10000;
+            int gradePoint = sumPrice / 10000;
             customerRepository.updateCustomerGradePoint(gradePoint, customerId);
         }
-        PaymentEntity payment = paymentRepository.findByPaymentId(lists[0]);
-        YearMonth yearMonth = YearMonth.from(payment.getDate());
         //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
-        if (!yearMonth.equals(YearMonth.now())) {
-            if (checkUnpaidBills(customerId, yearMonth)) {
+        if (!paymentYearMonth.equals(nowYearMonth)) {
+            if (checkUnpaidBills(customerId, paymentYearMonth)) {
                 releaseExtension(customerId);
             } 
         }

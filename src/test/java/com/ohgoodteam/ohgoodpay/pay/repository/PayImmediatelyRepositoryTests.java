@@ -52,9 +52,14 @@ public class PayImmediatelyRepositoryTests {
     // 결제 단일 건 조회
     @Test
     public void testFindByPaymentId() {
-        PaymentEntity payment = paymentRepository.findByPaymentId(1L);
+        PaymentEntity payment = paymentRepository.findByPaymentId(21L);
         System.out.println("--------------------------------");
         System.out.println(payment);
+        System.out.println(payment.getDate());
+        System.out.println(YearMonth.from(payment.getDate()));
+        System.out.println(YearMonth.now());
+        System.out.println(YearMonth.from(payment.getDate()).equals(YearMonth.now()));
+        System.out.println();
         System.out.println("--------------------------------");
     }
 

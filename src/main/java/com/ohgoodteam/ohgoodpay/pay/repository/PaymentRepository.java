@@ -32,7 +32,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     @Query("SELECT p FROM PaymentEntity p WHERE p.customer.customerId = :customerId AND p.isExpired = false AND FUNCTION('YEAR', p.date) = :year AND FUNCTION('MONTH', p.date) = :month")
     List<PaymentEntity> findByCustomerCustomerIdAndIsExpiredFalseAndYearMonth(Long customerId, int year, int month);
 
-    // 결제건 gradePoint 산출
+    // 결제건 금액 산출, point 산출 등 사용
     @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.paymentId IN :paymentIds")
     int sumPriceByPaymentId(Long[] paymentIds);
 }

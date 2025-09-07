@@ -36,4 +36,10 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Modifying
     @Query("UPDATE CustomerEntity c SET c.grade.gradeName = :gradeName WHERE c.customerId = :customerId")
     int updateCustomerGradeName(String gradeName, Long customerId);
+
+    // customerId로 회원 balance 업데이트
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.balance = c.balance + :balance WHERE c.customerId = :customerId")
+    int plusCustomerBalance(int balance, Long customerId);
 }
