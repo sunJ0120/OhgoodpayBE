@@ -1,0 +1,49 @@
+package com.ohgoodteam.ohgoodpay.recommend.controller;
+
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
+import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
+import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 추천 채팅 API
+ * v1: Mock 데이터로 구현, 향후 Redis + FastAPI 연동 예정
+ */
+@Tag(name = "추천 채팅", description = "AI 추천 챗봇 관련 API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/chat")
+public class ChatController {
+    private final ChatService chatService;
+
+    @Operation(summary = "채팅 시작", description = "고객 ID로 채팅 시작 후 개인화된 인사 메시지 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅 시작 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/start")
+    public ApiResponseWrapper<ChatStartResponse> startChat(
+            @Parameter(description = "채팅 시작 요청 (고객 ID 포함)")
+            @RequestBody ChatStartRequest request
+    ) {
+        try {
+            ChatStartResponse resp = chatService.startChat(request.getCustomerId());
+            return ApiResponseWrapper.ok(resp);
+        } catch (IllegalArgumentException e) {
+            return ApiResponseWrapper.error(400, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
+        }
+    }
+}

@@ -73,4 +73,6 @@ public class CustomerEntity {
     @JoinColumn(name = "grade_name")
     @ToString.Exclude
     private GradeEntity grade;
+
+    private int balance;
 }
