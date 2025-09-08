@@ -1,4 +1,4 @@
-package sunj.redisserver.config;
+package com.ohgoodteam.ohgoodpay.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
