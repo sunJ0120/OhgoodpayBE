@@ -1,15 +1,13 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequest;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@ToString
-@Builder
-@AllArgsConstructor
-public class ChatMoodRequest {
-    private final Long customerId;
-    private final String mood;
+@ToString(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+public class ChatMoodRequest extends BaseChatRequest {
+    private String mood;
 }

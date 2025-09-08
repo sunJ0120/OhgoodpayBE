@@ -62,6 +62,7 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatStartResponse.builder()
                 .message(greetingMessage)
+                .step("mood_input")
                 .build();
     }
 

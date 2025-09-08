@@ -1,16 +1,15 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@ToString
-@Builder
-@AllArgsConstructor
-public class ChatCheckHobbyResponse {
-    private final String message;
-    private final String currentHobbies;
-    private final String step;
+@ToString(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+public class ChatCheckHobbyResponse extends BaseChatResponse {
+    private String currentHobbies;
 }

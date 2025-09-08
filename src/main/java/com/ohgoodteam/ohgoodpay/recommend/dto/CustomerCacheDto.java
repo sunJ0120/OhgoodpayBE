@@ -10,7 +10,6 @@ import lombok.ToString;
 
 사용자 초기 기초 정보를 저장한다.
  */
-
 @Getter
 @ToString
 @Builder

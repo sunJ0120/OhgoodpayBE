@@ -1,14 +1,14 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@ToString
-@Builder
-@AllArgsConstructor
-public class ChatStartResponse {
-    private final String message;
+@ToString(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
+public class ChatStartResponse extends BaseChatResponse {
 }
