@@ -1,10 +1,14 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.ProductDto;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheSpec;
+import com.ohgoodteam.ohgoodpay.recommend.util.CacheStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 고객 정보 캐싱 서비스
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class ChatCacheService {
+    private final CacheStore cacheStore;
     // private final CacheStore cacheStore; // TODO: CacheStore 주입
     
     /**
@@ -56,6 +61,7 @@ public class ChatCacheService {
         // return cacheStore.get(CacheSpec.BALANCE, customerId);
         return 40000; // TODO: 임시 Mock 데이터
     }
+
     /**
      * 고객 최근 구매 카테고리 조회 (Read-through)
      */
@@ -69,5 +75,26 @@ public class ChatCacheService {
     /**
      * 추천 결과 캐시 저장
      */
-    // TODO: TOP5개의 데이터 받아서 캐시에 저장하기.
+    public void saveRecommendProducts(Long customerId, List<ProductDto> products) {
+        // TODO: 임시 Mock 데이터
+        // cacheStore.pushList(CacheSpec.RECOMMEND_PRODUCTS, customerId, products);
+    }
+
+    /**
+     * 추천 결과 조회
+     */
+    public ProductDto getRecommendProducts(Long customerId, int index) {
+//        return cacheStore.getByIndex(CacheSpec.RECOMMEND_PRODUCTS, customerId, index, ProductDto.class);
+        
+        // TODO: 임시 Mock 데이터 (index별로 다른 상품 반환)
+        return ProductDto.builder()
+                .rank(index + 1)
+                .name("추천상품 " + (index + 1))
+                .price(10000 + (index * 5000))
+                .image("https://example.com/product" + (index + 1) + ".jpg")
+                .url("https://example.com/product/" + (index + 1))
+                .category("운동 기구")
+                .build();
+    }
+
 }

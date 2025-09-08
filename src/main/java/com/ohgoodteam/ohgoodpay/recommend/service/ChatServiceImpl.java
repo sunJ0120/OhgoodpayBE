@@ -23,7 +23,7 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 채팅 시작 처리
-     * 고객 유효성 검증 → 고객명 조회 → 인사 메시지 생성
+     * 고객명 조회 → 인사 메시지 생성
      */
     @Override
     @Transactional(readOnly = true)
@@ -43,7 +43,7 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 고객 기분 입력받아서 llm요청
-     * 고객 유효성 검증 → 고객명 조회 → 기분 메시지 생성
+     * 고객명 조회 → 기분 메시지 생성
      */
     @Override
     @Transactional(readOnly = true)
@@ -65,7 +65,7 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 고객 아이디 입력받아서 llm요청
-     * 고객 유효성 검증 → 고객명 조회 → 취미 확인하는 메시지 생성
+     * 고객명 조회 → 취미 확인하는 메시지 생성
      */
     @Override
     @Transactional(readOnly = true)
@@ -87,7 +87,7 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 고객 취미 업데이트
-     * 고객 유효성 검증 → DB 업데이트 → 응답 생성
+     * DB 업데이트 → 응답 생성
      */
     @Override
     public ChatUpdateHobbyResponse updateHobby(Long customerId, String newHobby) {
@@ -116,7 +116,7 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 고객 구매 이력 (카테고리) 가져오기
-     * 고객 유효성 검증 → 고객명 조회 → DB또는 REDIS에서 구매 카테고리 가져오기 → 기분 메시지 생성
+     * 고객명 조회 → DB또는 REDIS에서 구매 카테고리 가져오기 → 기분 메시지 생성
      */
     @Override
     public ChatAnalyzePurchasesResponse analyzePurchases(Long customerId) {
@@ -137,10 +137,11 @@ public class ChatServiceImpl implements ChatService {
 
     /**
      * 고객한테 상품 추천 하기
-     * 고객 유효성 검증 → 고객명 조회 → DB또는 REDIS에서 상위 1등 상품만 가져오기 → 추천 메시지 생성
+     * 고객명 조회 → DB또는 REDIS에서 상위 1등 상품만 가져오기 → 추천 메시지 생성
      */
     @Override
     public ChatRecommendResponse recommend(Long customerId) {
+        // 캐싱 되어 있는 값들 전부 가져오기
         CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
         String hobby = chatCacheService.getHobby(customerId);
         String mood = chatCacheService.getMood(customerId);
@@ -165,20 +166,25 @@ public class ChatServiceImpl implements ChatService {
                         .maxResults(5)
                 .build());
 
-        // TODO : productSearchResponse TOPN개 저장 후 1개만 추천하도록 한다.
-        // chatCacheService.saveTop5Products(customerId, productSearchResponse.getProducts());
-
-        // TODO : Redis에서 TOP 1등 불러오는 로직 추가
-        ProductDto selectedProduct = selectBestProduct(productSearchResponse.getProducts());
-        //  RecommendMessageResponse recommendMessageResponse = fastApiService.generateRecommendMessage();
+        // topN개의 products 캐싱
+        chatCacheService.saveRecommendProducts(customerId, productSearchResponse.getProducts());
+        // 1등 상품 직접 선택
+        ProductDto selectedProduct = productSearchResponse.getProducts().get(0);
 
         // TODO : FastAPI 연동 구현 - LLM 메세지 생성
-        // RecommendMessageResponse recommendMessageResponse = fastApiService.generateRecommendMessage(messageRequest);
-        return null;
-    }
+        String responseMessage = String.format("%s가 %s에 관심생겼다니까 완전 찰떡인 %s 찾았어!", cacheDto.getName(), hobby, selectedProduct.getName());
+        String nextStep = "get_next_recommendation";
 
-    // TODO : 1등 상품 불러오는 로직 계산 필요...
-    private ProductDto selectBestProduct(List<ProductDto> products) {
-        return products.isEmpty() ? null : products.get(0); // 1순위 선택
+        //최종 응답 DTO 생성
+        // TODO : 현재는 하드코딩 이지만, 캐시에서 하나씩 빼서 size로 판단
+        ChatRecommendResponse chatRecommendResponse = ChatRecommendResponse.builder()
+                .item(selectedProduct)
+                .message(responseMessage)
+                .hasMore(productSearchResponse.getProducts().size() > 1)
+                .remainingCount(productSearchResponse.getProducts().size() - 1)
+                .nextStep(nextStep)
+                .build();
+
+        return chatRecommendResponse;
     }
 }

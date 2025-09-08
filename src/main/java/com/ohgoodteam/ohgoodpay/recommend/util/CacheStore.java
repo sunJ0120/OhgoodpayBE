@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Component
@@ -33,6 +34,19 @@ public class CacheStore {
     public <T> T get(CacheSpec spec, Object userId, Class<T> type) {
         Object raw = redis.opsForValue().get(key(spec, userId));
         return type.cast(raw); //typecast를 한 번 해주기 때문에, 잘못된 타입일경우 ClassCastException가 발생한다.
+    }
+
+    // redis에 list를 추가하고 싶을 때 사용한다.
+    public void pushList(CacheSpec spec, Object userId, List<?> values) {
+        redis.opsForList().rightPushAll(key(spec, userId), values.toArray());
+        //설정한 TTL로 갱신한다.
+        redis.expire(key(spec, userId), spec.getTtl());
+    }
+
+    // redis에서 index를 이용해서 특정 값을 가져올때 사용한다.
+    public <T> T getByIndex(CacheSpec spec, Object userId, int index, Class<T> type) {
+        Object raw = redis.opsForList().index(key(spec, userId), index);
+        return raw != null ? type.cast(raw) : null;
     }
 
     // DB에서 해당 데이터가 바뀌었거나 없어졌을 때, 캐시도 지워서 일관적으로 만들기 위함이다.

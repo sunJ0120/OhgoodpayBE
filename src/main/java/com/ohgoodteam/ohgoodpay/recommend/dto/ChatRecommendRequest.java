@@ -11,5 +11,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class ChatRecommendRequest extends BaseChatRequest {
-    private String require; //ENUM TYPE으로 잡을까 고민중...일단 String으로 틀만.
+    // TODO : 이거 어떤 방식으로 사용할지에 대한 고민 필요.
+    private String require;
 }
