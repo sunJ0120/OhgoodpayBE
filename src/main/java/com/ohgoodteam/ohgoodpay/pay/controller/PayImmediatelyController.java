@@ -34,31 +34,8 @@ public class PayImmediatelyController {
     // 납부 페이지 진입시 초기 정보 조회
     @GetMapping("/payment/info/{customerId}")
     public ResponseEntity<PayImmediatelyResponseDTO> getPayImmediately(@PathVariable Long customerId) {
-        GradeEntity grade = payImmediatelyService.findbyCustomerGradeName(customerId);
-        List<List<PaymentEntity>> unpaidBills = payImmediatelyService.classifyUnpaidBills(customerId);
-        List<List<PaymentResponseDTO>> unpaidBillsResponseDTO = new ArrayList<>();
 
-        for (List<PaymentEntity> unpaidBill : unpaidBills) {
-            List<PaymentResponseDTO> paymentResponseDTOList = new ArrayList<>();
-            for (PaymentEntity payment : unpaidBill) {
-                PaymentResponseDTO paymentResponseDTO = payImmediatelyService.entityToDto(payment);
-                paymentResponseDTOList.add(paymentResponseDTO);
-            }
-            unpaidBillsResponseDTO.add(paymentResponseDTOList);
-        }
-
-        PayImmediatelyResponseDTO response = PayImmediatelyResponseDTO.builder()
-            .customerId(customerId)
-            .gradeName(grade.getGradeName())
-            .limitPrice(grade.getLimitPrice())
-            .pointPercent(0.01f)
-            .account(customerRepository.findByCustomerId(customerId).getAccount())
-            .accountName(customerRepository.findByCustomerId(customerId).getAccountName())
-            .balance(customerRepository.findByCustomerId(customerId).getBalance())
-            .isExtension(customerRepository.findByCustomerId(customerId).isExtension())
-            .isAuto(customerRepository.findByCustomerId(customerId).isAuto())
-            .unpaidBills(unpaidBillsResponseDTO)
-            .build();
+        PayImmediatelyResponseDTO response = payImmediatelyService.classifyUnpaidBills(customerId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -88,13 +65,7 @@ public class PayImmediatelyController {
     // 결제 상세 내역 페이지 진입시 초기 정보 조회
     @GetMapping("/payment/history/{customerId}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentDetail(@PathVariable Long customerId) {
-        List<PaymentEntity> payments = payImmediatelyService.getAllPayment(customerId);
-        List<PaymentResponseDTO> paymentResponseDTOs = new ArrayList<>();
-        for (PaymentEntity payment : payments) {
-            PaymentResponseDTO paymentResponseDTO = payImmediatelyService.entityToDto(payment);
-            paymentResponseDTOs.add(paymentResponseDTO);
-        }
-        List<PaymentResponseDTO> response = paymentResponseDTOs;
+        List<PaymentResponseDTO> response = payImmediatelyService.getAllPayment(customerId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

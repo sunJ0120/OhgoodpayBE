@@ -2,18 +2,23 @@ package com.ohgoodteam.ohgoodpay.pay.service;
 
 import java.beans.Transient;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerDTO;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;   
 import com.ohgoodteam.ohgoodpay.pay.repository.GradeRepository;
+import com.ohgoodteam.ohgoodpay.pay.dto.GradeDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
 
 
 import jakarta.transaction.Transactional;
@@ -29,13 +34,27 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
 
     // 전체 결제건 조회
     @Override
-    public List<PaymentEntity> getAllPayment(Long customerId) {
-        return paymentRepository.findByCustomerCustomerId(customerId);
+    public List<PaymentResponseDTO> getAllPayment(Long customerId) {
+        List<PaymentEntity> paymentEntities = paymentRepository.findByCustomerCustomerId(customerId);
+        List<PaymentResponseDTO> paymentResponseDTOs = new ArrayList<>();
+        for (PaymentEntity paymentEntity : paymentEntities) {
+            PaymentResponseDTO paymentResponseDTO = entityToDto(paymentEntity);
+            paymentResponseDTOs.add(paymentResponseDTO);
+        }
+        return paymentResponseDTOs;
     }
     
     // 미납부건 월별 분류
     @Override
-    public List<List<PaymentEntity>> classifyUnpaidBills(Long customerId) {
+    public PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId) {
+        // 고객 정보 조회
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerDTO customerDTO = customerRepository.entityToDto(customer);
+
+        // 고객 등급 조회
+        GradeEntity grade = findbyCustomerGradeName(customerId);
+        GradeDTO gradeDTO = gradeRepository.entityToDto(grade);
+
         // 고객의 미납부건 조회
         List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalse(customerId);
         
@@ -46,12 +65,36 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
             ));
         
         // 월별로 정렬된 리스트 생성 (최신 월부터)
-        List<List<PaymentEntity>> result = billsByMonth.entrySet().stream()
+        List<List<PaymentEntity>> entityList = billsByMonth.entrySet().stream()
             .sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey()))
             .map(Map.Entry::getValue)
             .collect(Collectors.toList());
-        
-        return result;
+
+
+        List<List<PaymentResponseDTO>> result = new ArrayList<>();
+        for (List<PaymentEntity> entity : entityList) {
+            List<PaymentResponseDTO> paymentResponseDTOList = new ArrayList<>();
+            for (PaymentEntity payment : entity) {
+                PaymentResponseDTO paymentResponseDTO = entityToDto(payment);
+                paymentResponseDTOList.add(paymentResponseDTO);
+            }
+            result.add(paymentResponseDTOList);
+        }
+         
+        PayImmediatelyResponseDTO payImmediatelyResponseDTO = PayImmediatelyResponseDTO.builder()
+            .customerId(customerDTO.getCustomerId())
+            .gradeName(gradeDTO.getGradeName())
+            .limitPrice(gradeDTO.getLimitPrice())
+            .pointPercent(gradeDTO.getPointPercent())
+            .account(customerDTO.getAccount())
+            .accountName(customerDTO.getAccountName())
+            .balance(customerDTO.getBalance())
+            .isExtension(customerDTO.isExtension())
+            .isAuto(customerDTO.isAuto())
+            .unpaidBills(result)
+            .build();
+
+        return payImmediatelyResponseDTO;
     }
 
     // 고객 수동 연장 신청

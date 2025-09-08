@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
+import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
 
 @SpringBootTest
 public class PayImmediatelyServiceTests {
@@ -17,11 +18,9 @@ public class PayImmediatelyServiceTests {
 
     @Test
     public void testClassifyUnpaidBills() {
-        List<List<PaymentEntity>> unpaidBills = payImmediatelyService.classifyUnpaidBills(1L);
+        PayImmediatelyResponseDTO unpaidBills = payImmediatelyService.classifyUnpaidBills(1L);
         System.out.println("--------------------------------");
-        for (List<PaymentEntity> unpaidBill : unpaidBills) {
-            System.out.println(unpaidBill);
-        }
+        System.out.println(unpaidBills);
         System.out.println("--------------------------------");
     }
 

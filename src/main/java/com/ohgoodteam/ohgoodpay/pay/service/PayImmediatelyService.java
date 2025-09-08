@@ -7,6 +7,7 @@ import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentRequestEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
+import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
 import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRequestRepository;
 
@@ -15,10 +16,10 @@ import lombok.RequiredArgsConstructor;
 public interface PayImmediatelyService {
 
     // 전체 결제건 조회
-    List<PaymentEntity> getAllPayment(Long customerId);
+    List<PaymentResponseDTO> getAllPayment(Long customerId);
 
     // 미납부건 월별 분류
-    List<List<PaymentEntity>> classifyUnpaidBills(Long customerId);
+    PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId);
     
     // 고객 수동 연장 신청
     boolean requestCustomerExtension(Long customerId);
