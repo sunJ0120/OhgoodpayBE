@@ -1,5 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.controller;
 
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartRequest;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
     private final ChatService chatService;
 
+    //채팅 시작 api
     @Operation(summary = "채팅 시작", description = "고객 ID로 채팅 시작 후 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅 시작 성공"),
@@ -39,6 +42,28 @@ public class ChatController {
     ) {
         try {
             ChatStartResponse resp = chatService.startChat(request.getCustomerId());
+            return ApiResponseWrapper.ok(resp);
+        } catch (IllegalArgumentException e) {
+            return ApiResponseWrapper.error(400, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
+        }
+    }
+
+    //기분 받는 api
+    @Operation(summary = "사용자 기분 input", description = "고객의 기분을 입력 받은 후, 개인화된 인사 메시지 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "기분 받기 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/mood")
+    public ApiResponseWrapper<ChatMoodResponse> moodChat(
+            @Parameter(description = "기분 입력 요청 (고객 ID와 기분 포함)")
+            @RequestBody ChatMoodRequest request
+    ){
+        try {
+            ChatMoodResponse resp = chatService.moodChat(request.getCustomerId(), request.getMood());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
