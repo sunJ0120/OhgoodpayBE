@@ -1,12 +1,16 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
-import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.recommend.dto.*;
+import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.*;
+import com.ohgoodteam.ohgoodpay.recommend.service.fastapi.FastApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -14,34 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
     private final CustomerRepository customerRepository;
-
-    /**
-     * 고객 ID 유효성 검증
-     *
-     * 채팅에서 이를 반복적으로 사용하기 때문에 따로 별도의 메서드로 분리하였다.
-     */
-    private void validateCustomerId(Long customerId) {
-        if (customerId == null || customerId <= 0) {
-            throw new IllegalArgumentException("유효하지 않은 고객 ID입니다");
-        }
-    }
-
-    /**
-     * 고객명 조회 및 유효성 검증
-     *
-     * 채팅에서 이를 반복적으로 사용하기 때문에 따로 별도의 메서드로 분리하였다.
-     */
-    private String getValidCustomerName(Long customerId) {
-        String name = customerRepository.findByCustomerId(customerId)
-                .map(CustomerEntity::getName)
-                .orElse(null);
-        
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("존재하지 않는 고객입니다");
-        }
-        
-        return name;
-    }
+    private final ChatCacheService chatCacheService;
+    private final FastApiService fastApiService;
 
     /**
      * 채팅 시작 처리
@@ -50,10 +28,8 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public ChatStartResponse startChat(Long customerId) {
-        validateCustomerId(customerId);
-        String name = getValidCustomerName(customerId);
-
-        // TODO: Redis 캐싱 구현 (CustomerCacheDto 사용)
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        String name = cacheDto.getName();
         
         // TODO: FastAPI 연동 구현
         String greetingMessage = String.format("안녕 나는 너만의 오레이봇봇 ~ 나를 레이라고 불러줘 %s~ 오늘 기분은 어때?", name);
@@ -72,8 +48,8 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public ChatMoodResponse moodChat(Long customerId, String mood) {
-        validateCustomerId(customerId);
-        String name = getValidCustomerName(customerId);
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        String name = cacheDto.getName();
 
         // TODO: Redis 캐싱 구현 (mood만 저장)
 
@@ -94,18 +70,9 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public ChatCheckHobbyResponse checkHobby(Long customerId) {
-        validateCustomerId(customerId);
-        // 사용자가 이미 가지고 있는 hobby data 가져오기
-        String hobby = customerRepository.findByCustomerId(customerId)
-                .map(CustomerEntity::getHobby)
-                .orElse(null);
-
-        // 취미 정보가 없는 경우 처리
-        if (hobby == null || hobby.trim().isEmpty()) {
-            throw new IllegalArgumentException("취미 정보가 등록되지 않은 고객입니다");
-        }
-        
-        // TODO: Redis 캐싱 구현 (hobby만 저장)
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        String name = cacheDto.getName();
+        String hobby = chatCacheService.getHobby(customerId);
 
         // TODO: FastAPI 연동 구현
         String llmMessage = String.format("평소 관심있던 %s로 뭔가 찾아볼까?", hobby);
@@ -124,8 +91,8 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public ChatUpdateHobbyResponse updateHobby(Long customerId, String newHobby) {
-        validateCustomerId(customerId);
-        // TODO: 취미도 검증로직 넣을지는 고민중
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        // String name = cacheDto.getName();
 
         // TODO: Redis 캐싱 구현 (hobby만 저장)
         
@@ -153,12 +120,9 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public ChatAnalyzePurchasesResponse analyzePurchases(Long customerId) {
-        validateCustomerId(customerId);
-        String name = getValidCustomerName(customerId);
-        // TODO: 고객 구매 이력 가져오기... 이거 지금 DB에서 컬럼 안보여서 일단 보류
-        String category = "운동"; // 예시 카테고리
-
-        // TODO: Redis 캐싱 구현 (구매이력 카테고리만 저장)
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        String name = cacheDto.getName();
+        String category = chatCacheService.getRecentPurchaseCategory(customerId);
 
         // TODO: FastAPI 연동 구현
         String responseMessage = String.format("%s이가 최근에 뭘 샀는지 파악하는 중이야~ %s 카테고리를 구매했네? 새로운 관심사랑 잘 맞을 것 같아!", name, category);
@@ -169,5 +133,52 @@ public class ChatServiceImpl implements ChatService {
                 .analyzedCategory(category)
                 .nextStep(nextStep)
                 .build();
+    }
+
+    /**
+     * 고객한테 상품 추천 하기
+     * 고객 유효성 검증 → 고객명 조회 → DB또는 REDIS에서 상위 1등 상품만 가져오기 → 추천 메시지 생성
+     */
+    @Override
+    public ChatRecommendResponse recommend(Long customerId) {
+        CustomerCacheDto cacheDto = chatCacheService.getCustomerInfo(customerId);
+        String hobby = chatCacheService.getHobby(customerId);
+        String mood = chatCacheService.getMood(customerId);
+        String category = chatCacheService.getRecentPurchaseCategory(customerId);
+        Integer balance = chatCacheService.getBalance(customerId);
+
+        KeywordGenerateRequest keywordGenerateRequest = KeywordGenerateRequest.builder()
+                .customerInfo(cacheDto)
+                .hobby(hobby)
+                .mood(mood)  // 기분 정보는 현재 저장되지 않음
+                .category(category)
+                .balance(balance)
+                .build();
+
+        // 키워드 생성
+        KeywordGenerateResponse keywordGenerateResponse = fastApiService.generateKeywords(keywordGenerateRequest);
+
+        // 상품 가져오기
+        ProductSearchResponse productSearchResponse = fastApiService.searchProducts( ProductSearchRequest.builder()
+                        .keyword(keywordGenerateResponse.getKeyword())
+                        .priceRange(keywordGenerateResponse.getPriceRange())
+                        .maxResults(5)
+                .build());
+
+        // TODO : productSearchResponse TOPN개 저장 후 1개만 추천하도록 한다.
+        // chatCacheService.saveTop5Products(customerId, productSearchResponse.getProducts());
+
+        // TODO : Redis에서 TOP 1등 불러오는 로직 추가
+        ProductDto selectedProduct = selectBestProduct(productSearchResponse.getProducts());
+        //  RecommendMessageResponse recommendMessageResponse = fastApiService.generateRecommendMessage();
+
+        // TODO : FastAPI 연동 구현 - LLM 메세지 생성
+        // RecommendMessageResponse recommendMessageResponse = fastApiService.generateRecommendMessage(messageRequest);
+        return null;
+    }
+
+    // TODO : 1등 상품 불러오는 로직 계산 필요...
+    private ProductDto selectBestProduct(List<ProductDto> products) {
+        return products.isEmpty() ? null : products.get(0); // 1순위 선택
     }
 }

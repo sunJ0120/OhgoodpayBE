@@ -8,4 +8,5 @@ public interface ChatService {
     ChatCheckHobbyResponse checkHobby(Long customerId);
     ChatUpdateHobbyResponse updateHobby(Long customerId, String newHobby);
     ChatAnalyzePurchasesResponse analyzePurchases(Long customerId);
+    ChatRecommendResponse recommend(Long customerId);
 }

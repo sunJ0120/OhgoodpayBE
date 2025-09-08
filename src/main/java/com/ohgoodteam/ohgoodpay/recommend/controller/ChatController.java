@@ -135,4 +135,18 @@ public class ChatController {
         }
     }
 
+    //고객 상품 추천 api
+//    @Operation(summary = "고객 상품 추천", description = "고객 종합 정보를 바탕으로 최종 상품 추천")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "상품 추천 성공"),
+//            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
+//            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+//    })
+//    @PostMapping("/recommend")
+//    public ApiResponseWrapper<ChatRecommendRequest> recommendsChat(
+//            @Parameter(description = "최근 구매 카테고리 분석 요청 (고객 ID와 새로 입력 받은 취미 포함)")
+//            @RequestBody ChatRecommendRequest request
+//    ){
+//
+//    }
 }
