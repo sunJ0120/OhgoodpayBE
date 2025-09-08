@@ -112,4 +112,27 @@ public class ChatController {
             return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
         }
     }
+
+    //고객 최근 구매 카테고리 분석을 위한 api
+    @Operation(summary = "최근 구매 카테고리 분석", description = "고객이 최근에 구매한 제품의 카테고리 가져온 후, 개인화된 인사 메시지 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카테고리 분석 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/analyze/purchases")
+    public ApiResponseWrapper<ChatAnalyzePurchasesResponse> analyzePurchasesChat(
+            @Parameter(description = "최근 구매 카테고리 분석 요청 (고객 ID와 새로 입력 받은 취미 포함)")
+            @RequestBody ChatStartRequest request
+    ){
+        try {
+            ChatAnalyzePurchasesResponse resp = chatService.analyzePurchases(request.getCustomerId());
+            return ApiResponseWrapper.ok(resp);
+        } catch (IllegalArgumentException e) {
+            return ApiResponseWrapper.error(400, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
+        }
+    }
+
 }

@@ -2,10 +2,7 @@ package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatCheckHobbyResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatUpdateHobbyResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -146,6 +143,30 @@ public class ChatServiceImpl implements ChatService {
         return ChatUpdateHobbyResponse.builder()
                 .message(responseMessage)
                 .updatedHobby(newHobby)
+                .nextStep(nextStep)
+                .build();
+    }
+
+    /**
+     * 고객 구매 이력 (카테고리) 가져오기
+     * 고객 유효성 검증 → 고객명 조회 → DB또는 REDIS에서 구매 카테고리 가져오기 → 기분 메시지 생성
+     */
+    @Override
+    public ChatAnalyzePurchasesResponse analyzePurchases(Long customerId) {
+        validateCustomerId(customerId);
+        String name = getValidCustomerName(customerId);
+        // TODO: 고객 구매 이력 가져오기... 이거 지금 DB에서 컬럼 안보여서 일단 보류
+        String category = "운동"; // 예시 카테고리
+
+        // TODO: Redis 캐싱 구현 (구매이력 카테고리만 저장)
+
+        // TODO: FastAPI 연동 구현
+        String responseMessage = String.format("%s이가 최근에 뭘 샀는지 파악하는 중이야~ %s 카테고리를 구매했네? 새로운 관심사랑 잘 맞을 것 같아!", name, category);
+        String nextStep = "recommendation_ready";
+
+        return ChatAnalyzePurchasesResponse.builder()
+                .message(responseMessage)
+                .analyzedCategory(category)
                 .nextStep(nextStep)
                 .build();
     }
