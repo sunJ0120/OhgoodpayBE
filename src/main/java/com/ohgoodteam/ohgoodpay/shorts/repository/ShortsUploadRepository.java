@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 
 @Repository
-public interface VideoUploadRepository extends JpaRepository<ShortsEntity, Long>{
+public interface ShortsUploadRepository extends JpaRepository<ShortsEntity, Long>{
 
 }

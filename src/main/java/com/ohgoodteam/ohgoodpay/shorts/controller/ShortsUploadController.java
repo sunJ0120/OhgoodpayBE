@@ -3,30 +3,40 @@ package com.ohgoodteam.ohgoodpay.shorts.controller;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.ShortsUploadRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsUploadResponseDto;
-import com.ohgoodteam.ohgoodpay.shorts.service.S3VideoService;
+import com.ohgoodteam.ohgoodpay.shorts.service.ShortsUploadService;
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin(
+    origins = "http://localhost:5173",
+    allowCredentials = "true"
+)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ShortsUploadController {
-    private final S3VideoService s3VideoService;
+    private final ShortsUploadService s3VideoService;
 
     @PostMapping("/upload")
     public ResponseEntity<ShortsUploadResponseDto> upload(
         @RequestPart("video") MultipartFile video, 
-        @RequestPart("thumbnail") MultipartFile thumbnail,
+        @RequestPart(value="thumbnail", required = false) MultipartFile thumbnail,
         @RequestParam("title") String title,
         @RequestParam("content") String content
     ) {
+        // String title = requestDto.getTitle();
+        // String content = requestDto.getContent();
         try {
             ShortsUploadResponseDto response = s3VideoService.upload(video, thumbnail, title, content);
             return ResponseEntity.ok(response);
@@ -55,4 +65,6 @@ public class ShortsUploadController {
             return ResponseEntity.status(500).body("삭제 실패");
         }
     }
+    
+
 }
