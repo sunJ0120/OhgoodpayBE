@@ -1,6 +1,5 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.basedto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -12,5 +11,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class BaseChatResponse {
     private String message;
-    private String step;
+    private String nextStep;
 }

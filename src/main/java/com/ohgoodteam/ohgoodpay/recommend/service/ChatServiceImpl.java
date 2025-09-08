@@ -5,6 +5,7 @@ import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatCheckHobbyResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatUpdateHobbyResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,10 +60,11 @@ public class ChatServiceImpl implements ChatService {
         
         // TODO: FastAPI 연동 구현
         String greetingMessage = String.format("안녕 나는 너만의 오레이봇봇 ~ 나를 레이라고 불러줘 %s~ 오늘 기분은 어때?", name);
+        String nextStep = "mood_input";
 
         return ChatStartResponse.builder()
                 .message(greetingMessage)
-                .step("mood_input")
+                .nextStep(nextStep)
                 .build();
     }
 
@@ -84,7 +86,7 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatMoodResponse.builder()
                 .message(greetingMessage)
-                .step(nextStep)
+                .nextStep(nextStep)
                 .build();
     }
 
@@ -100,7 +102,7 @@ public class ChatServiceImpl implements ChatService {
         String hobby = customerRepository.findByCustomerId(customerId)
                 .map(CustomerEntity::getHobby)
                 .orElse(null);
-        
+
         // 취미 정보가 없는 경우 처리
         if (hobby == null || hobby.trim().isEmpty()) {
             throw new IllegalArgumentException("취미 정보가 등록되지 않은 고객입니다");
@@ -115,7 +117,36 @@ public class ChatServiceImpl implements ChatService {
         return ChatCheckHobbyResponse.builder()
                 .message(llmMessage)
                 .currentHobbies(hobby)
-                .step(nextStep)
+                .nextStep(nextStep)
+                .build();
+    }
+
+    /**
+     * 고객 취미 업데이트
+     * 고객 유효성 검증 → DB 업데이트 → 응답 생성
+     */
+    @Override
+    public ChatUpdateHobbyResponse updateHobby(Long customerId, String newHobby) {
+        validateCustomerId(customerId);
+        // TODO: 취미도 검증로직 넣을지는 고민중
+
+        // TODO: Redis 캐싱 구현 (hobby만 저장)
+        
+        // DB 업데이트 실행
+        int updatedRows = customerRepository.updateHobbyByCustomerId(customerId, newHobby);
+        
+        if (updatedRows == 0) {
+            throw new IllegalStateException("취미 업데이트에 실패했습니다");
+        }
+
+        // TODO: FastAPI 연동 구현
+        String responseMessage = String.format("%s에 관심생겼구나! 좋은 선택이야~", newHobby);
+        String nextStep = "analyzing_purchases";
+
+        return ChatUpdateHobbyResponse.builder()
+                .message(responseMessage)
+                .updatedHobby(newHobby)
+                .nextStep(nextStep)
                 .build();
     }
 }
