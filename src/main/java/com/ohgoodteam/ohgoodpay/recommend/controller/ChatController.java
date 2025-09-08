@@ -1,9 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.controller;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodRequest;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartRequest;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.*;
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,6 +61,28 @@ public class ChatController {
     ){
         try {
             ChatMoodResponse resp = chatService.moodChat(request.getCustomerId(), request.getMood());
+            return ApiResponseWrapper.ok(resp);
+        } catch (IllegalArgumentException e) {
+            return ApiResponseWrapper.error(400, e.getMessage());
+        } catch (Exception e) {
+            return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
+        }
+    }
+
+    //취미 확인 api
+    @Operation(summary = "취미 확인", description = "고객 ID로 DB에 있는 취미 확인 후 개인화된 인사 메시지 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "취미 확인 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @PostMapping("/hobby/check")
+    public ApiResponseWrapper<ChatCheckHobbyResponse> checkHobbyChat(
+            @Parameter(description = "취미 확인 요청 (고객 ID 포함)")
+            @RequestBody ChatStartRequest request
+    ){
+        try {
+            ChatCheckHobbyResponse resp = chatService.checkHobby(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());

@@ -2,6 +2,7 @@ package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
+import com.ohgoodteam.ohgoodpay.recommend.dto.ChatCheckHobbyResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatMoodResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartResponse;
 import lombok.RequiredArgsConstructor;
@@ -82,6 +83,37 @@ public class ChatServiceImpl implements ChatService {
 
         return ChatMoodResponse.builder()
                 .message(greetingMessage)
+                .step(nextStep)
+                .build();
+    }
+
+    /**
+     * 고객 아이디 입력받아서 llm요청
+     * 고객 유효성 검증 → 고객명 조회 → 취미 확인하는 메시지 생성
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ChatCheckHobbyResponse checkHobby(Long customerId) {
+        validateCustomerId(customerId);
+        // 사용자가 이미 가지고 있는 hobby data 가져오기
+        String hobby = customerRepository.findByCustomerId(customerId)
+                .map(CustomerEntity::getHobby)
+                .orElse(null);
+        
+        // 취미 정보가 없는 경우 처리
+        if (hobby == null || hobby.trim().isEmpty()) {
+            throw new IllegalArgumentException("취미 정보가 등록되지 않은 고객입니다");
+        }
+        
+        // TODO: Redis 캐싱 구현 (hobby만 저장)
+
+        // TODO: FastAPI 연동 구현
+        String llmMessage = String.format("평소 관심있던 %s로 뭔가 찾아볼까?", hobby);
+        String nextStep = "hobby_confirm";
+
+        return ChatCheckHobbyResponse.builder()
+                .message(llmMessage)
+                .currentHobbies(hobby)
                 .step(nextStep)
                 .build();
     }
