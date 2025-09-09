@@ -1,10 +1,13 @@
 package com.ohgoodteam.ohgoodpay.recommend.controller;
 
+import com.ohgoodteam.ohgoodpay.recommend.util.ApiErrorResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.*;
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,8 +34,10 @@ public class ChatController {
     @Operation(summary = "채팅 시작", description = "고객 ID로 채팅 시작 후 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채팅 시작 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/start")
     public ApiResponseWrapper<ChatMessageResponse> startChat(
@@ -53,8 +58,10 @@ public class ChatController {
     @Operation(summary = "사용자 기분 input", description = "고객의 기분을 입력 받은 후, 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "기분 받기 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/mood")
     public ApiResponseWrapper<ChatMessageResponse> moodChat(
@@ -75,8 +82,10 @@ public class ChatController {
     @Operation(summary = "취미 확인", description = "고객 ID로 DB에 있는 취미 확인 후 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "취미 확인 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/hobby/check")
     public ApiResponseWrapper<ChatCheckHobbyResponse> checkHobbyChat(
@@ -97,8 +106,10 @@ public class ChatController {
     @Operation(summary = "취미 업데이트", description = "고객이 입력한 취미로 업데이트 후, 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "취미 업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/hobby/update")
     public ApiResponseWrapper<ChatUpdateHobbyResponse> updateHobbyChat(
@@ -119,8 +130,10 @@ public class ChatController {
     @Operation(summary = "최근 구매 카테고리 분석", description = "고객이 최근에 구매한 제품의 카테고리 가져온 후, 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 분석 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/analyze/purchases")
     public ApiResponseWrapper<ChatAnalyzePurchasesResponse> analyzePurchasesChat(
@@ -141,8 +154,10 @@ public class ChatController {
     @Operation(summary = "고객 상품 추천", description = "고객 종합 정보를 바탕으로 최종 상품 추천")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 추천 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID"),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+            @ApiResponse(responseCode = "400", description = "잘못된 고객 ID",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/recommend")
     public ApiResponseWrapper<ChatRecommendResponse> recommendsChat(
