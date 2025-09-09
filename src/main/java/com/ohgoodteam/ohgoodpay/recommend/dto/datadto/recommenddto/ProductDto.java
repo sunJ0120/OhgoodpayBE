@@ -1,7 +1,10 @@
-package com.ohgoodteam.ohgoodpay.recommend.dto.datadto;
+package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto;
 
 import lombok.*;
 
+/**
+ * FAST API - product에 들어가는 DTO
+ */
 @Getter
 @ToString
 @Builder

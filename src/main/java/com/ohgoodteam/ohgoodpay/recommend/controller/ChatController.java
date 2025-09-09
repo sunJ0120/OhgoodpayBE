@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 추천 채팅 API
+ *
  * v1: Mock 데이터로 구현, 향후 Redis + FastAPI 연동 예정
  */
 @Tag(name = "추천 채팅", description = "AI 추천 챗봇 관련 API")
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/chat")
 public class ChatController {
+    // 겉으로 나오는 Service는 ChatService, 내부적으로 RecommendationService, CustomerService, ProductService 사용
     private final ChatService chatService;
 
     //채팅 시작 api
@@ -33,12 +35,12 @@ public class ChatController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @PostMapping("/start")
-    public ApiResponseWrapper<ChatStartResponse> startChat(
+    public ApiResponseWrapper<ChatMessageResponse> startChat(
             @Parameter(description = "채팅 시작 요청 (고객 ID 포함)")
             @RequestBody ChatStartRequest request
     ) {
         try {
-            ChatStartResponse resp = chatService.startChat(request.getCustomerId());
+            ChatMessageResponse resp = chatService.startChat(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -55,12 +57,12 @@ public class ChatController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @PostMapping("/mood")
-    public ApiResponseWrapper<ChatMoodResponse> moodChat(
+    public ApiResponseWrapper<ChatMessageResponse> moodChat(
             @Parameter(description = "기분 입력 요청 (고객 ID와 기분 포함)")
             @RequestBody ChatMoodRequest request
     ){
         try {
-            ChatMoodResponse resp = chatService.moodChat(request.getCustomerId(), request.getMood());
+            ChatMessageResponse resp = chatService.moodChat(request.getCustomerId(), request.getMood());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -113,7 +115,7 @@ public class ChatController {
         }
     }
 
-    //고객 최근 구매 카테고리 분석을 위한 api
+    //최근 구매 카테고리 분석 & 확인 api
     @Operation(summary = "최근 구매 카테고리 분석", description = "고객이 최근에 구매한 제품의 카테고리 가져온 후, 개인화된 인사 메시지 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 분석 성공"),
@@ -135,7 +137,7 @@ public class ChatController {
         }
     }
 
-    //고객 상품 추천 api
+    //개인화된 상품 추천 api
     @Operation(summary = "고객 상품 추천", description = "고객 종합 정보를 바탕으로 최종 상품 추천")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 추천 성공"),
@@ -147,7 +149,7 @@ public class ChatController {
             @Parameter(description = "고객 맞춤형 상품 추천 요청")
             @RequestBody ChatRecommendRequest request
     ){
-        //require에 따른 if문 분기 필요.
+        // TODO : require에 따른 if문 분기 필요.....이건 고민중
         try {
             ChatRecommendResponse resp = chatService.recommend(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);

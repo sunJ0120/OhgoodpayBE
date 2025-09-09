@@ -5,16 +5,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
 
-/*
-REDIS 캐싱을 위한 TTL 설정 값
-
-캐시에 들어가야 할 값은 다음과 같다.
-1) 사용자 스냅샷(JSON) - {name, id, creditLimit}
-2) 잔액(int) - balance
-3) 취미(string) - hobby
-4) 최근 구매한 제품 카테고리(string) - recent_purchase
-5) 기분 (string) - mood
-6) TOPN 추천 제품 캐싱 (List<RecommendProductDto>) - recommend_products
+/**
+ * REDIS 캐싱을 위한 TTL 설정 값
+ *
+ * 캐시에 들어가야 할 값은 다음과 같다.
+ * 1) 사용자 스냅샷(JSON) - {name, id, creditLimit}
+ * 2) 잔액(int) - balance
+ * 3) 취미(string) - hobby
+ * 4) 최근 구매한 제품 카테고리(string) - recent_purchase
+ * 5) 기분 (string) - mood
+ * 6) TOPN 추천 제품 캐싱 (List<RecommendProductDto>) - recommend_products
  */
 @Getter
 @RequiredArgsConstructor

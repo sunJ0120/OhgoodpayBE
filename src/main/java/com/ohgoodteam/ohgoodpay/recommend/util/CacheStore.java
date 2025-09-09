@@ -8,6 +8,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * REDIS 캐시 저장소
+ */
 @Component
 @RequiredArgsConstructor
 public class CacheStore {

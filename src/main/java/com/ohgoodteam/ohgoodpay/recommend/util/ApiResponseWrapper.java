@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * API 응답을 표준화하기 위한 래퍼 클래스
+ * @param <T>
+ */
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

@@ -5,7 +5,9 @@ import lombok.Getter;
 
 /**
  * 고객 캐시 정보 DTO
- * 초반에 Redis에 저장될 고객 기본 정보
+ *
+ * Redis에 저장되는 고객 기본 정보를 담는 데이터 전송 객체
+ * TTL : 12h
  */
 @Getter
 @Builder
