@@ -21,7 +21,7 @@ public interface ShortsSearchRepository extends JpaRepository<ShortsEntity, Long
         s.shorts_id,
         s.thumbnail,
         s.like_count,
-        s.commend_count,
+        s.comment_count,
         s.date,
         CAST(
           (:wLike    * LOG(1 + s.like_count)) +

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.ShortsUploadRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsUploadResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.service.ShortsUploadService;
