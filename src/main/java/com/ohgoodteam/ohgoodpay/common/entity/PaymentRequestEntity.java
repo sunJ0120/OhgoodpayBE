@@ -40,4 +40,8 @@ public class PaymentRequestEntity {
 
     @Column(nullable = false)
     private LocalDateTime date;
+
+    public void setValidated(boolean validated) {
+        this.isValidated = validated;
+    }
 }

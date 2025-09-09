@@ -43,6 +43,7 @@ public class CustomerEntity {
     private String accountName;
 
     private int point;
+    private int balance;
 
     private boolean isBlocked;
 
@@ -73,4 +74,24 @@ public class CustomerEntity {
     @JoinColumn(name = "grade_name")
     @ToString.Exclude
     private GradeEntity grade;
+
+    /** 포인트 차감 */
+    public void decreasePoint(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("amount must be >= 0");
+        if (this.point < amount) throw new IllegalArgumentException("포인트가 부족합니다.");
+        this.point -= amount;
+    }
+
+    /** 포인트 적립 */
+    public void addPoint(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("amount must be >= 0");
+        this.point += amount;
+    }
+
+    /** 잔액 차감 */
+    public void decreaseBalance(int amount) {
+        if (amount < 0) throw new IllegalArgumentException("amount must be >= 0");
+        if (this.balance < amount) throw new IllegalArgumentException("잔액이 부족합니다.");
+        this.balance -= amount;
+    }
 }
