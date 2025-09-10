@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,10 +15,10 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatMessageResponse extends BaseChatResponse {
+public class ChatMessageResponseDTO extends BaseChatResponseDTO {
     // 응답 dto를 위한 정적 팩토리 메서드
-    public static ChatMessageResponse of(String message, String nextStep) {
-        return ChatMessageResponse.builder()
+    public static ChatMessageResponseDTO of(String message, String nextStep) {
+        return ChatMessageResponseDTO.builder()
                 .message(message)
                 .nextStep(nextStep)
                 .build();

@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeywordGenerateResponse {
+public class KeywordGenerateResponseDTO {
     private String keyword;
     private String priceRange; //"10000-40000"
 }

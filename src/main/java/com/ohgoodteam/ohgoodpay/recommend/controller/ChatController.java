@@ -40,12 +40,12 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/start")
-    public ApiResponseWrapper<ChatMessageResponse> startChat(
+    public ApiResponseWrapper<ChatMessageResponseDTO> startChat(
             @Parameter(description = "채팅 시작 요청 (고객 ID 포함)")
-            @RequestBody ChatStartRequest request
+            @RequestBody ChatStartRequestDTO request
     ) {
         try {
-            ChatMessageResponse resp = chatService.startChat(request.getCustomerId());
+            ChatMessageResponseDTO resp = chatService.startChat(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -64,12 +64,12 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/mood")
-    public ApiResponseWrapper<ChatMessageResponse> moodChat(
+    public ApiResponseWrapper<ChatMessageResponseDTO> moodChat(
             @Parameter(description = "기분 입력 요청 (고객 ID와 기분 포함)")
-            @RequestBody ChatMoodRequest request
+            @RequestBody ChatMoodRequestDTO request
     ){
         try {
-            ChatMessageResponse resp = chatService.moodChat(request.getCustomerId(), request.getMood());
+            ChatMessageResponseDTO resp = chatService.moodChat(request.getCustomerId(), request.getMood());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -88,12 +88,12 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/hobby/check")
-    public ApiResponseWrapper<ChatCheckHobbyResponse> checkHobbyChat(
+    public ApiResponseWrapper<ChatCheckHobbyResponseDTO> checkHobbyChat(
             @Parameter(description = "취미 확인 요청 (고객 ID 포함)")
-            @RequestBody ChatStartRequest request
+            @RequestBody ChatStartRequestDTO request
     ){
         try {
-            ChatCheckHobbyResponse resp = chatService.checkHobby(request.getCustomerId());
+            ChatCheckHobbyResponseDTO resp = chatService.checkHobby(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -112,12 +112,12 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/hobby/update")
-    public ApiResponseWrapper<ChatUpdateHobbyResponse> updateHobbyChat(
+    public ApiResponseWrapper<ChatUpdateHobbyResponseDTO> updateHobbyChat(
             @Parameter(description = "취미 업데이트 요청 (고객 ID와 새로 입력 받은 취미 포함)")
-            @RequestBody ChatUpdateHobbyRequest request
+            @RequestBody ChatUpdateHobbyRequestDTO request
     ){
         try {
-            ChatUpdateHobbyResponse resp = chatService.updateHobby(request.getCustomerId(), request.getNewHobby());
+            ChatUpdateHobbyResponseDTO resp = chatService.updateHobby(request.getCustomerId(), request.getNewHobby());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -136,12 +136,12 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/analyze/purchases")
-    public ApiResponseWrapper<ChatAnalyzePurchasesResponse> analyzePurchasesChat(
+    public ApiResponseWrapper<ChatAnalyzePurchasesResponseDTO> analyzePurchasesChat(
             @Parameter(description = "최근 구매 카테고리 분석 요청 (고객 ID와 새로 입력 받은 취미 포함)")
-            @RequestBody ChatStartRequest request
+            @RequestBody ChatStartRequestDTO request
     ){
         try {
-            ChatAnalyzePurchasesResponse resp = chatService.analyzePurchases(request.getCustomerId());
+            ChatAnalyzePurchasesResponseDTO resp = chatService.analyzePurchases(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
@@ -160,13 +160,13 @@ public class ChatController {
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/recommend")
-    public ApiResponseWrapper<ChatRecommendResponse> recommendsChat(
+    public ApiResponseWrapper<ChatRecommendResponseDTO> recommendsChat(
             @Parameter(description = "고객 맞춤형 상품 추천 요청")
-            @RequestBody ChatRecommendRequest request
+            @RequestBody ChatRecommendRequestDTO request
     ){
         // TODO : require에 따른 if문 분기 필요.....이건 고민중
         try {
-            ChatRecommendResponse resp = chatService.recommend(request.getCustomerId());
+            ChatRecommendResponseDTO resp = chatService.recommend(request.getCustomerId());
             return ApiResponseWrapper.ok(resp);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());

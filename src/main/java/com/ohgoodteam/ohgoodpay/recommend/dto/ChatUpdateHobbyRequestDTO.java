@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequestDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatUpdateHobbyRequest extends BaseChatRequest {
+public class ChatUpdateHobbyRequestDTO extends BaseChatRequestDTO {
     private String newHobby;
     private String action; // TODO : 이 액션이 뭔지 정확하게 명시하기.
 }

@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,11 +15,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatUpdateHobbyResponse extends BaseChatResponse {
+public class ChatUpdateHobbyResponseDTO extends BaseChatResponseDTO {
     private String updatedHobby;
 
-    public static ChatUpdateHobbyResponse of(String message, String newHobby, String nextStep) {
-        return ChatUpdateHobbyResponse.builder()
+    public static ChatUpdateHobbyResponseDTO of(String message, String newHobby, String nextStep) {
+        return ChatUpdateHobbyResponseDTO.builder()
                 .message(message)
                 .updatedHobby(newHobby)
                 .nextStep(nextStep)

@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponseDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,11 +15,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatAnalyzePurchasesResponse extends BaseChatResponse {
+public class ChatAnalyzePurchasesResponseDTO extends BaseChatResponseDTO {
     private String analyzedCategory;
 
-    public static ChatAnalyzePurchasesResponse of(String message, String category, String nextStep) {
-        return ChatAnalyzePurchasesResponse.builder()
+    public static ChatAnalyzePurchasesResponseDTO of(String message, String category, String nextStep) {
+        return ChatAnalyzePurchasesResponseDTO.builder()
                 .message(message)
                 .analyzedCategory(category)
                 .nextStep(nextStep)

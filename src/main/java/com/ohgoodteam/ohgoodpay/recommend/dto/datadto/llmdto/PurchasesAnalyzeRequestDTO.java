@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequestDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,11 +13,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class PurchasesAnalyzeRequest extends BaseLlmRequest {
+public class PurchasesAnalyzeRequestDTO extends BaseLlmRequestDTO {
     private String recentPurchasesCategory;
 
-    public static PurchasesAnalyzeRequest of(Long customerId, String name, String recentPurchasesCategory) {
-        return PurchasesAnalyzeRequest.builder()
+    public static PurchasesAnalyzeRequestDTO of(Long customerId, String name, String recentPurchasesCategory) {
+        return PurchasesAnalyzeRequestDTO.builder()
                 .customerId(customerId)
                 .name(name)
                 .recentPurchasesCategory(recentPurchasesCategory)

@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmResponseDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,5 +13,5 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class BasicChatResponse extends BaseLlmResponse {
+public class BasicChatResponseDTO extends BaseLlmResponseDTO {
 }

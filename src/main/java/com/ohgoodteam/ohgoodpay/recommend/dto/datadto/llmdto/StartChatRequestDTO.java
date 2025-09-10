@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequestDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,12 +13,12 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class StartChatRequest extends BaseLlmRequest {
+public class StartChatRequestDTO extends BaseLlmRequestDTO {
 //    private Long customerId; 이거 이미 부모에 있음..왜 남겨뒀지
 //    private String name;
 
-    public static StartChatRequest of(Long customerId, String name) {
-        return StartChatRequest.builder()
+    public static StartChatRequestDTO of(Long customerId, String name) {
+        return StartChatRequestDTO.builder()
                 .customerId(customerId)
                 .name(name)
                 .build();
