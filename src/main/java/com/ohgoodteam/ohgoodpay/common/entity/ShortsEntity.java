@@ -37,7 +37,9 @@ public class ShortsEntity {
     @Column(nullable = false)
     private LocalDateTime date;
 
+    @Column(nullable = false)
     private long likeCount;
 
+    @Column(nullable = false)
     private long commentCount;
 }
