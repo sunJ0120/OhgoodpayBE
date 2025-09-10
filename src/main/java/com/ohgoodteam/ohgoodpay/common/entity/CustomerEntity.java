@@ -94,4 +94,7 @@ public class CustomerEntity {
         if (this.balance < amount) throw new IllegalArgumentException("잔액이 부족합니다.");
         this.balance -= amount;
     }
+  
+    private int balance;
+
 }
