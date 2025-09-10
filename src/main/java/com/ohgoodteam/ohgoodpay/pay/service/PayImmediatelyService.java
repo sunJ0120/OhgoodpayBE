@@ -8,7 +8,7 @@ import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentRequestEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
-import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentDTO;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRequestRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 public interface PayImmediatelyService {
 
     // 전체 결제건 조회
-    List<PaymentResponseDTO> getAllPayment(Long customerId);
+    List<PaymentDTO> getAllPayment(Long customerId);
 
     // 미납부건 월별 분류
     PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId);
@@ -33,7 +33,7 @@ public interface PayImmediatelyService {
     // 결제건 납부 처리
     boolean payImmediately(Long customerId, Long[] lists);
 
-    default PaymentEntity dtoToEntity(PaymentResponseDTO paymentResponseDTO) {
+    default PaymentEntity dtoToEntity(PaymentDTO paymentResponseDTO) {
 
         CustomerEntity customer = CustomerEntity.builder().customerId(paymentResponseDTO.getCustomerId()).build();
         PaymentRequestEntity paymentRequest = PaymentRequestEntity.builder().paymentRequestId(paymentResponseDTO.getPaymentRequestId()).build();
@@ -51,8 +51,8 @@ public interface PayImmediatelyService {
         return paymentEntity;
     }
 
-    default PaymentResponseDTO entityToDto(PaymentEntity paymentEntity) {
-        return PaymentResponseDTO.builder()
+    default PaymentDTO entityToDto(PaymentEntity paymentEntity) {
+        return PaymentDTO.builder()
             .paymentId(paymentEntity.getPaymentId())
             .customerId(paymentEntity.getCustomer().getCustomerId())
             .paymentRequestId(paymentEntity.getPaymentRequest().getPaymentRequestId())

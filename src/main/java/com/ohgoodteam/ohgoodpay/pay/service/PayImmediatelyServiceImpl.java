@@ -14,11 +14,13 @@ import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
+import com.ohgoodteam.ohgoodpay.common.service.CustomerService;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;   
+import com.ohgoodteam.ohgoodpay.pay.service.GradeService;
 import com.ohgoodteam.ohgoodpay.pay.repository.GradeRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.GradeDTO;
 import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
-import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentDTO;
 
 
 import jakarta.transaction.Transactional;
@@ -31,14 +33,16 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     private final PaymentRepository paymentRepository;
     private final CustomerRepository customerRepository;
     private final GradeRepository gradeRepository;
+    private final CustomerService customerService;
+    private final GradeService gradeService;
 
     // 전체 결제건 조회
     @Override
-    public List<PaymentResponseDTO> getAllPayment(Long customerId) {
+    public List<PaymentDTO> getAllPayment(Long customerId) {
         List<PaymentEntity> paymentEntities = paymentRepository.findByCustomerCustomerId(customerId);
-        List<PaymentResponseDTO> paymentResponseDTOs = new ArrayList<>();
+        List<PaymentDTO> paymentResponseDTOs = new ArrayList<>();
         for (PaymentEntity paymentEntity : paymentEntities) {
-            PaymentResponseDTO paymentResponseDTO = entityToDto(paymentEntity);
+            PaymentDTO paymentResponseDTO = entityToDto(paymentEntity);
             paymentResponseDTOs.add(paymentResponseDTO);
         }
         return paymentResponseDTOs;
@@ -49,11 +53,11 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     public PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId) {
         // 고객 정보 조회
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
-        CustomerDTO customerDTO = customerRepository.entityToDto(customer);
+        CustomerDTO customerDTO = customerService.entityToDto(customer);
 
         // 고객 등급 조회
         GradeEntity grade = findbyCustomerGradeName(customerId);
-        GradeDTO gradeDTO = gradeRepository.entityToDto(grade);
+        GradeDTO gradeDTO = gradeService.entityToDto(grade);
 
         // 고객의 미납부건 조회
         List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalse(customerId);
@@ -71,11 +75,11 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
             .collect(Collectors.toList());
 
 
-        List<List<PaymentResponseDTO>> result = new ArrayList<>();
+        List<List<PaymentDTO>> result = new ArrayList<>();
         for (List<PaymentEntity> entity : entityList) {
-            List<PaymentResponseDTO> paymentResponseDTOList = new ArrayList<>();
+            List<PaymentDTO> paymentResponseDTOList = new ArrayList<>();
             for (PaymentEntity payment : entity) {
-                PaymentResponseDTO paymentResponseDTO = entityToDto(payment);
+                PaymentDTO paymentResponseDTO = entityToDto(payment);
                 paymentResponseDTOList.add(paymentResponseDTO);
             }
             result.add(paymentResponseDTOList);

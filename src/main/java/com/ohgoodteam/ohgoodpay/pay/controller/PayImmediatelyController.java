@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
-import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentDTO;
 import com.ohgoodteam.ohgoodpay.pay.service.PayImmediatelyService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*")
+@CrossOrigin(
+    origins = "http://localhost:5173", 
+    allowedHeaders = "*",
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
+)
 public class PayImmediatelyController {
 
     private final PayImmediatelyService payImmediatelyService;
@@ -64,8 +69,8 @@ public class PayImmediatelyController {
 
     // 결제 상세 내역 페이지 진입시 초기 정보 조회
     @GetMapping("/payment/history/{customerId}")
-    public ResponseEntity<List<PaymentResponseDTO>> getPaymentDetail(@PathVariable Long customerId) {
-        List<PaymentResponseDTO> response = payImmediatelyService.getAllPayment(customerId);
+    public ResponseEntity<List<PaymentDTO>> getPaymentDetail(@PathVariable Long customerId) {
+        List<PaymentDTO> response = payImmediatelyService.getAllPayment(customerId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

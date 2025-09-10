@@ -9,6 +9,7 @@ import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.GradeDTO;
 import com.ohgoodteam.ohgoodpay.pay.repository.GradeRepository;
+import com.ohgoodteam.ohgoodpay.pay.service.GradeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,14 +19,16 @@ public class MypageServiceImpl implements MypageService {
 
     private final CustomerRepository customerRepository;
     private final GradeRepository gradeRepository;
+    private final CustomerService customerService;
+    private final GradeService gradeService;
     
     @Override
     public MypageDTO getMypageInfo(Long customerId) {
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
-        CustomerDTO customerDTO = customerRepository.entityToDto(customer);
+        CustomerDTO customerDTO = customerService.entityToDto(customer);
 
         GradeEntity grade = gradeRepository.findByGradeName(customerDTO.getGradeName());
-        GradeDTO gradeDTO = gradeRepository.entityToDto(grade);
+        GradeDTO gradeDTO = gradeService.entityToDto(grade);
 
         MypageDTO mypageDTO = MypageDTO.builder()
             .customerId(customerDTO.getCustomerId())

@@ -2,7 +2,7 @@ package com.ohgoodteam.ohgoodpay.pay.dto;
 
 import java.util.List;
 
-import com.ohgoodteam.ohgoodpay.pay.dto.PaymentResponseDTO;
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +27,6 @@ public class PayImmediatelyResponseDTO {
     private int balance;
     private boolean isExtension;
     private boolean isAuto;
-    private List<List<PaymentResponseDTO>> unpaidBills;
+    private List<List<PaymentDTO>> unpaidBills;
 
 }

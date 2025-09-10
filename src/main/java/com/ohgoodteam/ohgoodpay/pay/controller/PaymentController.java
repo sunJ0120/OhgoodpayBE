@@ -5,9 +5,13 @@ import com.ohgoodteam.ohgoodpay.pay.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
+// @CrossOrigin(
+//     origins = "http://localhost:5173", 
+//     allowedHeaders = "*",
+//     methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
+// )
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
 
@@ -19,8 +23,8 @@ public class PaymentController {
      * @param dto 결제요청 생성에 필요한 정보
      * @return 생성된 요청의 ID, QR/PIN 코드 등
      */
-    @PostMapping("/requestment")
-    public PaymentResponseDto createCode(@RequestBody PaymentRequestDto dto) {
+    @PostMapping("/payment/requestment")
+    public PaymentResponseDTO createCode(@RequestBody PaymentRequestDTO dto) {
         return paymentService.createCode(dto);
     }
 
@@ -30,8 +34,8 @@ public class PaymentController {
      * @param id 만료할 결제요청 ID
      * @return 만료 처리 결과
      */
-    @PostMapping("/expiration/{id}")
-    public PaymentResponseDto expireCode(@PathVariable Long id) {
+    @PostMapping("/payment/expiration/{id}")
+    public PaymentResponseDTO expireCode(@PathVariable Long id) {
         return paymentService.expireCode(id);
     }
 
@@ -41,8 +45,8 @@ public class PaymentController {
      * @param req 코드유형/값/고객ID를 담은 요청 DTO
      * @return 상점명, 총금액, 보유포인트, 잔액/한도, requestId 등 모달 표시 데이터
      */
-    @PostMapping("/validate")
-    public PaymentModalDto validateCode(@RequestBody ValidateRequestDto req) {
+    @PostMapping("/payment/validate")
+    public PaymentModalDTO validateCode(@RequestBody ValidateRequestDTO req) {
         return paymentService.validateCode(
                 req.getCodeType(),
                 req.getValue(),
@@ -55,8 +59,8 @@ public class PaymentController {
      * @param customerId 고객 ID
      * @return 모달 표시 데이터
      */
-    @GetMapping("/modal/{requestId}/{customerId}")
-    public PaymentModalDto getModalInfo(@PathVariable Long requestId, @PathVariable Long customerId) {
+    @GetMapping("/payment/modal/{requestId}/{customerId}")
+    public PaymentModalDTO getModalInfo(@PathVariable Long requestId, @PathVariable Long customerId) {
         return paymentService.getModalInfo(requestId, customerId);
     }
 
@@ -68,8 +72,8 @@ public class PaymentController {
      * @param requestId 결제요청 ID
      * @return 성공/실패 결과
      */
-    @PostMapping("/final")
-    public PaymentConfirmDto finalPayment(@RequestParam Long customerId,
+    @PostMapping("/payment/final")
+    public PaymentConfirmDTO finalPayment(@RequestParam Long customerId,
                                           @RequestParam int point,
                                           @RequestParam Long requestId) {
         return paymentService.finalPayment(customerId, point, requestId);
@@ -82,8 +86,8 @@ public class PaymentController {
      * @return 결제 존재 여부(success/result=true/false)
      *
      */
-    @GetMapping("/check/{orderId}")
-    public PaymentConfirmDto checkPayment(@PathVariable String orderId) {
+    @GetMapping("/payment/check/{orderId}")
+    public PaymentConfirmDTO checkPayment(@PathVariable String orderId) {
         return paymentService.checkPayment(orderId);
     }
 }

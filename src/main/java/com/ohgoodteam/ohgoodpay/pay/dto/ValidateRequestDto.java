@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ValidateRequestDto {
+public class ValidateRequestDTO {
     private String codeType;
     private String value;
     private Long customerId;
