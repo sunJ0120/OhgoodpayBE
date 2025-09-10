@@ -1,0 +1,2 @@
+fastapi:
+  base-url: ${FASTAPI_BASE_URL}/ml

@@ -24,10 +24,7 @@ public class LlmServiceImpl implements LlmService {
         // FAST API 요청 DTO 생성
         StartChatRequest request = StartChatRequest.of(customerId, name);
         
-//        return fastApiClient.post("/greeting", request, BasicChatResponse.class);
-        return BasicChatResponse.builder()
-                .message(String.format("안녕 나는 너만의 오레이봉봉 ~ 나를 레이라고 불러줘 %s~ 오늘 기분은 어때?", name))
-                .build();
+        return fastApiClient.post("/chat/greeting", request, BasicChatResponse.class);
     }
 
     // llm으로 기분 확인 메세지 생성
@@ -36,10 +33,7 @@ public class LlmServiceImpl implements LlmService {
         // FAST API 요청 DTO 생성
         InputMoodRequest request = InputMoodRequest.of(customerId, name, mood);
 
-//        return fastApiClient.post("/mood-response", request, BasicChatResponse.class);
-        return BasicChatResponse.builder()
-                .message(String.format("%s이가 기분이 %s하다니 나도 좋은걸~ 그럼 오늘 뭐가 필요한지 알아볼까?", request.getName(), request.getMood()))
-                .build();
+        return fastApiClient.post("/chat/mood-response", request, BasicChatResponse.class);
     }
 
     // llm으로 취미 확인 메세지 생성
@@ -48,10 +42,7 @@ public class LlmServiceImpl implements LlmService {
         // FAST API 요청 DTO 생성
         CheckHobbyRequest request = CheckHobbyRequest.of(customerId, name, currentHobby);
 
-//        return fastApiClient.post("/hobby-check", request, BasicChatResponse.class);
-        return BasicChatResponse.builder()
-                .message(String.format("평소 관심있던 %s로 뭔가 찾아볼까?", request.getCurrentHobby()))
-                .build();
+        return fastApiClient.post("/chat/hobby-check", request, BasicChatResponse.class);
     }
 
     // llm으로 취미 변경 메세지 생성
@@ -59,10 +50,7 @@ public class LlmServiceImpl implements LlmService {
     public BasicChatResponse generateUpdateHobbyMessage(Long customerId, String name, String newHobby) {
         UpdateHobbyRequest request = UpdateHobbyRequest.of(customerId, name, newHobby);
 
-//        return fastApiClient.post("/hobby-update", request, BasicChatResponse.class);
-        return BasicChatResponse.builder()
-                .message(String.format("%s에 관심생겼구나! 좋은 선택이야~", request.getNewHobby()))
-                .build();
+        return fastApiClient.post("/chat/hobby-update", request, BasicChatResponse.class);
     }
 
     // llm으로 최근 구매 카테고리 확인 메세지 생성

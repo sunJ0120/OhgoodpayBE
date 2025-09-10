@@ -14,8 +14,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class StartChatRequest extends BaseLlmRequest {
-    private Long customerId;
-    private String name;
+//    private Long customerId; 이거 이미 부모에 있음..왜 남겨뒀지
+//    private String name;
 
     public static StartChatRequest of(Long customerId, String name) {
         return StartChatRequest.builder()
