@@ -1,17 +1,27 @@
 package com.ohgoodteam.ohgoodpay.pay.repository;
 
-import java.time.YearMonth;
-import java.util.List;
-
+import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
+import java.time.YearMonth;
+import java.util.List;
+
+import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 
+@Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
+    Optional<PaymentEntity> findByPaymentRequest_OrderId(String orderId);
+
+    // 결제내역 만료 처리
+    @Transactional
+    @Modifying
+    @Query("UPDATE PaymentEntity p SET p.isExpired = true WHERE p.paymentId = :paymentId")
+    int expirePayment(Long paymentId);
 
     // 고객의 결제 내역 조회
     List<PaymentEntity> findByCustomerCustomerId(Long customerId);
@@ -35,4 +45,5 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     // 결제건 금액 산출, point 산출 등 사용
     @Query("SELECT SUM(p.price) FROM PaymentEntity p WHERE p.paymentId IN :paymentIds")
     int sumPriceByPaymentId(Long[] paymentIds);
+
 }
