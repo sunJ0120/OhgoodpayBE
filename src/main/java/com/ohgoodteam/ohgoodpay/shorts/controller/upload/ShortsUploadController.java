@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.upload.ShortsUploadRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.service.upload.ShortsUploadService;
@@ -43,12 +42,11 @@ public class ShortsUploadController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 공용 error dto 구현되면 그에 맞게
-            return ResponseEntity.status(500).body(
-                ShortsUploadResponseDto.builder()
-                    .success(false)
-                    .message("업로드 실패: " + e.getMessage())
-                    .build()
-            );
+            return ResponseEntity.<ShortsUploadResponseDto>status(500)
+                .body(ShortsUploadResponseDto.builder()
+                .success(false)
+                .message("업로드 실패: " + e.getMessage())
+                .build());
         }
     }
 
