@@ -4,7 +4,7 @@ import com.ohgoodteam.ohgoodpay.common.entity.CommentEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
-import com.ohgoodteam.ohgoodpay.shorts.Converter;
+// import com.ohgoodteam.ohgoodpay.shorts.Converter;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
@@ -29,7 +29,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     private final ShortsRepository shortsRepository;
     private final CommentRepository commentRepository;
 
-    private final Converter converter;
+    // private final Converter converter;
 
     /**
      * 전체 쇼츠 피드 조회
