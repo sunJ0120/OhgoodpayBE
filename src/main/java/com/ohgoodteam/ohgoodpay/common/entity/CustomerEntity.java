@@ -43,7 +43,6 @@ public class CustomerEntity {
     private String accountName;
 
     private int point;
-    private int balance;
 
     private boolean isBlocked;
 

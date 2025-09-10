@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PaymentModalDto {
+public class PaymentModalDTO {
     private String requestName;
     private int price;
     private int point;

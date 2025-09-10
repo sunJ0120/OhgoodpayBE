@@ -51,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
      * isValidated = true로 설정
      */
     @Override
-    public PaymentResponseDto createCode(PaymentRequestDto requestDto) {
+    public PaymentResponseDTO createCode(PaymentRequestDTO requestDto) {
         String qr = generateUniqueQr();
         String pin = generateUniquePin6();
 
@@ -66,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .date(LocalDateTime.now())
                         .build()
         );
-        return PaymentResponseDto.builder()
+        return PaymentResponseDTO.builder()
                 .paymentRequestId(saved.getPaymentRequestId())
                 .qrCode(saved.getQrcode())
                 .pinCode(saved.getPincode())
@@ -78,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     @Transactional
-    public PaymentResponseDto expireCode(Long requestId) {
+    public PaymentResponseDTO expireCode(Long requestId) {
         int updated = paymentRequestRepository.expirePaymentRequest(requestId);
         if (updated == 0) {
             throw new RuntimeException("요청 없음");
@@ -87,7 +87,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentRequestEntity entity = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
 
-        return PaymentResponseDto.builder()
+        return PaymentResponseDTO.builder()
                 .paymentRequestId(entity.getPaymentRequestId())
                 .qrCode(entity.getQrcode())
                 .pinCode(entity.getPincode())
@@ -100,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
      *
      */
     @Override
-    public PaymentModalDto validateCode(String codeType, String value, Long customerId) {
+    public PaymentModalDTO validateCode(String codeType, String value, Long customerId) {
         PaymentRequestEntity entity = "qrcode".equalsIgnoreCase(codeType)
                 ? paymentRequestRepository.findByQrcode(value).orElseThrow(() -> new RuntimeException("QR 없음"))
                 : paymentRequestRepository.findByPincode(value).orElseThrow(() -> new RuntimeException("PIN 없음"));
@@ -112,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
         if (customer == null) throw new RuntimeException("고객 없음");
 
-        return PaymentModalDto.builder()
+        return PaymentModalDTO.builder()
                 .requestName(entity.getRequestName())
                 .price(entity.getTotalPrice())
                 .point(customer.getPoint())
@@ -122,12 +122,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
     // 4. 결제 모달 정보 요청
     @Override
-    public PaymentModalDto getModalInfo(Long requestId, Long customerId) {
+    public PaymentModalDTO getModalInfo(Long requestId, Long customerId) {
         PaymentRequestEntity request = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
 
-        return PaymentModalDto.builder()
+        return PaymentModalDTO.builder()
                 .requestName(request.getRequestName())
                 .price(request.getTotalPrice())
                 .point(customer.getPoint())
@@ -140,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
      * */
     @Override
     @Transactional
-    public PaymentConfirmDto finalPayment(Long customerId, int point, Long requestId) {
+    public PaymentConfirmDTO finalPayment(Long customerId, int point, Long requestId) {
         PaymentRequestEntity request = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
@@ -150,7 +150,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 사전 잔액 확인
         if (customer.getBalance() < actualPrice) {
-            return PaymentConfirmDto.builder()
+            return PaymentConfirmDTO.builder()
                     .success(false)
                     .result(false)
                     .build();
@@ -162,7 +162,7 @@ public class PaymentServiceImpl implements PaymentService {
                 customer.decreasePoint(point);
             } catch (IllegalArgumentException e) {
                 // 포인트 부족 등 비즈니스 검증 실패
-                return PaymentConfirmDto.builder()
+                return PaymentConfirmDTO.builder()
                         .success(false)
                         .result(false)
                         .build();
@@ -173,7 +173,7 @@ public class PaymentServiceImpl implements PaymentService {
             customer.decreaseBalance(actualPrice);
         } catch (IllegalArgumentException e) {
             // 경합 등으로 잔액이 부족해진 경우 방어
-            return PaymentConfirmDto.builder()
+            return PaymentConfirmDTO.builder()
                     .success(false)
                     .result(false)
                     .build();
@@ -198,16 +198,16 @@ public class PaymentServiceImpl implements PaymentService {
         }
         request.setValidated(false);
         // 성공 반환
-        return PaymentConfirmDto.builder()
+        return PaymentConfirmDTO.builder()
                 .success(true)
                 .result(true)
                 .build();
     }
     // 6. 결제 결과 확인
     @Override
-    public PaymentConfirmDto checkPayment(String orderId) {
+    public PaymentConfirmDTO checkPayment(String orderId) {
         boolean exists = paymentRepository.findByPaymentRequest_OrderId(orderId).isPresent();
-        return PaymentConfirmDto.builder()
+        return PaymentConfirmDTO.builder()
                 .success(exists)
                 .result(exists)
                 .build();

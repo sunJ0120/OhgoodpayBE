@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentResponseDto {
+public class PaymentResponseDTO {
     private Long paymentRequestId;
     private String qrCode;
     private String pinCode;

@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PaymentConfirmDto {
+public class PaymentConfirmDTO {
     private boolean success;
     private boolean result;
 }
