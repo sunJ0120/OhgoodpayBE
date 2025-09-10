@@ -23,12 +23,7 @@ public class RecommendationServiceImpl implements RecommendationService {
     public KeywordGenerateResponse generateKeywords(CustomerCacheDto cacheDto, String hobby, String mood, String category, Integer balance) {
         KeywordGenerateRequest request = KeywordGenerateRequest.of(cacheDto, hobby, mood, category, balance);
 
-//        return fastApiClient.post("/product/generate-keywords", request, KeywordGenerateResponse.class);
-
-        return KeywordGenerateResponse.builder()
-                .keyword("요리 도구")
-                .priceRange("10000-40000")
-                .build();
+        return fastApiClient.post("/recommend/generate-keyword", request, KeywordGenerateResponse.class);
     }
 
     // naver shopping api로 상품 검색 결과

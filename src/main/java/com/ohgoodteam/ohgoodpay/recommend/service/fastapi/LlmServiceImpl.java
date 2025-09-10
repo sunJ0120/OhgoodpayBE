@@ -58,10 +58,7 @@ public class LlmServiceImpl implements LlmService {
     public BasicChatResponse generatePurchasesAnalyzeMessage(Long customerId, String name, String category) {
         PurchasesAnalyzeRequest request = PurchasesAnalyzeRequest.of(customerId, name, category);
 
-//        return fastApiClient.post("/analyze-purchases", request, BasicChatResponse.class);
-        return BasicChatResponse.builder()
-                .message(String.format("%s이가 최근에 뭘 샀는지 파악하는 중이야~ %s 카테고리를 구매했네? 새로운 관심사랑 잘 맞을 것 같아!", request.getName(), request.getRecentPurchasesCategory()))
-                .build();
+        return fastApiClient.post("/chat/analyze-purchases", request, BasicChatResponse.class);
     }
 
     // llm으로 추천 메세지 생성
