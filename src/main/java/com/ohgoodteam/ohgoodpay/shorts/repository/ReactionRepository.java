@@ -63,7 +63,8 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
     // 댓글 미리보기
     @Query(value = """
         SELECT
-          r.reaction_id AS cursorId,
+          cm.comment_id AS cursorId,
+          cm.content AS context,
           s.shorts_id AS shortsId,
           s.shorts_name AS shortsName,
           s.shorts_explain AS shortsExplain,
@@ -76,11 +77,11 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
           c.name AS ownerName,
           c.nickname AS ownerNickname,
           c.profile_img AS ownerProfileImg
-        FROM reaction r
-        JOIN shorts s ON s.shorts_id = r.shorts_id
+        FROM comment cm
+        JOIN shorts s ON s.shorts_id = cm.shorts_id
         JOIN customer c ON c.customer_id = s.customer_id
-        WHERE r.customer_id = :meId AND r.react = 'COMMENT'
-        ORDER BY r.reaction_id DESC
+        WHERE cm.customer_id = :meId
+        ORDER BY cm.comment_id DESC
         LIMIT :size
     """, nativeQuery = true)
     List<VideoJoinRow> findCommentedShortsPreview(@Param("meId") Long meId, @Param("size") int size);
@@ -88,7 +89,7 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
     // 댓글 페이지
     @Query(value = """
         SELECT
-          r.reaction_id AS cursorId,
+          cm.comment_id AS cursorId,
           s.shorts_id AS shortsId,
           s.shorts_name AS shortsName,
           s.shorts_explain AS shortsExplain,
@@ -100,14 +101,14 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
           c.customer_id AS ownerId,
           c.name AS ownerName,
           c.nickname AS ownerNickname,
-          c.profile_img AS ownerProfileImg
-        FROM reaction r
-        JOIN shorts s ON s.shorts_id = r.shorts_id
+          c.profile_img AS ownerProfileImg,
+          cm.content AS context
+        FROM comment cm
+        JOIN shorts s ON s.shorts_id = cm.shorts_id
         JOIN customer c ON c.customer_id = s.customer_id
-        WHERE r.customer_id = :meId 
-          AND r.react = 'COMMENT'
-          AND (:lastId IS NULL OR r.reaction_id < :lastId)
-        ORDER BY r.reaction_id DESC
+        WHERE cm.customer_id = :meId 
+          AND (:lastId IS NULL OR cm.comment_id < :lastId)
+        ORDER BY cm.comment_id DESC
         LIMIT :size
     """, nativeQuery = true)
     List<VideoJoinRow> findCommentedShortsPage(@Param("meId") Long meId, @Param("lastId") Long lastReactionId, @Param("size") int size);
@@ -115,6 +116,7 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
     // Projection
     interface VideoJoinRow {
         Long getCursorId();          
+        String getContext();
         Long getShortsId();
         String getShortsName();
         String getShortsExplain();

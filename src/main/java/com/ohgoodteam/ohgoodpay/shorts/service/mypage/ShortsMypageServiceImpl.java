@@ -207,6 +207,7 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
                 .likeCount(r.getLikeCount())
                 .commentCount(r.getCommentCount())
                 .createdAt(r.getDate())
+                .context(r.getContext())
                 .owner(Owner.builder()
                         .userId(r.getOwnerId())
                         .displayName(prefer(r.getOwnerNickname(), r.getOwnerName()))

@@ -55,5 +55,4 @@ public class ShortsMypageController {
     ) {
         return shortsMypageService.getCommentedVideos(userId, cursor, limit);
     }
-
 }
