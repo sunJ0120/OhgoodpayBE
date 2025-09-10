@@ -69,7 +69,7 @@ public class PaymentController {
      * @return 성공/실패 결과
      */
     @PostMapping("/final")
-    public PaymentConfirmDto finalPayment(@RequestParam String customerId,
+    public PaymentConfirmDto finalPayment(@RequestParam Long customerId,
                                           @RequestParam int point,
                                           @RequestParam Long requestId) {
         return paymentService.finalPayment(customerId, point, requestId);

@@ -45,7 +45,7 @@ public interface PaymentService {
      * @param requestId 결제 요청 ID
      * @return 결제 결과 성공 여부
      */
-    PaymentConfirmDto finalPayment(String customerId, int point, Long requestId);
+    PaymentConfirmDto finalPayment(Long customerId, int point, Long requestId);
 
     /**
      * 결제 확인 결과 요청 API

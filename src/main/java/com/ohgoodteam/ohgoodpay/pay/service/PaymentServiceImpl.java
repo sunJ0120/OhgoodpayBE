@@ -140,10 +140,10 @@ public class PaymentServiceImpl implements PaymentService {
      * */
     @Override
     @Transactional
-    public PaymentConfirmDto finalPayment(String customerId, int point, Long requestId) {
+    public PaymentConfirmDto finalPayment(Long customerId, int point, Long requestId) {
         PaymentRequestEntity request = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
-        CustomerEntity customer = customerRepository.findByCustomerId(Long.valueOf(customerId));
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
 
         int totalPrice = request.getTotalPrice();
         int actualPrice = totalPrice - point; // 포인트 사용 후 실결제 금액
