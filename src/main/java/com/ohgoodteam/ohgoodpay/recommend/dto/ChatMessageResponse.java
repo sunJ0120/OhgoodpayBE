@@ -7,21 +7,19 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 취미 업데이트 확인 채팅 DTO
+ * 채팅 메세지 기본 DTO
  *
- * 취미를 업데이트 한 후 채팅을 생성하기 위한 Response DTO
+ * 응답에 LLM에서 사용된 채팅 메세지만 담기는 경우 사용하는 Response DTO
  */
 @Getter
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatUpdateHobbyResponse extends BaseChatResponse {
-    private String updatedHobby;
-
-    public static ChatUpdateHobbyResponse of(String message, String newHobby, String nextStep) {
-        return ChatUpdateHobbyResponse.builder()
+public class ChatMessageResponse extends BaseChatResponse {
+    // 응답 dto를 위한 정적 팩토리 메서드
+    public static ChatMessageResponse of(String message, String nextStep) {
+        return ChatMessageResponse.builder()
                 .message(message)
-                .updatedHobby(newHobby)
                 .nextStep(nextStep)
                 .build();
     }
