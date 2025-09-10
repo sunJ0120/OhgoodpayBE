@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.service;
+package com.ohgoodteam.ohgoodpay.shorts.service.upload;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsUploadResponseDto;
-import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsUploadRepository;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
+import com.ohgoodteam.ohgoodpay.shorts.repository.upload.ShortsUploadRepository;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.dto.request;
+package com.ohgoodteam.ohgoodpay.shorts.dto.request.upload;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

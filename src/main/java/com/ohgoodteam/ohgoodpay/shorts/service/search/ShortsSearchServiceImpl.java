@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.service;
+package com.ohgoodteam.ohgoodpay.shorts.service.search;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,11 +6,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsSearchResponseDto.CursorResponse;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsSearchResponseDto.CursorResponse.NextCursor;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsSearchResponseDto.LayoutItem;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsSearchResponseDto.ShortsSearchResponse;
-import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsSearchRepository;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.CursorResponse;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.LayoutItem;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.ShortsSearchResponse;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.CursorResponse.NextCursor;
+import com.ohgoodteam.ohgoodpay.shorts.repository.search.ShortsSearchRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service

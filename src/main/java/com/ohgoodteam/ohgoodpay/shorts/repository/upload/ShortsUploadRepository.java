@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository;
+package com.ohgoodteam.ohgoodpay.shorts.repository.upload;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;

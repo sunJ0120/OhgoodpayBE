@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.dto.response;
+package com.ohgoodteam.ohgoodpay.shorts.dto.response.upload;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

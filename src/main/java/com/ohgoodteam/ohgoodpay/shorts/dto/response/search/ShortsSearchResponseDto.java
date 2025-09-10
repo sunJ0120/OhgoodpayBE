@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.dto.response;
+package com.ohgoodteam.ohgoodpay.shorts.dto.response.search;
 
 import java.time.LocalDateTime;
 import java.util.List;
