@@ -31,39 +31,6 @@ public class RecommendationServiceImpl implements RecommendationService {
     public ProductSearchResponseDTO searchProducts(String keyword, String priceRange) {
         //top 5개만 가져오도록 구성한다.
         ProductSearchRequestDTO request = ProductSearchRequestDTO.of(keyword, priceRange, 5);
-
-        // TODO: 나중에 FastAPI 호출, 지금은 Mock
-        List<ProductDTO> mockProducts = Arrays.asList(
-                ProductDTO.builder()
-                        .rank(1)
-                        .name("쿠킹 스푼 세트")
-                        .price(15000)
-                        .image("http://example.com/image1.jpg")
-                        .url("http://example.com/product1")
-                        .category("주방용품")
-                        .build(),
-                ProductDTO.builder()
-                        .rank(2)
-                        .name("논스틱 프라이팬")
-                        .price(30000)
-                        .image("http://example.com/image2.jpg")
-                        .url("http://example.com/product2")
-                        .category("주방용품")
-                        .build(),
-                ProductDTO.builder()
-                        .rank(3)
-                        .name("스테인레스 냄비")
-                        .price(45000)
-                        .image("http://example.com/image3.jpg")
-                        .url("http://example.com/product3")
-                        .category("주방용품")
-                        .build()
-        );
-
-//        return fastApiClient.post("/product/generate-keywords", request, ProductSearchResponse.class);
-
-        return ProductSearchResponseDTO.builder()
-                .products(mockProducts)
-                .build();
+        return fastApiClient.post("/recommend/search", request, ProductSearchResponseDTO.class);
     }
 }

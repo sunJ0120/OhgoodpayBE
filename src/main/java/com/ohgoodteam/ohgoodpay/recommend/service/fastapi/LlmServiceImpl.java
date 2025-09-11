@@ -66,9 +66,6 @@ public class LlmServiceImpl implements LlmService {
     public BasicChatResponseDTO generateRecommendMessage(Long customerId, String name, ProductDTO selectedProduct, String mood, String hobby) {
         RecommendMessageRequestDTO request = RecommendMessageRequestDTO.of(customerId, name, selectedProduct, ConsumerContextDTO.of(mood, hobby));
 
-//        return fastApiClient.post("/recommendation-message", request, BasicChatResponse.class);
-        return BasicChatResponseDTO.builder()
-                .message(String.format("%s이가 %s에 관심생겼다니까 완전 찰떡인것 찾았어!", request.getName(), request.getConsumerContext().getHobby()))
-                .build();
+        return fastApiClient.post("/chat/recommend-message", request, BasicChatResponseDTO.class);
     }
 }
