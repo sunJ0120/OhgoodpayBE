@@ -1,17 +1,17 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequestDTO;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 /**
- * 채팅 메세지 생성 요청 DTO
- *
- * 처음 채팅 메세지 생성을 요청하는 Response DTO
+ * 채팅 시작 요청 DTO
+ * 
+ * 프론트엔드에서 채팅 시작 시 전달하는 최소한의 정보
  */
 @Getter
-@ToString(callSuper = true)
-@SuperBuilder
+@ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class ChatStartRequestDTO extends BaseChatRequestDTO {
+public class ChatStartRequestDTO {
+    private Long customerId;
 }
