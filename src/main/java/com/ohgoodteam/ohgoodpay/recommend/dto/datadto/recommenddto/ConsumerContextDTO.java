@@ -10,13 +10,13 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConsumerContextDto {
+public class ConsumerContextDTO {
     private String mood;
     private String hobby;
 //    private Boolean isFirstRecommendation;
 
-    public static ConsumerContextDto of(String mood, String hobby) {
-        return ConsumerContextDto.builder()
+    public static ConsumerContextDTO of(String mood, String hobby) {
+        return ConsumerContextDTO.builder()
                 .mood(mood)
                 .hobby(hobby)
                 .build();

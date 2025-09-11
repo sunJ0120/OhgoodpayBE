@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.service.fastapi;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
 
 /**
@@ -10,20 +10,20 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
  */
 public interface LlmService {
     // 초기 메세지 생성
-    BasicChatResponse generateStartMessage(Long customerId, String name);
+    BasicChatResponseDTO generateStartMessage(Long customerId, String name);
 
     // 기분 확인 메세지 생성
-    BasicChatResponse generateInputMoodMessage(Long customerId, String name, String mood);
+    BasicChatResponseDTO generateInputMoodMessage(Long customerId, String name, String mood);
 
     // 취미 확인 메세지 생성
-    BasicChatResponse generateCheckHobbyMessage(Long customerId, String name, String currentHobby);
+    BasicChatResponseDTO generateCheckHobbyMessage(Long customerId, String name, String currentHobby);
 
     // 취미 변경 메세지 생성
-    BasicChatResponse generateUpdateHobbyMessage(Long customerId, String name, String newHobby);
+    BasicChatResponseDTO generateUpdateHobbyMessage(Long customerId, String name, String newHobby);
 
     // 최근 구매 카테고리 확인 메세지 생성
-    BasicChatResponse generatePurchasesAnalyzeMessage(Long customerId, String name, String category);
+    BasicChatResponseDTO generatePurchasesAnalyzeMessage(Long customerId, String name, String category);
 
     // 추천 메세지 생성
-    BasicChatResponse generateRecommendMessage(Long customerId, String name, ProductDto selectedProduct, String mood, String hobby);
+    BasicChatResponseDTO generateRecommendMessage(Long customerId, String name, ProductDTO selectedProduct, String mood, String hobby);
 }

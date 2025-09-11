@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponseDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,21 +17,21 @@ import java.util.List;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatRecommendResponse extends BaseChatResponse {
-    private ProductDto product;
+public class ChatRecommendResponseDTO extends BaseChatResponseDTO {
+    private ProductDTO product;
     private String message;
     private Boolean hasMore;
     private Integer remainingCount;
     private String nextStep;
 
     // 응답 dto 생성하는 정적 팩토리 메서드
-    public static ChatRecommendResponse of(
-            ProductDto selectedProduct,
+    public static ChatRecommendResponseDTO of(
+            ProductDTO selectedProduct,
             String message,
-            List<ProductDto> allProducts,
+            List<ProductDTO> allProducts,
             String nextStep) {
 
-        return ChatRecommendResponse.builder()
+        return ChatRecommendResponseDTO.builder()
                 .product(selectedProduct)
                 .message(message)
                 .hasMore(allProducts.size() > 1)

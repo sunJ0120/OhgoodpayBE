@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDto {
+public class ProductDTO {
     private int rank;
     private String name;
     private int price;

@@ -10,13 +10,13 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductSearchRequest {
+public class ProductSearchRequestDTO {
     private String keyword;
     private String priceRange;
     private Integer maxResults;
 
-    public static ProductSearchRequest of(String keyword, String priceRange, Integer maxResults) {
-        return ProductSearchRequest.builder()
+    public static ProductSearchRequestDTO of(String keyword, String priceRange, Integer maxResults) {
+        return ProductSearchRequestDTO.builder()
                 .keyword(keyword)
                 .priceRange(priceRange)
                 .maxResults(maxResults)

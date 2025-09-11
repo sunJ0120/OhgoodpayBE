@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDto;
-import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDTO;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +22,12 @@ public class ChatCacheService {
      private final CacheStore cacheStore;
 
     // 고객 기본 정보 조회 (Read-through)
-    public CustomerCacheDto getCustomerInfo(Long customerId) {
+    public CustomerCacheDTO getCustomerInfo(Long customerId) {
         // Read-through 패턴: Cache Miss 시 자동으로 DB 조회 후 캐시 저장
         // return cacheStore.get(CacheSpec.CUSTOMER_INFO, customerId);
         
         // TODO: 임시 Mock 데이터 (REDIS / CacheStore 연동 전까지)
-        return CustomerCacheDto.builder()
+        return CustomerCacheDTO.builder()
                 .customerId(customerId)
                 .name("테스트고객" + customerId)
                 .creditLimit(200000)
@@ -66,7 +66,7 @@ public class ChatCacheService {
     }
 
     // 추천 결과 캐시 저장
-    public void saveRecommendProducts(Long customerId, List<ProductDto> products) {
+    public void saveRecommendProducts(Long customerId, List<ProductDTO> products) {
         // TODO: 임시 Mock 데이터
         // cacheStore.pushList(CacheSpec.RECOMMEND_PRODUCTS, customerId, products);
     }

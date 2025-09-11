@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
  */
 @Component
 public class FastApiClient {
-//    @Value("${fastapi.base-url}") // /ml/chat
+    @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
 
     private final RestTemplate restTemplate;

@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequestDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,11 +13,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class InputMoodRequest extends BaseLlmRequest {
+public class InputMoodRequestDTO extends BaseLlmRequestDTO {
     private String mood;
 
-    public static InputMoodRequest of(Long customerId, String name, String mood) {
-        return InputMoodRequest.builder()
+    public static InputMoodRequestDTO of(Long customerId, String name, String mood) {
+        return InputMoodRequestDTO.builder()
                 .customerId(customerId)
                 .name(name)
                 .mood(mood)
