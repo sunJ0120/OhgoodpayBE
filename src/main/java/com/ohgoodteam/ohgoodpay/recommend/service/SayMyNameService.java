@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameResponse;
+import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameResponseDTO;
 
 public interface SayMyNameService {
-    DashSayMyNameResponse execute(Long customerId);
+    DashSayMyNameResponseDTO execute(Long customerId);
 }

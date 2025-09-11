@@ -1,66 +1,103 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.ProfileSummaryDTO;
+import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
+import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
+import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameResponseDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.SayMyNameDTO;
 import com.ohgoodteam.ohgoodpay.recommend.service.fastapi.DashAiClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ObjectProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SayMyNameServiceImpl implements SayMyNameService {
 
-    private final ProfileService profileService;
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
+    private final PaymentRepository paymentRepository;
+    private final CustomerRepository customerRepository;
     private final DashAiClient dashAiClient;
 
-    // ★ Assembler가 없어도 컨테이너가 항상 제공해주는 Provider(빈 없어도 주입 가능)
-    private final ObjectProvider<ScoreFeatureAssembler> assemblerProvider;
-
     @Override
-    public DashSayMyNameResponse execute(Long customerId) {
-        ProfileSummaryDTO p = profileService.getProfile(customerId);
+    public DashSayMyNameResponseDTO execute(Long customerId) {
+        // 기간 경계 (KST 기준, [from, to))
+        var nowKst = ZonedDateTime.now(KST);
+        var firstOfThisMonth = nowKst.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay();
+        var firstOfNextMonth = firstOfThisMonth.plusMonths(1);
+        var firstOf12mAgo    = firstOfThisMonth.minusMonths(11);
 
-        Map<String, Object> payload = new HashMap<>();
+        // 고객 플래그/점수 로드 (Projection)
+        var flags = customerRepository.findFlagsById(customerId);
+        if (flags == null) throw new IllegalArgumentException("No such customer: " + customerId);
 
-        // 1) 특징치: 있으면 사용, 없으면 기본값으로 조립
-        ScoreFeatureAssembler assembler = assemblerProvider.getIfAvailable();
-        if (assembler != null) {
-            var f = assembler.assemble(String.valueOf(customerId));
-            payload.put("extension_this_month",      f.extensionThisMonth());
-            payload.put("auto_extension_this_month", f.autoExtensionThisMonth());
-            payload.put("auto_extension_cnt_12m",    f.autoExtensionCnt12m());
-            payload.put("grade_point",               f.gradePoint());
-            payload.put("is_blocked",                f.isBlocked());
-            payload.put("payment_cnt_12m",           f.paymentCnt12m());
-            payload.put("payment_amount_12m",        f.paymentAmount12m());
-            payload.put("current_cycle_spend",       f.currentCycleSpend());
-            if (f.cycleLimit() != null) payload.put("cycle_limit", f.cycleLimit());
-        } else {
-            // ▼ 임시 기본값(지금 당장 테스트용) — 조인/계산 구현되면 제거
-            payload.put("extension_this_month",      false);
-            payload.put("auto_extension_this_month", false);
-            payload.put("auto_extension_cnt_12m",    0);
-            payload.put("grade_point",               p.getScore() != null ? p.getScore() : 62);
-            payload.put("is_blocked",                false);
-            payload.put("payment_cnt_12m",           12);
-            payload.put("payment_amount_12m",        6_800_000);
-            payload.put("current_cycle_spend",       180_000);
-            payload.put("cycle_limit",               300_000);
-        }
+        boolean isBlocked    = Boolean.TRUE.equals(flags.getIsBlocked());
+        boolean isAuto       = Boolean.TRUE.equals(flags.getIsAuto());
+        boolean isExtensionF = Boolean.TRUE.equals(flags.getIsExtension()); // 의미가 '이번달 연장'이 아니라면 참고용
+        int     gradePoint   = flags.getGradePoint() == null ? 0 : flags.getGradePoint();
+        int     autoExtCnt12m = parseIntSafe(flags.getExtensionCnt());      // 스키마 VARCHAR → int 변환
 
-        // 2) 컨텍스트(메시지 참고용)
-        payload.put("customer_id", p.getCustomerId());
-        payload.put("username",    p.getUsername());
-        payload.put("grade",       p.getGrade());
-        payload.put("ohgood_score",p.getScore());
+        // 결제 집계 (payment)
+        long cnt12m = paymentRepository.countValidInRange(customerId, firstOf12mAgo, firstOfNextMonth);
+        long amt12m = paymentRepository.sumAmountValidInRange(customerId, firstOf12mAgo, firstOfNextMonth); // 원 단위 long
 
-        // 3) FastAPI 호출
-        return dashAiClient.sayMyName(payload);
+        long curAmt = paymentRepository.sumAmountValidInRange(customerId, firstOfThisMonth, firstOfNextMonth);
+        double currentCycleSpend = (curAmt == 0L) ? (amt12m / 12.0) : (double) curAmt;
+
+        boolean extensionThisMonth =
+                paymentRepository.existsExtensionThisMonth(customerId, firstOfThisMonth, firstOfNextMonth);
+        boolean autoExtensionThisMonth =
+                paymentRepository.existsAutoExtensionThisMonth(customerId, firstOfThisMonth, firstOfNextMonth)
+                        || (isAuto && extensionThisMonth); // 정책: 자동연장 ON + 연장 발생 = 자동연장 간주
+        var customer = customerRepository.findById(customerId).orElseThrow();
+        String username = (customer.getNickname() != null && !customer.getNickname().isBlank())
+                ? customer.getNickname()
+                : customer.getName();
+
+        // 속껍질 In 구성 (FastAPI용 피처 포함)
+        var in = SayMyNameDTO.In.builder()
+                .customerId(customerId)
+                .username(username)
+                .extensionThisMonth(extensionThisMonth)
+                .autoExtensionThisMonth(autoExtensionThisMonth)
+                .autoExtensionCnt12m(autoExtCnt12m)
+                .gradePoint(gradePoint)
+                .isBlocked(isBlocked)
+                .paymentCnt12m((int) cnt12m)
+                .paymentAmount12m((double) amt12m)
+                .currentCycleSpend(currentCycleSpend)
+                .build();
+
+        log.info("[SayMyName] features -> {}", in);
+
+        // 5) FastAPI 호출 (세션 + 점수)
+        var out = dashAiClient.sayMyName(in);
+        log.info("[SayMyName] fastapi <- {}", out);
+        return DashSayMyNameResponseDTO.builder()
+                .message(out.getMessage())
+                .sessionId(out.getSessionId())
+                .ttlSeconds(out.getTtlSeconds())
+                .ohgoodScore(out.getScore())
+                .extensionThisMonth(in.isExtensionThisMonth())
+                .autoExtensionThisMonth(in.isAutoExtensionThisMonth())
+                .autoExtensionCnt12m(in.getAutoExtensionCnt12m())
+                .gradePoint(in.getGradePoint())
+                .blocked(in.isBlocked())
+                .paymentCnt12m(in.getPaymentCnt12m())
+                .paymentAmount12m(in.getPaymentAmount12m())
+                .currentCycleSpend(in.getCurrentCycleSpend())
+                .build();
+
+    }
+
+    private int parseIntSafe(String s) {
+        try { return (s == null || s.isBlank()) ? 0 : Integer.parseInt(s.trim()); }
+        catch (NumberFormatException e) { return 0; }
     }
 }

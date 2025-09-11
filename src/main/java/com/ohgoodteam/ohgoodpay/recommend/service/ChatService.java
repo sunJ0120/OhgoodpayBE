@@ -9,15 +9,15 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.*;
  */
 public interface ChatService {
     // 채팅 시작
-    ChatMessageResponse startChat(Long customerId);
+    ChatMessageResponseDTO startChat(Long customerId);
     // 기분 입력
-    ChatMessageResponse moodChat(Long customerId, String mood);
+    ChatMessageResponseDTO moodChat(Long customerId, String mood);
     // 취미 확인
-    ChatCheckHobbyResponse checkHobby(Long customerId);
+    ChatCheckHobbyResponseDTO checkHobby(Long customerId);
     // 취미 업데이트
-    ChatUpdateHobbyResponse updateHobby(Long customerId, String newHobby);
+    ChatUpdateHobbyResponseDTO updateHobby(Long customerId, String newHobby);
     // 구매 이력 (카테고리) 가져오기
-    ChatAnalyzePurchasesResponse analyzePurchases(Long customerId);
+    ChatAnalyzePurchasesResponseDTO analyzePurchases(Long customerId);
     // 개인화 상품 추천
-    ChatRecommendResponse recommend(Long customerId);
+    ChatRecommendResponseDTO recommend(Long customerId);
 }

@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class CustomerCacheDto {
+public class CustomerCacheDTO {
     private Long customerId;
     private String name;
     private int creditLimit; // 신용 한도

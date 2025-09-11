@@ -1,7 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponse;
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmRequestDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,11 +13,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class CheckHobbyRequest extends BaseLlmRequest {
+public class CheckHobbyRequestDTO extends BaseLlmRequestDTO {
     private String currentHobby;
 
-    public static CheckHobbyRequest of(Long customerId, String name, String currentHobby) {
-        return CheckHobbyRequest.builder()
+    public static CheckHobbyRequestDTO of(Long customerId, String name, String currentHobby) {
+        return CheckHobbyRequestDTO.builder()
                 .customerId(customerId)
                 .name(name)
                 .currentHobby(currentHobby)

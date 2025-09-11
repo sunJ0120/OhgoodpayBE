@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDto;
+import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
 import lombok.*;
 
 /*
@@ -11,15 +11,15 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeywordGenerateRequest {
-    private CustomerCacheDto customerInfo;
+public class KeywordGenerateRequestDTO {
+    private CustomerCacheDTO customerInfo;
     private String mood;
     private String hobby;
     private String category;
     private Integer balance;
 
-    public static KeywordGenerateRequest of(CustomerCacheDto cacheDto, String mood, String hobby, String category, Integer balance) {
-        return KeywordGenerateRequest.builder()
+    public static KeywordGenerateRequestDTO of(CustomerCacheDTO cacheDto, String mood, String hobby, String category, Integer balance) {
+        return KeywordGenerateRequestDTO.builder()
                 .customerInfo(cacheDto)
                 .mood(mood)
                 .hobby(hobby)

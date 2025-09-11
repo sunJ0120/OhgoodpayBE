@@ -1,21 +1,33 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.dashdto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@JsonInclude(JsonInclude.Include.NON_NULL) // null 필드는 JSON에서 생략
 public class SayMyNameDTO {
-    @NotNull private Long customerId;   // 내부 식별자
-    @NotNull private String username;   // 닉네임(없으면 이름 폴백)
-    @NotNull private String grade;      // DB grade_name → 대문자 정규화
-    @NotNull private Integer ohgoodScore; // customer.score (null이면 0 폴백)
-    // 필요해지면 사용
-    private Integer percentile;         // 선택: 지금은 안 쓰면 null
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+    public static class In {
+        private Long customerId;
+        private String username;
+        private String grade;
+        private boolean extensionThisMonth;
+        private boolean autoExtensionThisMonth;
+        private int     autoExtensionCnt12m;
+        private int     gradePoint;
+        private boolean isBlocked;
+        private int     paymentCnt12m;
+        private double  paymentAmount12m;
+        private double  currentCycleSpend;
+    }
+
+    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+    public static class Out {
+        private String  message;     // FastAPI가 내려줌
+        private String  sessionId;   // camelCase 그대로 내려오므로 그대로 매핑
+        private Integer ttlSeconds;
+        private Integer score;       // FastAPI가 내려줌 (서비스에서 ohgoodScore로 매핑)
+        private String  userId;
+        private String  gradeName;
+        private Integer gradeLimit;
+        private Double  pointPercent;
+    }
 }

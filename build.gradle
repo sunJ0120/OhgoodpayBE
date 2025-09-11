@@ -57,6 +57,9 @@ dependencies {
 
 	// YAML 바인딩 자동완성/메타데이터
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	// .env 파일 지원
+	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
 }
 
 tasks.named('test') {

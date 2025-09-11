@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequest;
+import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequestDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -13,6 +13,6 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class ChatMoodRequest extends BaseChatRequest {
+public class ChatMoodRequestDTO extends BaseChatRequestDTO {
     private String mood;
 }
