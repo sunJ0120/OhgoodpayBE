@@ -8,18 +8,15 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.repository.upload.ShortsUploadRepository;
-
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.exception.SdkClientException;

@@ -28,7 +28,7 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
         WHERE s.follower_id = :meId
         ORDER BY s.subscription_id DESC
         LIMIT :size
-    """, nativeQuery = true)
+    """, nativeQuery = true) // 구독 미리보기
     List<FollowingRow> findFollowingPreview(@Param("meId") Long meId, @Param("size") int size); // 구독 미리보기
 
     @Query(value = """
@@ -54,5 +54,6 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
         String getProfileImg();
     }
 
+    // 구독 취소
     long deleteByFollowerCustomerIdAndFollowingCustomerId(Long userId, Long targetId);
 }
