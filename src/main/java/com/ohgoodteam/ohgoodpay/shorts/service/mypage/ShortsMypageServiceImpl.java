@@ -219,5 +219,10 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
     private String prefer(String nickname, String name) {
         return (nickname != null && !nickname.isBlank()) ? nickname : name;
     }
+    @Override
+    public long deleteSubscription(Long userId, Long targetId) {
+        long result = subscriptionRepository.deleteByFollowerCustomerIdAndFollowingCustomerId(userId, targetId);
+        return result;
+    }
 
 }

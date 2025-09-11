@@ -26,7 +26,7 @@ public class ShortsSearchController {
 
     @GetMapping("/search")
     public CursorResponse search(
-        @RequestParam String q,
+        @RequestParam(required = false) String q,
         @RequestParam(required = false) Integer limit,
         @RequestParam(required = false) Long lastId,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
