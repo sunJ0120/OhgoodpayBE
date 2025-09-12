@@ -1,12 +1,12 @@
 package com.ohgoodteam.ohgoodpay.recommend.controller;
 
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameRequestDTO;
-import com.ohgoodteam.ohgoodpay.recommend.dto.DashSayMyNameResponseDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.*;
 //import com.ohgoodteam.ohgoodpay.recommend.dto.SpendingAnalyzeRequest;
 //import com.ohgoodteam.ohgoodpay.recommend.dto.SpendingAnalyzeResponse;
 import com.ohgoodteam.ohgoodpay.recommend.service.SayMyNameService;
 //import com.ohgoodteam.ohgoodpay.recommend.service.SpendingAnalyzeService;
+import com.ohgoodteam.ohgoodpay.recommend.service.SpendingAnalyzeService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -24,8 +24,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class DashController {
 
     private final SayMyNameService sayMyNameService;
-//    private final SpendingAnalyzeService spendingAnalyzeService;
-
+    private final SpendingAnalyzeService spendingAnalyzeService;
+    
+    @Operation(summary = "ohgoodscore 계산", description = "고객 정보를 바탕으로 ohgoodscore 계산 후 한마디 반환하기")
     @PostMapping("/saymyname")
     public ResponseEntity<ApiResponseWrapper<DashSayMyNameResponseDTO>> sayMyName(
             @RequestBody @Valid DashSayMyNameRequestDTO req
@@ -34,6 +35,21 @@ public class DashController {
         return ResponseEntity.ok(ApiResponseWrapper.ok(out));
     }
 
+    @Operation(summary = "결제 내역 카테고리 분류", description = "고객 정보를 바탕으로 ohgoodscore 계산 후 한마디 반환하기")
+    @PostMapping("/analyze")
+    public ResponseEntity<ApiEnvelopeDTO<SpendingAnalyzeResponseDTO>> analyze(
+            @RequestBody @Valid SpendingAnalyzeRequestDTO req
+    ) {
+        var data = spendingAnalyzeService.analyze(req);
+        return ResponseEntity.ok(
+                ApiEnvelopeDTO.<SpendingAnalyzeResponseDTO>builder()
+                        .success(true)
+                        .code("200")
+                        .message("success")
+                        .data(data)
+                        .build()
+        );
+    }
 
 //    @Operation(summary = "사용자 3개월 결제내역 input", description = "사용자 3개월 결제 정보를 바탕으로 카테고리 분류 및 소비 패턴 분석")
 //    @PostMapping(value="/analyze", consumes = MediaType.APPLICATION_JSON_VALUE)

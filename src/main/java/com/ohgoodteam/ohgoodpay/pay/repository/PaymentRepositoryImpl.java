@@ -1,11 +1,15 @@
 package com.ohgoodteam.ohgoodpay.pay.repository;
 
+import com.ohgoodteam.ohgoodpay.pay.dto.PaymentViewDTO;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.ohgoodteam.ohgoodpay.common.entity.QPaymentEntity.paymentEntity;
 
@@ -75,4 +79,31 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
                 .fetchFirst();
         return exists != null;
     }
+
+    @PersistenceContext
+    private EntityManager em; // final 제거!
+
+    @Override
+    public List<PaymentViewDTO> findRecentByCustomer(Long customerId, LocalDateTime start, LocalDateTime end) {
+        String jpql = """
+        select new com.ohgoodteam.ohgoodpay.pay.dto.PaymentViewDTO(
+            p.paymentId,
+            p.date,
+            p.requestName,
+            p.totalPrice
+        )
+        
+        from PaymentEntity p
+        where p.customer.customerId = :cid
+          and p.isExpired = true     
+          and p.date between :start and :end
+        order by p.date asc
+    """;
+        return em.createQuery(jpql, PaymentViewDTO.class)
+                .setParameter("cid", customerId)
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .getResultList();
+    }
+
 }
