@@ -36,10 +36,15 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     private final CustomerService customerService;
     private final GradeService gradeService;
 
-    // 전체 결제건 조회
+    /**
+     * [GET] /api/payment/history/{customerId}
+     * 전체 결제건 조회
+     * @param customerId 고객 ID
+     * @return 결제건 리스트
+     */
     @Override
     public List<PaymentDTO> getAllPayment(Long customerId) {
-        List<PaymentEntity> paymentEntities = paymentRepository.findByCustomerCustomerId(customerId);
+        List<PaymentEntity> paymentEntities = paymentRepository.findByCustomerCustomerIdOrderByDateDesc(customerId);
         List<PaymentDTO> paymentResponseDTOs = new ArrayList<>();
         for (PaymentEntity paymentEntity : paymentEntities) {
             PaymentDTO paymentResponseDTO = entityToDto(paymentEntity);
@@ -48,7 +53,12 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         return paymentResponseDTOs;
     }
     
-    // 미납부건 월별 분류
+    /**
+     * [GET] /api/payment/info/{customerId}
+     * 미납부건 월별 분류
+     * @param customerId 고객 ID
+     * @return 미납부건 리스트
+     */
     @Override
     public PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId) {
         // 고객 정보 조회
@@ -60,7 +70,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         GradeDTO gradeDTO = gradeService.entityToDto(grade);
 
         // 고객의 미납부건 조회
-        List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalse(customerId);
+        List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(customerId);
         
         // 월별로 그룹화
         Map<YearMonth, List<PaymentEntity>> billsByMonth = unpaidBills.stream()
@@ -74,7 +84,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
             .map(Map.Entry::getValue)
             .collect(Collectors.toList());
 
-
+        // 월별로 정렬된 리스트를 DTO로 변환
         List<List<PaymentDTO>> result = new ArrayList<>();
         for (List<PaymentEntity> entity : entityList) {
             List<PaymentDTO> paymentResponseDTOList = new ArrayList<>();
@@ -85,43 +95,50 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
             result.add(paymentResponseDTOList);
         }
          
-        PayImmediatelyResponseDTO payImmediatelyResponseDTO = PayImmediatelyResponseDTO.builder()
-            .customerId(customerDTO.getCustomerId())
-            .gradeName(gradeDTO.getGradeName())
-            .limitPrice(gradeDTO.getLimitPrice())
-            .pointPercent(gradeDTO.getPointPercent())
-            .account(customerDTO.getAccount())
-            .accountName(customerDTO.getAccountName())
-            .balance(customerDTO.getBalance())
-            .isExtension(customerDTO.isExtension())
-            .isAuto(customerDTO.isAuto())
-            .unpaidBills(result)
-            .build();
-
-        return payImmediatelyResponseDTO;
+        return PayImmediatelyResponseDTO.builder()
+        .customerId(customerDTO.getCustomerId())
+        .gradeName(gradeDTO.getGradeName())
+        .limitPrice(gradeDTO.getLimitPrice())
+        .pointPercent(gradeDTO.getPointPercent())
+        .account(customerDTO.getAccount())
+        .accountName(customerDTO.getAccountName())
+        .balance(customerDTO.getBalance())
+        .isExtension(customerDTO.isExtension())
+        .isAuto(customerDTO.isAuto())
+        .unpaidBills(result)
+        .build();
     }
 
-    // 고객 수동 연장 신청
+    /**
+     * [POST] /api/payment/extension/{customerId}
+     * 고객 수동 연장 신청
+     * @param customerId 고객 ID
+     * @return 연장 신청 결과
+     */
     @Override
     public boolean requestCustomerExtension(Long customerId) {
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
 
         // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
-        if(customer.isExtension() || !checkUnpaidBills(customerId, YearMonth.now().minusMonths(1))) {
+        if(customer.isExtension() || !checkUnpaidBills(customerId)) {
             return false;
         }
         int result = customerRepository.updateCustomerIsExtension(true, customerId);
         return result > 0;
     }
 
-    // 고객 자동 연장 신청
+    /**
+     * 고객 자동 연장 신청
+     * @param customerId 고객 ID
+     * @return 연장 신청 결과
+     */
     @Override
     @Transactional
     public boolean requestCustomerAutoExtension(Long customerId) {
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
 
         // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
-        if(customer.isExtension() || !checkUnpaidBills(customerId, YearMonth.now().minusMonths(1))) {
+        if(customer.isExtension() || !checkUnpaidBills(customerId)) {
             return false;
         }
         customerRepository.updateCustomerIsExtension(true, customerId);
@@ -136,7 +153,13 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         return gradeRepository.findByGradeName(gradeName);
     }
 
-    // 결제건 납부 처리
+    /**
+     * [POST] /api/payment/immediately/{customerId}
+     * 결제건 납부 처리
+     * @param customerId 고객 ID
+     * @param lists 결제건 ID 리스트
+     * @return 납부 결과
+     */
     @Override
     public boolean payImmediately(Long customerId, Long[] lists) {
         int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, lists);
@@ -152,25 +175,31 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         }
         
         if(result > 0) {
-            int gradePoint = sumPrice / 10000;
-            customerRepository.updateCustomerGradePoint(gradePoint, customerId);
+            CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+            if (customer.getGradePoint() < 150){
+                int gradePoint = sumPrice / 10000;
+                if (customer.getGradePoint() + gradePoint > 150){
+                    gradePoint = 150 - customer.getGradePoint();
+                }
+                customerRepository.updateCustomerGradePoint(gradePoint, customerId);
+            }
         }
         //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
         if (!paymentYearMonth.equals(nowYearMonth)) {
-            if (checkUnpaidBills(customerId, paymentYearMonth)) {
-                releaseExtension(customerId);
-            } 
+            releaseExtension(customerId);
         }
         return result > 0;
     }
 
-    // 미납건이 있는지 확인. 확인 후 미납건이 있으면 false 없으면 true
-    public boolean checkUnpaidBills(Long customerId, YearMonth yearMonth) {
-        List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseAndYearMonth(customerId, yearMonth.getYear(), yearMonth.getMonthValue());
+    // 미납건이 있는지 확인. 확인 후 가장 빠른 날자의 미납건이 이번달이면 false 아니면 true
+    public boolean checkUnpaidBills(Long customerId) {
+        List<PaymentEntity> unpaidBills = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(customerId);
         if(unpaidBills.isEmpty()) {
-            return true;
-        } else {
             return false;
+        } else if (YearMonth.from(unpaidBills.get(0).getDate()).equals(YearMonth.now())) {
+            return false;
+        } else {
+            return true;
         }
     }
 

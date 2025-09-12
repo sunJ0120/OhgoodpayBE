@@ -24,10 +24,10 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     int expirePayment(Long paymentId);
 
     // 고객의 결제 내역 조회
-    List<PaymentEntity> findByCustomerCustomerId(Long customerId);
+    List<PaymentEntity> findByCustomerCustomerIdOrderByDateDesc(Long customerId);
 
     // 고객의 결제 내역 조회 (만료되지 않은 결제 내역)
-    List<PaymentEntity> findByCustomerCustomerIdAndIsExpiredFalse(Long customerId);
+    List<PaymentEntity> findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(Long customerId);
 
     // 결제 단일 건 조회
     PaymentEntity findByPaymentId(Long paymentId);

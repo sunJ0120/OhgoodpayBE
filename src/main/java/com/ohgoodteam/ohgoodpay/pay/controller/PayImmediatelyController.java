@@ -26,15 +26,9 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(
-    origins = "http://localhost:5173", 
-    allowedHeaders = "*",
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
-)
 public class PayImmediatelyController {
 
     private final PayImmediatelyService payImmediatelyService;
-    private final CustomerRepository customerRepository;
 
     // 납부 페이지 진입시 초기 정보 조회
     @GetMapping("/payment/info/{customerId}")
