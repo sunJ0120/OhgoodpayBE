@@ -17,7 +17,6 @@ public interface LlmService {
     BasicChatResponseDTO generateChat(
             String sessionId,
             CustomerCacheDTO customerInfo,
-            String category,
             String mood,
             String hobby,
             int balance,

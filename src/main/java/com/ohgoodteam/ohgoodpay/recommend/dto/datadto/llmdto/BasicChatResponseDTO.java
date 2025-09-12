@@ -15,6 +15,11 @@ import lombok.*;
 public class BasicChatResponseDTO{
     private String sessionId;
     private String message;
+
+    // TODO : FastAPI에서도 이거 정확히 맞춰주기
+    // DB 저장이 필요한 정보만 (FastAPI → Spring)
+    private String newHobby;       // 새로 파악한 취미
+    private boolean shouldUpdateHobbyDB; // DB 저장 신호
     
     // TODO : 성공하면 이거 정적 팩토리 메서드 생성하기
     // TODO : 시간 남으면 ChatStartResponseDTO 생성해서 응답용으로 감싸기

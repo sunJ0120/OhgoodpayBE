@@ -41,13 +41,11 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public BasicChatResponseDTO chat(Long customerId) {
-
         // TODO: Redis에 사용할 sessionId 생성 로직 필요
         String sessionId = "session-" + customerId; // 임시 sessionId
         CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId); //고객 기본 정보
         String hobby = chatCacheService.getHobby(customerId); //원래 저장되어 있었던 취미
         String mood = chatCacheService.getMood(customerId);
-        String category = chatCacheService.getRecentPurchaseCategory(customerId); //원래 저장되어 있었던 구매 카테고리
         Integer balance = chatCacheService.getBalance(customerId);
 
         // TODO: Redis에 저장된 이전 대화 내역 불러오기 로직 필요
@@ -61,15 +59,24 @@ public class ChatServiceImpl implements ChatService {
         List<CachedMessageDTO> cachedMessages = new ArrayList<>();
         cachedMessages.add(cachedMessage);
 
+        // LLM 서비스에 채팅 생성 요청
+        // 속 서버에 요청하기 위한 값들을 겉 서버에서 모아서 넘긴다.
         BasicChatResponseDTO response = llmService.generateChat(
                 sessionId,
                 customerInfo,
-                category,
                 hobby,
                 mood,
                 balance,
                 cachedMessages
         );
+
+        // fast api에서 온 DB 저장 신호 확인
+        if (response.isShouldUpdateHobbyDB()) {
+            // 신호가 왔다면, spring에서 DB에 저장
+            customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
+            log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}",
+                    customerId, response.getNewHobby());
+        }
 
         return response;
     }

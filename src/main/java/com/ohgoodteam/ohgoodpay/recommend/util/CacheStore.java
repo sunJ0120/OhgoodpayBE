@@ -1,6 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.util;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.function.Supplier;
  * REDIS 캐시 저장소
  */
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class CacheStore {
     // 정의해둔 REDIS TEMPLATE를 가져옴
@@ -35,8 +37,16 @@ public class CacheStore {
     // redis는 Object만 반환하기 때문에 DTO를 꺼내 쓰려면 캐스팅이 필수이다.
     // 그래서 redis.opsForValue().get(...)의 값은 항상 Object이기 때문에 이걸 정의해서 서비스 단에서 캐스팅을 하지 않도록 해야 한다.
     public <T> T get(CacheSpec spec, Object userId, Class<T> type) {
-        Object raw = redis.opsForValue().get(key(spec, userId));
-        return type.cast(raw); //typecast를 한 번 해주기 때문에, 잘못된 타입일경우 ClassCastException가 발생한다.
+        try {
+            log.info("Redis GET 시도: {}", key(spec, userId));
+            Object raw = redis.opsForValue().get(key(spec, userId));
+            log.info("Redis GET 시도: {}", raw);
+            return type.cast(raw);
+        } catch (Exception e) {
+            log.info("Redis GET 실패: {}", e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     // redis에 list를 추가하고 싶을 때 사용한다.

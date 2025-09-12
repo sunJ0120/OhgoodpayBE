@@ -24,7 +24,6 @@ public class LlmServiceImpl implements LlmService {
     public BasicChatResponseDTO generateChat(
             String sessionId,
             CustomerCacheDTO customerInfo,
-            String category,
             String mood,
             String hobby,
             int balance,
@@ -35,7 +34,6 @@ public class LlmServiceImpl implements LlmService {
         BasicChatRequestDTO request = BasicChatRequestDTO.of(
                 sessionId,
                 customerInfo,
-                category,
                 mood,
                 hobby,
                 balance,
