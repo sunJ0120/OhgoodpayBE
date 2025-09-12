@@ -5,8 +5,9 @@ fastapi:
     #    internal-token: ${OHGOODPAY_INTERNAL_TOKEN}
     http:
       connect-timeout: 2000
-      read-timeout: 5000
+      read-timeout: 25000
     paths:
       sayMyName: /dash/saymyname
       analyzeSpending: /dash/analyze
+      advice: /dash/advice
 

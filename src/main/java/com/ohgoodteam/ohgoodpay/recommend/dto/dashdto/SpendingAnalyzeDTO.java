@@ -56,9 +56,9 @@ public class SpendingAnalyzeDTO {
         @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class MonthlyData {
-            private BigDecimal totalSpend;                         // total_spend
-            private Map<String, CategoryStat> categories;          // "식비": { ... }
-            private List<TopTransaction> topTransactions;          // top_transactions
+            private BigDecimal totalSpend;
+            private Map<String, CategoryStat> categories;
+            private List<TopTransaction> topTransactions;
         }
 
         @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString

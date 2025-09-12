@@ -32,16 +32,16 @@ public class SpendingAnalyzeServiceImpl implements SpendingAnalyzeService {
         Long customerId = req.getCustomerId();
         int months = (req.getWindowMonths() == null || req.getWindowMonths() <= 0) ? 3 : req.getWindowMonths();
 
-        // ⏱ 최근 N개월 (당월은 '지금까지')
+        // 최근 3개월 (당월은 '지금까지')
         LocalDateTime now = LocalDateTime.now(KST);
         YearMonth startYm = YearMonth.from(now).minusMonths(months - 1);
         LocalDateTime start = startYm.atDay(1).atStartOfDay();
         LocalDateTime end   = now;
 
-        // 1) RAW 거래 조회
+        //  RAW 거래 조회
         List<PaymentViewDTO> rows = paymentRepository.findRecentByCustomer(customerId, start, end);
 
-        // 2) FastAPI 요청 In으로 매핑
+        // FastAPI 요청 In으로 매핑
         var tx = rows.stream().map(v ->
                 SpendingAnalyzeDTO.In.Transaction.builder()
                         .paymentId(v.paymentId())
@@ -57,10 +57,10 @@ public class SpendingAnalyzeServiceImpl implements SpendingAnalyzeService {
                 .transactions(tx)
                 .build();
 
-        // 3) FastAPI 호출 → Out 수신
+        // FastAPI 호출 → Out 수신
         SpendingAnalyzeDTO.Out out = ai.analyzeSpending(payload);
 
-        // 4) Out → 프론트 계약(SpendingAnalyzeResponseDTO)으로 변환
+        // Out → 프론트 계약(SpendingAnalyzeResponseDTO)으로 변환
         SpendingAnalyzeResponseDTO.Summary summary =
                 SpendingAnalyzeResponseDTO.Summary.builder()
                         .total_months(out.getSummary().getTotalMonths())

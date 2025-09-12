@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ohgoodteam.ohgoodpay.config.FastApiConfig;
 import com.ohgoodteam.ohgoodpay.recommend.dto.SpendingAnalyzeRequestDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.SpendingAnalyzeResponseDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.AdviceDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.SayMyNameDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.SpendingAnalyzeDTO;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,27 @@ public class DashAiClientImpl implements DashAiClient {
                                 .flatMap(body -> resp.createException().flatMap(Mono::error))
                 )
                 .bodyToMono(SpendingAnalyzeDTO.Out.class)
+                .timeout(Duration.ofMillis(readTimeoutMs))
+                .block();
+    }
+
+    public AdviceDTO.Out getAdvice(AdviceDTO.In in) {
+        final String path = resolvedPath("advice", "/dash/advice");
+        final int readTimeoutMs = Optional.ofNullable(cfg.getHttp())
+                .map(FastApiConfig.Http::getReadTimeout).orElse(5000);
+        return webClient.post()
+                .uri(path)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Internal-Token", cfg.getInternalToken())
+                .bodyValue(in)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, resp ->
+                        resp.bodyToMono(String.class)
+                                .doOnNext(body -> log.warn("[AI<-] {} body={}", resp.statusCode(), body))
+                                .flatMap(body -> resp.createException().flatMap(Mono::error))
+                )
+                .bodyToMono(AdviceDTO.Out.class)
                 .timeout(Duration.ofMillis(readTimeoutMs))
                 .block();
     }
