@@ -17,6 +17,14 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -25,6 +33,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final CustomerRepository customerRepository;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    private String generateQrBase64(String text) throws Exception {
+        BitMatrix matrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(matrix, "PNG", out);
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
+    }
 
     // qr, pincode 중복 확인
     private String generateUniqueQr() {
@@ -52,27 +67,39 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public PaymentResponseDTO createCode(PaymentRequestDTO requestDto) {
-        String qr = generateUniqueQr();
-        String pin = generateUniquePin6();
+        try {
+            String qr = generateUniqueQr();
+            String pin = generateUniquePin6();
 
-        PaymentRequestEntity saved = paymentRequestRepository.save(
-                PaymentRequestEntity.builder()
-                        .orderId(requestDto.getOrderId())
-                        .requestName(requestDto.getRequestName())
-                        .totalPrice(requestDto.getTotalPrice())
-                        .qrcode(qr)
-                        .pincode(pin)
-                        .isValidated(true)
-                        .date(LocalDateTime.now())
-                        .build()
-        );
-        return PaymentResponseDTO.builder()
-                .paymentRequestId(saved.getPaymentRequestId())
-                .qrCode(saved.getQrcode())
-                .pinCode(saved.getPincode())
-                .success(true)
-                .build();
+            PaymentRequestEntity saved = paymentRequestRepository.save(
+                    PaymentRequestEntity.builder()
+                            .orderId(requestDto.getOrderId())
+                            .requestName(requestDto.getRequestName())
+                            .totalPrice(requestDto.getTotalPrice())
+                            .qrcode(qr)
+                            .pincode(pin)
+                            .isValidated(true)
+                            .date(LocalDateTime.now())
+                            .build()
+            );
+
+            // Base64 QR 코드 생성
+            String qrBase64 = generateQrBase64(qr);
+
+            return PaymentResponseDTO.builder()
+                    .paymentRequestId(saved.getPaymentRequestId())
+                    .qrCode(saved.getQrcode())
+                    .qrImageUrl(qrBase64) // 이제 바로 <img src="..."> 가능
+                    .pinCode(saved.getPincode())
+                    .success(true)
+                    .build();
+
+        } catch (Exception e) {
+            throw new RuntimeException("QR 코드 생성 실패: " + e.getMessage());
+        }
     }
+
+
     /**
      * 2. 만료 요청
      */
