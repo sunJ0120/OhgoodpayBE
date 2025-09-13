@@ -11,5 +11,4 @@ public class PaymentRequestDTO {
     private String orderId;
     private String requestName;
     private int totalPrice;
-
 }
