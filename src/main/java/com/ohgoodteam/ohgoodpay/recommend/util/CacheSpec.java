@@ -32,9 +32,11 @@ public enum CacheSpec {
 //    // 4) 최근 구매한 제품 카테고리(List<String> or Set<String>) - 5분
 //    RECENT_PURCHASE("v1:recent_purchase", Duration.ofMinutes(5)),
     // 5) 기분 데이터(String) - 10분
-    MOOD("v1:mood", Duration.ofMinutes(10));
+    MOOD("v1:mood", Duration.ofMinutes(10)),
 //    // 6) TOPN 추천 제품 캐싱 (List<RecommendProductDto>) - 10분
 //    RECOMMEND_PRODUCTS("v1:recommend_products", Duration.ofMinutes(10));
+
+    SUMMARY("v1:summary", Duration.ofHours(12)); //메세지들 캐싱을 위해서 선언
 
     private final String prefix; //키 네임 스페이스
     private final Duration ttl;

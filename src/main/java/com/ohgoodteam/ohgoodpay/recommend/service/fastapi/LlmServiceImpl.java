@@ -1,14 +1,11 @@
 package com.ohgoodteam.ohgoodpay.recommend.service.fastapi;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CachedMessageDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
 import com.ohgoodteam.ohgoodpay.recommend.util.FastApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * FAST API - LLM 채팅 서비스 구현체
@@ -27,7 +24,9 @@ public class LlmServiceImpl implements LlmService {
             String mood,
             String hobby,
             int balance,
-            List<CachedMessageDTO> cachedMessages
+            String inputMessage,
+            String summary,
+            String flow
     ) {
         // FAST API 요청 DTO 생성
         // 여기 안쪽에서 자세한 DTO를 생성하도록 한다.
@@ -37,16 +36,10 @@ public class LlmServiceImpl implements LlmService {
                 mood,
                 hobby,
                 balance,
-                cachedMessages
+                inputMessage,
+                summary,
+                flow
         );
         return fastApiClient.post("/chat", request, BasicChatResponseDTO.class);
     }
-//
-//    // llm으로 추천 메세지 생성
-//    @Override
-//    public BasicChatResponseDTO generateRecommendMessage(Long customerId, String name, ProductDTO selectedProduct, String mood, String hobby) {
-//        RecommendMessageRequestDTO request = RecommendMessageRequestDTO.of(customerId, name, selectedProduct, ConsumerContextDTO.of(mood, hobby));
-//
-//        return fastApiClient.post("/chat/recommend-message", request, BasicChatResponseDTO.class);
-//    }
 }

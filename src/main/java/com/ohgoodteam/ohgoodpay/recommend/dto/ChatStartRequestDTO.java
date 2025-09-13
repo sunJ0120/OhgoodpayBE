@@ -14,5 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 public class ChatStartRequestDTO {
     private Long customerId;
+    private String sessionId; // 프론트에서 관리하는 세션 ID
     private String message; // 사용자가 보낸 메시지
+    private String flow; // 대화 흐름 (예: "recommendation", "general", etc.)
 }

@@ -2,14 +2,11 @@ package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
-import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto.ProductDTO;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheSpec;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * 고객 정보 캐싱 서비스 (REDIS)
@@ -47,13 +44,6 @@ public class ChatCacheService {
         );
     }
 
-    // 고객 기분 저장값 조회
-    // 캐싱 안 되어 있을 경우 "보통" 기본값 반환
-    public String getMood(Long customerId) {
-        String mood = cacheStore.get(CacheSpec.MOOD, customerId, String.class);
-        return mood != null ? mood : "보통"; // 기본값
-    }
-
     // 고객 잔액 조회 (Read-through)
     // 잔액 정보가 없을 경우 50000원 기본값 반환 (일단은...)
     public Integer getBalance(Long customerId) {
@@ -66,13 +56,17 @@ public class ChatCacheService {
         );
     }
 
-//    // 고객 최근 구매 카테고리 조회 (Read-through)
-//    // TODO : 카테고리 테이블 필요.. 일단은 임시 데이터로 진행
-//    public String getRecentPurchaseCategory(Long customerId) {
-//        // return cacheStore.get(CacheSpec.RECENT_PURCHASE, customerId);
-//        return "운동 기구";
-//    }
+    // === SessionId 기반 메서드들 ===
 
-    // FastAPI에서 캐시 저장을 담당하므로, Spring에서는 저장 메서드 없음
-    // Spring은 DB 저장만 담당 (CustomerRepository 사용)
+    // 세션별 기분 조회
+    public String getMoodBySession(String sessionId) {
+        String mood = cacheStore.getBySession(CacheSpec.MOOD, sessionId, String.class);
+        return mood != null ? mood : "";
+    }
+
+    // 세션별 대화 요약 조회
+    public String getSummaryBySession(String sessionId) {
+        String summary = cacheStore.getBySession(CacheSpec.SUMMARY, sessionId, String.class);
+        return summary != null ? summary : ""; // 기본값
+    }
 }

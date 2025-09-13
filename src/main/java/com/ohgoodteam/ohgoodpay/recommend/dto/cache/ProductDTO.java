@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.recommenddto;
+package com.ohgoodteam.ohgoodpay.recommend.dto.cache;
 
 import lombok.*;
 
