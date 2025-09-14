@@ -1,8 +1,10 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.feed;
 
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsPointResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
 import com.ohgoodteam.ohgoodpay.shorts.service.feed.ShortsFeedService;
 import lombok.RequiredArgsConstructor;
@@ -85,4 +87,22 @@ public class ShortsFeedController {
         return ResponseEntity.status(HttpStatus.OK).body(data);
 
     }
+
+    // 5초마다 호출해서 포인트 지급 가능한지 체크
+    @GetMapping("/pointstatus")
+    public ResponseEntity<ShortsPointResponseDto> getPointStatus(
+        @RequestParam("customerId") Long customerId
+    ){
+        return ResponseEntity.ok(shortsFeedService.getPointStatus(customerId));
+    }
+
+    // 시청시간 계산 후 포인트 적립
+    @PostMapping("/watch/feed")
+    public ResponseEntity<ShortsPointResponseDto> watchFeed(
+        @RequestParam("customerId") Long customerId,
+        @RequestBody ShortsPointRequestDto requestDto
+    ){
+        return ResponseEntity.ok(shortsFeedService.watchFeed(customerId, requestDto));
+    }
+
 }

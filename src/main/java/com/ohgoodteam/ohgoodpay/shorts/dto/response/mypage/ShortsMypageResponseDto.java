@@ -60,7 +60,6 @@ public class ShortsMypageResponseDto {
         private Long commentCount; 
         private String context;
         
-
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime createdAt;
         private Owner owner; 
