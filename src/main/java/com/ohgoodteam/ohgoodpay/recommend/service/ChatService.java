@@ -10,6 +10,4 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDT
 public interface ChatService {
     // 채팅 생성
     BasicChatResponseDTO chat(Long customerId, String sessionId, String message, String flow);
-//    // 개인화 상품 추천
-//    ChatRecommendResponseDTO recommend(Long customerId);
 }

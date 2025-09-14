@@ -8,7 +8,7 @@ package com.ohgoodteam.ohgoodpay.recommend.dto;
  */
 public enum ChatFlowType {
     MOODCHECK("mood_check"),
-    HOBBYUPDATE("hobby_update"),
+    HOBBYCHECK("hobby_check"),
     CHOOSE("choose"),
     RECOMMENDATION("recommendation"),
     RE_RECOMMENDATION("re-recommendation");

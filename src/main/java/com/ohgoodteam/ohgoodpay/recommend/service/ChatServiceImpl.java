@@ -65,8 +65,8 @@ public class ChatServiceImpl implements ChatService {
                 flowType.getValue()
         );
 
-        // fast api에서 온 DB 저장 신호 확인
-        if (response.isShouldUpdateHobbyDB()) {
+        // fast api에서 newhobby가 왔을 경우,
+        if (!response.getNewHobby().equals("")) {
             // 신호가 왔다면, spring에서 DB에 저장
             customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
             log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}",

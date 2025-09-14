@@ -2,15 +2,8 @@ package com.ohgoodteam.ohgoodpay.recommend.controller;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartRequestDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDTO;
-import com.ohgoodteam.ohgoodpay.recommend.util.ApiErrorResponse;
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
