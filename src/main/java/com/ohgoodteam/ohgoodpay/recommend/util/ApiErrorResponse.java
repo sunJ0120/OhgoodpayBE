@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 
 /**
  * API 에러 응답 공통 DTO
+ *
+ * TODO : 공용으로 사용하지 않을시 삭제 예정....
  */
 @Getter
 @Builder

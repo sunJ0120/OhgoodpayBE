@@ -45,11 +45,10 @@ public class ChatServiceImpl implements ChatService {
         // 프론트에서 전달받은 sessionId 사용
         log.debug("Using sessionId: {} for customerId: {}", sessionId, customerId);
 
-
         CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId); //고객 기본 정보
         String hobby = chatCacheService.getHobby(customerId); //원래 저장되어 있었던 취미
         String mood = chatCacheService.getMoodBySession(sessionId); // 세션별 기분
-        Integer balance = chatCacheService.getBalance(customerId);
+        Integer balance = chatCacheService.getBalance(customerId); // 고객 잔액
         String summary = chatCacheService.getSummaryBySession(sessionId); // 세션별 대화 요약
 
         // LLM 서비스에 채팅 생성 요청 (검증된 enum 값 사용)

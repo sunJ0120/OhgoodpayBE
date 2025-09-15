@@ -5,6 +5,7 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDT
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +23,17 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("")
-    public ApiResponseWrapper<BasicChatResponseDTO> chat(@RequestBody ChatStartRequestDTO request) {
+    // TODO : 에러 정의를 좀 더 세분화 하는 방향 고려
+    @PostMapping()
+    public ApiResponseWrapper<BasicChatResponseDTO> chat(
+            @RequestBody ChatStartRequestDTO request,
+            HttpServletRequest httpRequest) {
         try {
+            // JWT에서 customerId 추출하는 파트 미리 만들어 놓음
+//            String customerId = jwtUtil.getCustomerIdFromToken(httpRequest);
+
             BasicChatResponseDTO response = chatService.chat(
+//                    customerId,
                     request.getCustomerId(),
                     request.getSessionId(),
                     request.getMessage(),
