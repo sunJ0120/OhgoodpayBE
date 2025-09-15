@@ -29,7 +29,7 @@ public class PayImmediatelyRepositoryTests {
     @Test
     public void testFindByCustomerId() {
         // CustomerEntity customer = customerRepository.findById(1L).orElseThrow(() -> new RuntimeException("Customer not found"));
-        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerId(1L);
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdOrderByDateDesc(1L);
         System.out.println("--------------------------------");
         for (PaymentEntity payment : payments) {
             System.out.println(payment);
@@ -41,7 +41,7 @@ public class PayImmediatelyRepositoryTests {
     // 고객의 결제 내역 조회 (만료되지 않은 결제 내역)
     @Test
     public void testFindByCustomerIdAndIsExpiredFalse() {
-        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalse(1L);
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(1L);
         System.out.println("--------------------------------");
         for (PaymentEntity payment : payments) {
             System.out.println(payment);
