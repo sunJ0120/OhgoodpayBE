@@ -18,27 +18,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ValidCheckService {
     private final LlmService llmService;
-
-    /**
-     * 사용자 입력이 현재 플로우에 유효한지 검증
-     */
-    public boolean isValidInput(Long customerId, String sessionId, String inputMessage, String flow) {
-        ValidInputResponseDTO result = validateInput(customerId, sessionId, inputMessage, flow);
-        return result.isValid();
-    }
-
-    /**
-     * 검증 실패시 에러 메시지 반환
-     */
-    public String getValidationMessage(Long customerId, String sessionId, String inputMessage, String flow) {
-        ValidInputResponseDTO result = validateInput(customerId, sessionId, inputMessage, flow);
-        return result.getMessage();
-    }
-
     /**
      * LlmService를 통해 실제 검증 수행
      */
-    private ValidInputResponseDTO validateInput(Long customerId, String sessionId, String inputMessage, String flow) {
+    public ValidInputResponseDTO validateInput(Long customerId, String sessionId, String inputMessage, String flow) {
         ValidInputRequestDTO request = ValidInputRequestDTO.builder()
                 .customerId(customerId)
                 .sessionId(sessionId)

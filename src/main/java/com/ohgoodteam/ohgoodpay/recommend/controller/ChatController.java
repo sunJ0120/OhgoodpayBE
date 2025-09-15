@@ -36,7 +36,7 @@ public class ChatController {
 //                    customerId,
                     request.getCustomerId(),
                     request.getSessionId(),
-                    request.getMessage(),
+                    request.getInputMessage(),
                     request.getFlow()
             );
             return ApiResponseWrapper.ok(response);

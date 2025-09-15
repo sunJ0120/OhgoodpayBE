@@ -25,6 +25,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatCacheService chatCacheService; // 캐싱 서비스
     private final LlmService llmService; // FastAPI LLM 연동 서비스
     private final ValidCheckService validCheckService; // 입력 검증 서비스
+    private final FlowService flowService; // 플로우 관리 서비스
 
     /**
      * 채팅 처리
@@ -34,16 +35,21 @@ public class ChatServiceImpl implements ChatService {
     public BasicChatResponseDTO chat(Long customerId, String sessionId, String message, String flow) {
         log.debug("Using sessionId: {} for customerId: {}", sessionId, customerId);
 
-        // 입력이 유효하지 않으면 validation 실패 메시지로 바로 응답
-        if (!validCheckService.isValidInput(customerId, sessionId, message, flow)) {
-            String errorMessage = validCheckService.getValidationMessage(customerId, sessionId, message, flow);
+        // 입력 검증
+        ValidInputResponseDTO validated = validCheckService.validateInput(customerId, sessionId, message, flow);
+
+        // 입력이 유효하지 않으면 현재 플로우 유지하고 에러 메시지를 바로 응답.
+        if (!validated.isValid()) {
             return BasicChatResponseDTO.builder()
                     .sessionId(sessionId)
-                    .message(errorMessage)
+                    .message(validated.getMessage())
                     .newHobby("")
                     .products(null)
                     .build();
         }
+
+        // validation 성공시 다음 플로우로 전환
+        String nextFlow = flowService.getNextFlow(flow);
 
         // 입력이 유효한 경우 기존 채팅 생성 로직 수행
         CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId);
@@ -52,17 +58,8 @@ public class ChatServiceImpl implements ChatService {
         Integer balance = chatCacheService.getBalance(customerId);
         String summary = chatCacheService.getSummaryBySession(sessionId);
 
-        // flow 문자열을 enum으로 변환하여 검증
-        ChatFlowType flowType;
-        try {
-            flowType = ChatFlowType.fromValue(flow);
-            log.info("Valid flow type received: {} -> {}", flow, flowType);
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid flow type received: {}", flow);
-            throw new IllegalArgumentException("유효하지 않은 플로우 타입입니다: " + flow);
-        }
-
-        // LLM 서비스에 채팅 생성 요청
+        // LLM 서비스에 채팅 생성 요청 (다음 플로우로)
+        // TODO : 차후 nextFlow 부분 FRONT에서 제거하고 REDIS로 이관 예정
         BasicChatResponseDTO response = llmService.generateChat(
                 sessionId,
                 customerInfo,
@@ -71,10 +68,11 @@ public class ChatServiceImpl implements ChatService {
                 balance,
                 message,
                 summary,
-                flowType.getValue()
+                nextFlow
         );
 
         // fast api에서 newhobby가 왔을 경우 DB 업데이트
+        // TODO : 향후 로직 리팩터링시 분리 예정...
         if (!response.getNewHobby().equals("")) {
             customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
             log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}", customerId, response.getNewHobby());
