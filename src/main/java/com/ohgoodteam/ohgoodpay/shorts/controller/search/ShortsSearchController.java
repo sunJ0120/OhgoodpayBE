@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.CursorResponse;
 import com.ohgoodteam.ohgoodpay.shorts.service.search.ShortsSearchService;
-
 import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(
