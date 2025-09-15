@@ -65,9 +65,30 @@ public class ChatCacheService {
         return mood != null ? mood : "쏘쏘";
     }
 
+    // 세션별 기분 저장
+    public void saveMoodBySession(String sessionId, String mood) {
+        cacheStore.saveBySession(CacheSpec.MOOD, sessionId, mood);
+    }
+
     // 세션별 대화 요약 조회
     public String getSummaryBySession(String sessionId) {
         String summary = cacheStore.getBySession(CacheSpec.SUMMARY, sessionId, String.class);
         return summary != null ? summary : ""; // 기본값
+    }
+
+    // 세션별 대화 요약 저장
+    public void saveSummaryBySession(String sessionId, String summary) {
+        cacheStore.saveBySession(CacheSpec.SUMMARY, sessionId, summary);
+    }
+
+    // 세션별 플로우 조회
+    public String getFlowBySession(String sessionId) {
+        String flow = cacheStore.getBySession(CacheSpec.FLOW, sessionId, String.class);
+        return flow != null ? flow : "mood_check"; // 플로우 없을 경우 기본값: 첫 번째 플로우
+    }
+
+    // 세션별 플로우 저장
+    public void saveFlowBySession(String sessionId, String flow) {
+        cacheStore.saveBySession(CacheSpec.FLOW, sessionId, flow);
     }
 }
