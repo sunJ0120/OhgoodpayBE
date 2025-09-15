@@ -1,8 +1,13 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.dashdto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,73 +15,84 @@ import java.util.Map;
 
 public class SpendingAnalyzeDTO {
 
-    // ---------- FastAPI 요청 ----------
-    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+    // ---------- 요청 DTO ----------
+    @Getter @ToString
+    @Builder @Jacksonized
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class In {
-        private Long customerId;
-//        private Integer windowMonths;      // 기본 3 (서비스에서 세팅)
-        private String timezone;           // "Asia/Seoul"
-        private List<Transaction> transactions;
+        @JsonAlias({"customer_id","customerId"})
+        private final Long customerId;
+        // private final Integer windowMonths; // 필요 시 서비스에서 세팅
+        private final String timezone;           // "Asia/Seoul"
+        private final List<Transaction> transactions;
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Transaction {
-            private Long paymentId;       // 전역 SNAKE_CASE면 JSON에서는 payment_id
-            private String date;          // "YYYY-MM-DD"
-            private String requestName;   // request_name
-            private BigDecimal amount;
-            private Boolean isBnpl;       // is_bnpl
-            private String memo;
-            private String merchantCode;  // merchant_code
+            @JsonAlias({"customer_id","customerId"})
+            private final Long paymentId;
+            private final String date;
+            private final String requestName;
+            private final BigDecimal amount;
+            @JsonProperty("is_bnpl")
+            private final Boolean isBnpl;       // 네이밍 이슈 방지
+            private final String memo;
+            private final String merchantCode;  // JSON: merchant_code
         }
     }
 
-    // ---------- FastAPI 응답 ----------
-    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+    // ---------- 응답 DTO ----------
+    @Getter @ToString
+    @Builder @Jacksonized
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Out {
-        private Summary summary;
-        private Map<String, MonthlyData> monthlyData; // JSON: monthly_data
+        private final Summary summary;
+        private final Map<String, MonthlyData> monthlyData; // JSON: monthly_data
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Summary {
-            private Integer totalMonths;  // total_months
-            private DateRange dateRange;  // date_range
+            private final Integer totalMonths;  // JSON: total_months
+            private final DateRange dateRange;  // JSON: date_range
         }
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class DateRange {
-            private String start;         // "YYYY-MM"
-            private String end;           // "YYYY-MM"
+            private final String start;         // "YYYY-MM"
+            private final String end;           // "YYYY-MM"
         }
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class MonthlyData {
-            private BigDecimal totalSpend;
-            private Map<String, CategoryStat> categories;
-            private List<TopTransaction> topTransactions;
+            private final BigDecimal totalSpend;                 // JSON: total_spend
+            private final Map<String, CategoryStat> categories;
+            private final List<TopTransaction> topTransactions;  // JSON: top_transactions
         }
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class CategoryStat {
-            private BigDecimal amount;
-            private Double share;
-            private Integer rank;
+            private final BigDecimal amount;
+            private final Double share;
+            private final Integer rank;
         }
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder @ToString
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class TopTransaction {
-            private Long paymentId;
-            private String requestName;
-            private BigDecimal amount;
-            private String date;     // "YYYY-MM-DD"
-            private String category; // 한글 카테고리
+            private final Long paymentId;
+            private final String requestName;
+            private final BigDecimal amount;
+            private final String date;     // "YYYY-MM-DD"
+            private final String category; // 한글 카테고리
         }
     }
 }

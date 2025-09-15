@@ -29,7 +29,7 @@ public class SwaggerConfig {
                                 .url("https://github.com/OhGoodTeam/OhgoodpayBE")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8081")
+                                .url("http://localhost:8090") // 선정언니는 8081
                                 .description("개발 로컬 서버")
 //                        new Server() //차후 도메인 배포시 사용
 //                                .url("https://api.ohgoodpay.com")

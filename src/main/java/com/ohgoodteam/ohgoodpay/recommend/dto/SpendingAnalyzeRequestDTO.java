@@ -1,16 +1,25 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatRequestDTO;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
 
-@ToString(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-@Getter
+@Getter @ToString
+@Builder @Jacksonized
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class SpendingAnalyzeRequestDTO {
+    @JsonAlias({"customer_id","customerId"})
+    private final Long customerId;
+    @Builder.Default private final Integer windowMonths = 3;
 
-public class SpendingAnalyzeRequestDTO extends BaseChatRequestDTO {
-    private Long customerId;
-    // 필요하면 옵션으로 windowMonths 허용 (기본 3)
-     @Builder.Default private Integer windowMonths = 3;
+    public static SpendingAnalyzeRequestDTO ofDefault3m(Long customerId) {
+        return builder().customerId(customerId).windowMonths(3).build();
+    }
+    public static SpendingAnalyzeRequestDTO of(Long customerId, int windowMonths) {
+        return builder().customerId(customerId).windowMonths(windowMonths).build();
+    }
 }

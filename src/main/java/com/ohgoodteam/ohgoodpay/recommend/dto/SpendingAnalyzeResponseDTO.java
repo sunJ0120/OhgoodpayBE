@@ -1,47 +1,52 @@
-// SpendingReportResponse.java
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import lombok.*;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.jackson.Jacksonized;
+
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
-@Getter @Builder @AllArgsConstructor @NoArgsConstructor
+@Getter @ToString
+@Builder @Jacksonized
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SpendingAnalyzeResponseDTO {
-    private Summary summary;
-    private Map<String, MonthlyData> monthly_data; // "YYYY-MM" -> 월별 블록
 
-    @Getter @Builder @AllArgsConstructor @NoArgsConstructor
+    private final Summary summary;
+    private final Map<String, MonthlyData> monthly_data;
+
+    @Getter @ToString
+    @Builder @Jacksonized
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Summary {
-        private Integer total_months;
-        private DateRange date_range;
+        private final DateRange date_range;
     }
-    @Getter @Builder @AllArgsConstructor @NoArgsConstructor
+
+    @Getter @ToString
+    @Builder @Jacksonized
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class DateRange {
-        private String start; // "YYYY-MM"
-        private String end;   // "YYYY-MM"
+        private final String start;
+        private final String end;
     }
 
-    @Getter @Builder @AllArgsConstructor @NoArgsConstructor
+    @Getter @ToString
+    @Builder @Jacksonized
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class MonthlyData {
-        private BigDecimal total_spend;
-        private Map<String, CategoryStat> categories; 
-        private List<TopTransaction> top_transactions;
+        private final BigDecimal total_spend;
+        private final Map<String, CategoryData> categories;
     }
 
-    @Getter @Builder @AllArgsConstructor @NoArgsConstructor
-    public static class CategoryStat {
-        private BigDecimal amount;
-        private Double share;
-        private Integer rank;
-    }
-
-    @Getter @Builder @AllArgsConstructor @NoArgsConstructor
-    public static class TopTransaction {
-        private Long payment_id;
-        private String request_name;
-        private BigDecimal amount;
-        private String date;
-        private String category;
+    @Getter @ToString
+    @Builder @Jacksonized
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class CategoryData {
+        private final BigDecimal amount;
+        private final Double share;
+        private final String rank;
     }
 }

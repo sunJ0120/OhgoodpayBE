@@ -1,72 +1,82 @@
-// AdviceDTO.java
 package com.ohgoodteam.ohgoodpay.recommend.dto.dashdto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 public class AdviceDTO {
 
-    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    // ---------- 요청 DTO ----------
+    @Getter @ToString
+    @Builder @Jacksonized
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class In {
-        private Identity identity;
-        private Spending spending;
+        private final Identity identity;
+        private final Spending spending;
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Identity {
-            private Long customerId;
-            private String username;
-            private String tier;             // grade / gradeName 중 택1
-            private Integer gradePoint;
-            private Boolean autoExtensionThisMonth;
-            private Integer autoExtensionCnt12m;
-            private Boolean blocked;
-            private Integer paymentCnt12m;
-            private BigDecimal paymentAmount12m;
-            private BigDecimal currentCycleSpend;
+            @JsonAlias({"customer_id","customerId"})
+            private final Long customerId;
+            private final String username;
+            private final String tier;
+            private final Integer gradePoint;
+            private final Boolean autoExtensionThisMonth;
+            private final Integer autoExtensionCnt12m;
+            private final Boolean blocked;
+            private final Integer paymentCnt12m;
+            private final BigDecimal paymentAmount12m;
+            private final BigDecimal currentCycleSpend;
         }
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+        @Getter @ToString
+        @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Spending {
-            private Map<String,String> dateRange;     // {"start","end"}
-            private String latestMonth;               // "YYYY-MM"
-            private BigDecimal latestTotalSpend;
-            private Double momGrowth;          
-            private Boolean spikeFlag;
-            private List<Category> topCategoriesLatest;
-            private Map<String, Double> categoriesShareLatest;
+            private final Map<String,String> dateRange;
+            private final String latestMonth;
+            private final BigDecimal latestTotalSpend;
+            private final Double momGrowth;
+            private final Boolean spikeFlag;
+            private final List<Category> topCategoriesLatest;
+            private final Map<String, Double> categoriesShareLatest;
 
-            @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+            @Getter @ToString
+            @Builder @Jacksonized
             @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
             public static class Category {
-                private String category;
-                private BigDecimal amount;
-                private Double share;
+                private final String category;
+                private final BigDecimal amount;
+                private final Double share;
             }
         }
     }
 
-    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    // ---------- 응답 DTO ----------
+    @Getter @ToString
+    @Builder
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Out {
-        private List<Advice> advices;
-        private Map<String,String> meta;
+        private final List<Advice> advices;
+        private final Map<String,String> meta;
 
-        @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+        @Getter @ToString
+        @Builder
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Advice {
-            private String id;
-            private String title;
-            private String body;
-            private String level;
-            private List<String> tags;
-            private List<String> refs;
+            private final String id;
+            private final String title;
+            private final String body;
+            private final String level;
+            private final List<String> tags;
+            private final List<String> refs;
         }
     }
 }

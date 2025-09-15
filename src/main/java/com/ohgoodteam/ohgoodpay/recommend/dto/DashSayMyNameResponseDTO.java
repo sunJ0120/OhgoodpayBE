@@ -1,33 +1,34 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseChatResponseDTO;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 @Getter
-@ToString(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class DashSayMyNameResponseDTO extends BaseChatResponseDTO { // userId 만 가져오는 dto
-    /** 후속 대화/추적용 세션 ID */
-    private String sessionId;
+@ToString
+@Builder
+public class DashSayMyNameResponseDTO {
+    private final String  message;
+    private final String  sessionId;
+    private final Integer ttlSeconds;
+    private final Integer ohgoodScore;
 
-    /** 세션 TTL(초) — FastAPI가 준 값을 그대로 전달 */
-    private Integer ttlSeconds;
+    private final boolean extensionThisMonth;
+    private final boolean autoExtensionThisMonth;
+    private final Integer autoExtensionCnt12m;
+    private final Integer gradePoint;
+    private final boolean blocked;
 
-    @JsonProperty("ohgoodScore")
-    private Integer ohgoodScore;
+    private final Integer paymentCnt12m;
+    private final Double  paymentAmount12m;
+    private final Double  currentCycleSpend;
 
-    /** 스프링이 DB에서 집계) */
-    private boolean extensionThisMonth;       // 이번달 연장 여부
-    private boolean autoExtensionThisMonth;   // 이번달 자동연장 여부
-    private int     autoExtensionCnt12m;      // 최근 12개월 자동연장 횟수
-    private int     gradePoint;               // 등급점수(0~150)
-    private boolean blocked;                  // 제재 여부
-    private int     paymentCnt12m;            // 최근 12개월 결제 횟수
-    private double  paymentAmount12m;         // 최근 12개월 결제 금액
-    private double  currentCycleSpend;        // 이번달 결제 금액(0이면 12개월 평균/12 대체)
+    public static DashSayMyNameResponseDTO ofCore(String message, String sessionId, Integer ttlSeconds, Integer ohgoodScore) {
+        return builder()
+                .message(message)
+                .sessionId(sessionId)
+                .ttlSeconds(ttlSeconds)
+                .ohgoodScore(ohgoodScore)
+                .build();
+    }
 }
