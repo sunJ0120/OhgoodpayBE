@@ -6,11 +6,13 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.*;
 //import com.ohgoodteam.ohgoodpay.recommend.dto.SpendingAnalyzeResponse;
 import com.ohgoodteam.ohgoodpay.recommend.dto.dashdto.AdviceDTO;
 import com.ohgoodteam.ohgoodpay.recommend.service.DashAdviceService;
+import com.ohgoodteam.ohgoodpay.recommend.service.PayThisMonthService;
 import com.ohgoodteam.ohgoodpay.recommend.service.SayMyNameService;
 //import com.ohgoodteam.ohgoodpay.recommend.service.SpendingAnalyzeService;
 import com.ohgoodteam.ohgoodpay.recommend.service.SpendingAnalyzeService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,11 +25,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RequestMapping("/api/dash")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Dash")
 public class DashController {
 
     private final SayMyNameService sayMyNameService;
     private final SpendingAnalyzeService spendingAnalyzeService;
     private final DashAdviceService dashAdviceService;
+    private final PayThisMonthService service;
 
 
     @Operation(summary = "ohgoodscore 계산", description = "고객 정보를 바탕으로 ohgoodscore 계산 후 한마디 반환하기")
@@ -66,5 +70,10 @@ public class DashController {
                         .data(data)
                         .build()
         );
+    }
+    @Operation(summary = "이번달 결제 내역", description = "이번달 결제 내역 반환하기")
+    @GetMapping("/{customerId}/pay-this-month")
+    public ResponseEntity<?> getThisMonth(@PathVariable Long customerId) {
+        return ResponseEntity.ok(ApiResponseWrapper.ok(service.getThisMonth(customerId)));
     }
 }

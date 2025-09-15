@@ -16,7 +16,6 @@ public interface PaymentRepositoryCustom {
     boolean existsExtensionThisMonth(Long customerId, LocalDateTime from, LocalDateTime to);
     // 이번달 자동연장 여부
     boolean existsAutoExtensionThisMonth(Long customerId, LocalDateTime from, LocalDateTime to);
-
     // 최근 결제 내역
     List<PaymentViewDTO> findRecentByCustomer(Long customerId, LocalDateTime start, LocalDateTime end);
 
