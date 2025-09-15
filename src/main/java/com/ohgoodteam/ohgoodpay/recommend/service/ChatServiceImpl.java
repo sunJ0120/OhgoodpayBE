@@ -40,16 +40,36 @@ public class ChatServiceImpl implements ChatService {
 
         // 입력이 유효하지 않으면 현재 플로우 유지하고 에러 메시지를 바로 응답.
         if (!validated.isValid()) {
-            return BasicChatResponseDTO.builder()
-                    .sessionId(sessionId)
-                    .message(validated.getMessage())
-                    .newHobby("")
-                    .products(null)
-                    .build();
+            int cnt = chatCacheService.getCntBySession(sessionId);
+            if(cnt < 2){
+                chatCacheService.saveCntBySession(sessionId, cnt + 1); // 카운트 증가 후 저장
+                return BasicChatResponseDTO.builder()
+                        .sessionId(sessionId)
+                        .message(validated.getMessage())
+                        .newHobby("")
+                        .products(null)
+                        .build();
+            }
+            // cnt >= 2면 다음 플로우로 강제 진행
+            log.info("Validation 실패 {}번, 다음 플로우로 바로 넘어간다.", cnt);
         }
 
-        // validation 성공시 다음 플로우로 전환
+        // validation 성공 또는 2번 실패 후 다음 플로우로 전환
         String nextFlow = flowService.getNextFlow(flow);
+
+        //====== LLM 전송 전에 캐싱 필요한 파트들 ==========
+        // 플로우 전환시 카운트 리셋
+        chatCacheService.saveCntBySession(sessionId, 1);
+
+        // 특정 플로우에서 mood 저장
+        if ("hobby_check".equals(nextFlow) && validated != null) {
+            chatCacheService.saveMoodBySession(sessionId, validated.getInputMessage());
+        }
+
+        // 특정 플로우에서 hobby 저장
+        if ("choose".equals(nextFlow) && validated != null) {
+            chatCacheService.saveHobby(customerId, validated.getInputMessage());
+        }
 
         // 입력이 유효한 경우 기존 채팅 생성 로직 수행
         CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId);
@@ -77,6 +97,15 @@ public class ChatServiceImpl implements ChatService {
             customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
             log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}", customerId, response.getNewHobby());
         }
+
+        //====== LLM 전송 후에 캐싱 필요한 파트들 ==========
+
+        // 대화 요약본 저장 (LLM이 업데이트된 요약본 제공)
+        if (response.getSummary() != null && !response.getSummary().isEmpty()) {
+            chatCacheService.saveSummaryBySession(sessionId, response.getSummary());
+        }
+        // 세션에 flow 새로 저장
+        chatCacheService.saveFlowBySession(sessionId, nextFlow);
 
         return response;
     }

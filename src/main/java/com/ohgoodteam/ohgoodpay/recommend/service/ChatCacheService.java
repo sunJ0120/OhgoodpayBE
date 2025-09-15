@@ -45,6 +45,12 @@ public class ChatCacheService {
         );
     }
 
+    // 고객 취미 정보 저장
+    public void saveHobby(Long customerId, String hobby) {
+        cacheStore.put(CacheSpec.HOBBY, customerId, hobby);
+        log.debug("취미를 customerId: {}로 저장 -> {}", customerId, hobby);
+    }
+
     // 고객 잔액 조회 (Read-through)
     // 잔액 정보가 없을 경우 50000원 기본값 반환 (일단은...)
     public Integer getBalance(Long customerId) {
