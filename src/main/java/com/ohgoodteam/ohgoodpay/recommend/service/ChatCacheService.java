@@ -99,7 +99,7 @@ public class ChatCacheService {
     }
 
     // 세션별 플로우 count 저장
-    public void saveCntBySession(String sessionId, String flow) {
-        cacheStore.saveBySession(CacheSpec.COUNT, sessionId, flow);
+    public void saveCntBySession(String sessionId, Integer count) {
+        cacheStore.saveBySession(CacheSpec.COUNT, sessionId, count);
     }
 }
