@@ -49,4 +49,23 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("UPDATE CustomerEntity c SET c.balance = c.balance + :balance WHERE c.customerId = :customerId")
     int plusCustomerBalance(int balance, Long customerId);
 
+
+    // customerId로 회원 point 차감
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.point = c.point - :point WHERE c.customerId = :customerId")
+    int minusCustomerPoint(int point, Long customerId);
+
+    //customerId로 회원 point 적립
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.point = c.point + :point WHERE c.customerId = :customerId")
+    int plusCustomerPoint(int point, Long customerId);
+
+    //customerId로 회원 balance 차감
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.balance = c.balance - :balance WHERE c.customerId = :customerId")
+    int minusCustomerBalance(int balance, Long customerId);
+
 }

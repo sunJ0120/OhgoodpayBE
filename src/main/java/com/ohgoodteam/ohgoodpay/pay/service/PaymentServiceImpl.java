@@ -3,11 +3,14 @@ package com.ohgoodteam.ohgoodpay.pay.service;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.PaymentRequestEntity;
+import com.ohgoodteam.ohgoodpay.common.entity.PointHistoryEntity;
 import com.ohgoodteam.ohgoodpay.pay.dto.*;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.enums.GradePointRate;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRequestRepository;
+import com.ohgoodteam.ohgoodpay.pay.repository.PointHistoryRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRequestRepository paymentRequestRepository;
     private final PaymentRepository paymentRepository;
     private final CustomerRepository customerRepository;
+    private final PointHistoryRepository pointHistoryRepository;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private String generateQrBase64(String text) throws Exception {
@@ -184,11 +188,15 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // 포인트 차감
         if (point > 0) {
-            try {
-                // 차감 가능한지 CustomerEntity가 스스로 검증
-                customer.decreasePoint(point);
-            } catch (IllegalArgumentException e) {
-                // 포인트 부족 등 비즈니스 검증 실패
+            if ( customer.getPoint() - point >= 0 ) {
+                customerRepository.minusCustomerPoint(point, customerId);
+                pointHistoryRepository.save(PointHistoryEntity.builder()
+                        .customer(customer)
+                        .point(-point)
+                        .pointExplain("포인트 사용")
+                        .date(LocalDateTime.now())
+                        .build());
+            } else {
                 return PaymentConfirmDTO.builder()
                         .success(false)
                         .result(false)
@@ -197,7 +205,14 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // 잔액 차감 (엔티티 메서드 사용) — @Transactional로 커밋 시 DB 반영
         try {
-            customer.decreaseBalance(actualPrice);
+            if (customer.getBalance() - actualPrice >= 0) {
+                customerRepository.minusCustomerBalance(actualPrice, customerId);
+            } else {
+                return PaymentConfirmDTO.builder()
+                        .success(false)
+                        .result(false)
+                        .build();
+            }
         } catch (IllegalArgumentException e) {
             // 경합 등으로 잔액이 부족해진 경우 방어
             return PaymentConfirmDTO.builder()
@@ -221,9 +236,15 @@ public class PaymentServiceImpl implements PaymentService {
         double rate = GradePointRate.getRateByGrade(customer.getGrade().getGradeName());
         int earnedPoint = (int) Math.floor(actualPrice * rate);
         if (earnedPoint > 0) {
-            customer.addPoint(earnedPoint);
+            customerRepository.plusCustomerPoint(earnedPoint, customerId);
+            pointHistoryRepository.save(PointHistoryEntity.builder()
+                    .customer(customer)
+                    .point(earnedPoint)
+                    .pointExplain("결제 적립")
+                    .date(LocalDateTime.now())
+                    .build());
         }
-        request.setValidated(false);
+        paymentRequestRepository.expirePaymentRequest(requestId);
         // 성공 반환
         return PaymentConfirmDTO.builder()
                 .success(true)

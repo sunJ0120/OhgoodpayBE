@@ -24,4 +24,5 @@ public interface PaymentRequestRepository extends JpaRepository<PaymentRequestEn
     boolean existsByPincodeAndIsValidatedTrue(String pincode);
 
     PaymentRequestEntity findByPaymentRequestId(Long paymentRequestId);
+
 }
