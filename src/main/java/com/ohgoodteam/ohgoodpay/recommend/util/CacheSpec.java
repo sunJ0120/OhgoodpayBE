@@ -29,6 +29,8 @@ public enum CacheSpec {
     MOOD("v1:mood", Duration.ofMinutes(10)),
     // 5) 대화 요약본 - 1시간, 세션 초기화 시 초기화 하도록 구성
     SUMMARY("v1:summary", Duration.ofHours(1)); //메세지들 캐싱을 위해서 선언
+    // TODO : 플로우 관리 REDIS KEY 추가 (session 기반)
+    // TODO : CNT 로직 추가 (session 기반)
 
     private final String prefix; //키 네임 스페이스
     private final Duration ttl;

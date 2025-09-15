@@ -20,4 +20,7 @@ public interface LlmService {
             String summary,
             String flow
     );
+
+    // 사용자 입력 검증
+    ValidInputResponseDTO validateInput(ValidInputRequestDTO request);
 }

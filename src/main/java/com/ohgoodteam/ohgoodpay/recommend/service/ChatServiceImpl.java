@@ -24,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final CustomerRepository customerRepository; // DB 직접 접근용 (update)
     private final ChatCacheService chatCacheService; // 캐싱 서비스
     private final LlmService llmService; // FastAPI LLM 연동 서비스
+    private final ValidCheckService validCheckService; // 입력 검증 서비스
 
     /**
      * 채팅 처리
@@ -31,7 +32,26 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public BasicChatResponseDTO chat(Long customerId, String sessionId, String message, String flow) {
-        // TODO: [MVP 이후(~18)] 플로우 틀릴 시, front에서 어떻게 처리할지 정의 필요
+        log.debug("Using sessionId: {} for customerId: {}", sessionId, customerId);
+
+        // 입력이 유효하지 않으면 validation 실패 메시지로 바로 응답
+        if (!validCheckService.isValidInput(customerId, sessionId, message, flow)) {
+            String errorMessage = validCheckService.getValidationMessage(customerId, sessionId, message, flow);
+            return BasicChatResponseDTO.builder()
+                    .sessionId(sessionId)
+                    .message(errorMessage)
+                    .newHobby("")
+                    .products(null)
+                    .build();
+        }
+
+        // 입력이 유효한 경우 기존 채팅 생성 로직 수행
+        CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId);
+        String hobby = chatCacheService.getHobby(customerId);
+        String mood = chatCacheService.getMoodBySession(sessionId);
+        Integer balance = chatCacheService.getBalance(customerId);
+        String summary = chatCacheService.getSummaryBySession(sessionId);
+
         // flow 문자열을 enum으로 변환하여 검증
         ChatFlowType flowType;
         try {
@@ -42,17 +62,7 @@ public class ChatServiceImpl implements ChatService {
             throw new IllegalArgumentException("유효하지 않은 플로우 타입입니다: " + flow);
         }
 
-        // 프론트에서 전달받은 sessionId 사용
-        log.debug("Using sessionId: {} for customerId: {}", sessionId, customerId);
-
-        CustomerCacheDTO customerInfo = chatCacheService.getCustomerInfo(customerId); //고객 기본 정보
-        String hobby = chatCacheService.getHobby(customerId); //원래 저장되어 있었던 취미
-        String mood = chatCacheService.getMoodBySession(sessionId); // 세션별 기분
-        Integer balance = chatCacheService.getBalance(customerId); // 고객 잔액
-        String summary = chatCacheService.getSummaryBySession(sessionId); // 세션별 대화 요약
-
-        // LLM 서비스에 채팅 생성 요청 (검증된 enum 값 사용)
-        // 속 서버에 요청하기 위한 값들을 겉 서버에서 모아서 넘긴다.
+        // LLM 서비스에 채팅 생성 요청
         BasicChatResponseDTO response = llmService.generateChat(
                 sessionId,
                 customerInfo,
@@ -64,12 +74,10 @@ public class ChatServiceImpl implements ChatService {
                 flowType.getValue()
         );
 
-        // fast api에서 newhobby가 왔을 경우,
+        // fast api에서 newhobby가 왔을 경우 DB 업데이트
         if (!response.getNewHobby().equals("")) {
-            // 신호가 왔다면, spring에서 DB에 저장
             customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
-            log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}",
-                    customerId, response.getNewHobby());
+            log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}", customerId, response.getNewHobby());
         }
 
         return response;
