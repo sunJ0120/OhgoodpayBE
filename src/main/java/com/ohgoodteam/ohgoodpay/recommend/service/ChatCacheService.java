@@ -91,4 +91,15 @@ public class ChatCacheService {
     public void saveFlowBySession(String sessionId, String flow) {
         cacheStore.saveBySession(CacheSpec.FLOW, sessionId, flow);
     }
+
+    // 세션별 플로우 count 조회
+    public Integer getCntBySession(String sessionId) {
+        Integer cnt = cacheStore.getBySession(CacheSpec.COUNT, sessionId, Integer.class);
+        return cnt != null ? cnt : 1; // count 없을 경우 기본이 1
+    }
+
+    // 세션별 플로우 count 저장
+    public void saveCntBySession(String sessionId, String flow) {
+        cacheStore.saveBySession(CacheSpec.COUNT, sessionId, flow);
+    }
 }
