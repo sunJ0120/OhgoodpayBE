@@ -116,6 +116,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
      * @return 연장 신청 결과
      */
     @Override
+    @Transactional
     public boolean requestCustomerExtension(Long customerId) {
         CustomerEntity customer = customerRepository.findByCustomerId(customerId);
 
@@ -161,6 +162,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
      * @return 납부 결과
      */
     @Override
+    @Transactional
     public boolean payImmediately(Long customerId, Long[] lists) {
         int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, lists);
         // 들어온 결제건이 이번 달인지 확인
@@ -168,14 +170,11 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         YearMonth paymentYearMonth = YearMonth.from(payment.getDate());
         YearMonth nowYearMonth = YearMonth.now();
         int sumPrice = paymentRepository.sumPriceByPaymentId(lists);
-        // payment의 년월과 현재 년월이 같은지 체크
-        if (paymentYearMonth.equals(nowYearMonth)) {
-            // 이번 달 결제건이면 balance 업데이트 (한도 풀어줌)
-            customerRepository.plusCustomerBalance(sumPrice, customerId);
-        }
         
+        // 결제건 납부 처리가 제대로 되었으면
         if(result > 0) {
             CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+            // 등급 포인트 적립 처리
             if (customer.getGradePoint() < 150){
                 int gradePoint = sumPrice / 10000;
                 if (customer.getGradePoint() + gradePoint > 150){
@@ -183,11 +182,17 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
                 }
                 customerRepository.updateCustomerGradePoint(gradePoint, customerId);
             }
+            // payment의 년월과 현재 년월이 같은지 체크
+            if (paymentYearMonth.equals(nowYearMonth)) {
+                // 이번 달 결제건이면 balance 업데이트 (한도 풀어줌)
+                customerRepository.plusCustomerBalance(sumPrice, customerId);
+            }
+            //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
+            if (!paymentYearMonth.equals(nowYearMonth)) {
+                releaseExtension(customerId);
+            }
         }
-        //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
-        if (!paymentYearMonth.equals(nowYearMonth)) {
-            releaseExtension(customerId);
-        }
+        
         return result > 0;
     }
 
