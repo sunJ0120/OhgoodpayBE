@@ -2,9 +2,9 @@ package com.ohgoodteam.ohgoodpay.shorts.controller.feed;
 
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsPointResponseDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.ApiResponseWrapper;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
 import com.ohgoodteam.ohgoodpay.shorts.service.feed.ShortsFeedService;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +34,12 @@ public class ShortsFeedController {
     public ResponseEntity<ShortsCommonResponse> getAllFeed(
             @RequestParam (value = "page") int page,
             @RequestParam (value = "size", defaultValue = "10", required = false) int size,
-            @RequestParam (value = "keyword", required = false) String keyword
+            @RequestParam (value = "keyword", required = false) String keyword,
+            @RequestParam (value = "customerId", required = false) Long customerId
     ) {
         log.info("전체 쇼츠 피드 조회 요청");
 
-        List<ShortsFeedDataDto> data = shortsFeedService.findAllFeeds(page,size,keyword);
+        List<ShortsFeedDataDto> data = shortsFeedService.findAllFeeds(page,size,keyword,customerId );
 
         ShortsCommonResponse res = ShortsCommonResponse.builder()
                 .resultCode("0000")
@@ -47,6 +48,20 @@ public class ShortsFeedController {
                 .build();
 
         return ResponseEntity.ok(res);
+    }
+
+
+    @GetMapping("/feeds-v2")
+    public ApiResponseWrapper<ShortsFeedListDataDto> getAllFeedV2(
+            @RequestParam (value = "page") int page,
+            @RequestParam (value = "size", defaultValue = "10", required = false) int size,
+            @RequestParam (value = "keyword", required = false) String keyword
+    ){
+        log.info("전체 쇼츠 피드 조회 요청 v2 : page={}, size={}, keyword={}", page, size, keyword);
+
+        ShortsFeedListDataDto data  = shortsFeedService.findAllFeedsV2(page,size,keyword);
+
+        return ApiResponseWrapper.ok(data);
     }
 
     /**
@@ -70,6 +85,13 @@ public class ShortsFeedController {
 
     }
 
+    @GetMapping("/feeds-v2/{shortsId}/comments")
+    public ApiResponseWrapper<ShortsCommentListDataDto> getAllCommentsV2(@PathVariable (value = "shortsId") Long shortsId){
+        log.info("특정 쇼츠 댓글 조회 요청 : shortsId={}" , shortsId);
+        ShortsCommentListDataDto data = shortsFeedService.findAllCommentsV2(shortsId);
+        return ApiResponseWrapper.ok(data);
+    }
+
     /**
      * 쇼츠 댓글 작성
      * @param requestDto 댓글 요청 DTO
@@ -82,7 +104,7 @@ public class ShortsFeedController {
             @PathVariable (value = "shortsId") Long shortsId
     ){
         log.info("쇼츠 댓글 작성 요청: shortsId={}, requestDto={}", shortsId, requestDto);
-        ShortsCommentDataDto data = shortsFeedService.createComment(shortsId, requestDto);
+        boolean data = shortsFeedService.createComment(shortsId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(data);
 
@@ -103,6 +125,32 @@ public class ShortsFeedController {
         @RequestBody ShortsPointRequestDto requestDto
     ){
         return ResponseEntity.ok(shortsFeedService.watchFeed(customerId, requestDto));
+    }
+    @PostMapping("/feeds-v2/{shortsId}/comments")
+    public ApiResponseWrapper<ShortsCommentDataDto> createCommentV2(
+            @PathVariable (value = "shortsId") Long shortsId,
+            @RequestBody ShortsCommentRequestDto requestDto
+        ){
+        log.info("특정 쇼츠 댓글 작성 요청 : shortsId={}, requestDto={}", shortsId, requestDto);
+        ShortsCommentDataDto dto = shortsFeedService.createCommentV2(shortsId, requestDto);
+
+        return ApiResponseWrapper.ok(dto);
+    }
+
+    @PostMapping("/feeds/{shortsId}/reactions")
+    public ApiResponseWrapper<ShortsReactionDataDto> reactToShorts(
+            @PathVariable (value ="shortsId") Long shortsId,
+            @RequestBody ShortsReactionRequestDto requestDto
+    ){
+        log.info("쇼츠 반응(좋아요/싫어요) 요청: shortsId={}, requestDto={}", shortsId, requestDto);
+        try {
+            ShortsReactionDataDto dto = shortsFeedService.reactToShorts(requestDto);
+            return ApiResponseWrapper.ok(dto);
+        } catch (IllegalArgumentException e){
+            // 이미 반응한 쇼츠
+            return ApiResponseWrapper.error(400, e.getMessage());
+        }
+
     }
 
 }

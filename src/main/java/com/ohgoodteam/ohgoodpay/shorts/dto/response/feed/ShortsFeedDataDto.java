@@ -34,6 +34,9 @@ public class ShortsFeedDataDto {
     private int likeCount;
     private int commentCount;
 
+    // 반응한 상태 (예 : "like", "dislike" )
+    private String myReaction;
+
     public static ShortsFeedDataDto entityToDto(ShortsEntity shortsEntity) {
         return  ShortsFeedDataDto.builder()
                 .shortsId(shortsEntity.getShortsId())
@@ -61,6 +64,9 @@ public class ShortsFeedDataDto {
         this.profileImg = shortsEntity.getCustomer().getProfileImg();
         this.likeCount = (int) shortsEntity.getLikeCount();
         this.commentCount = (int) shortsEntity.getCommentCount();
+        this.myReaction = null; // Entity에는 myReaction 필드가 없으므로 null로 설정
     }
+
+
 
 }
