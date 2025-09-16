@@ -17,4 +17,7 @@ public interface ShortsMypageService {
 
     // 댓글 단 영상 전체보기
     ShelfPageResponse<VideoCard> getCommentedVideos(Long userId, String cursor, int limit);
+
+    // 구독 취소
+    long deleteSubscription(Long userId, Long targetId);
 }

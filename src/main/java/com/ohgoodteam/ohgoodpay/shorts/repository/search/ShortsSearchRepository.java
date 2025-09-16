@@ -41,7 +41,7 @@ public interface ShortsSearchRepository extends JpaRepository<ShortsEntity, Long
     ORDER BY t.score DESC, t.date DESC, t.shorts_id DESC
     LIMIT :limitPlusOne
     """, nativeQuery = true)
-  List<ShortsSearchResponse> fetchExposure(
+  List<ShortsSearchResponse> fetchExposure( // 가중치 로직, 점수 계산, 정렬, 페이징 처리
       @Param("q") String q,
       @Param("wLike") double wLike,
       @Param("wComment") double wComment,

@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -153,6 +154,38 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
         """, nativeQuery = true)
     List<ShortsCommonResponse> findShortsFeedByCustomerId(@Param("customerId") Long customerId);
 
+    @Query(value = """
+        SELECT COALESCE(SUM(ph.point), 0)
+          FROM point_history ph
+         WHERE ph.customer_id = :customerId
+           AND ph.point_explain = :reason
+           AND ph.date >= :start
+           AND ph.date <  :end
+        """, nativeQuery = true)
+    int sumTodayShortsPoint(Long customerId, String reason, LocalDateTime start, LocalDateTime end);
+
+
+    @Query(value = "SELECT customer_id FROM customer WHERE customer_id = :customerId FOR UPDATE", nativeQuery = true)
+    Long lockCustomerRow(Long customerId);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO point_history (customer_id, point, point_explain, date)
+        VALUES (:customerId, :pointPerLap, :reason, :kstNow)
+        """, nativeQuery = true)
+    void insertPointHistory(Long customerId, int pointPerLap, String reason, LocalDateTime kstNow);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE customer
+           SET point = point + :pointPerLap
+         WHERE customer_id = :customerId
+        """, nativeQuery = true)
+    void addCustomerPoint(Long customerId, int pointPerLap);
     /**
      * 특정 쇼츠의 좋아요 수
      * @param shortsId

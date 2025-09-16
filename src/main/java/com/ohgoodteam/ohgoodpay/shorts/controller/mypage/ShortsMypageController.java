@@ -1,6 +1,8 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.mypage;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +31,7 @@ public class ShortsMypageController {
         return shortsMypageService.getOverview(userId, limit);
     }
 
-    @GetMapping("/subscribe")
+    @GetMapping("/subscribe") // 구독 전체보기
     public ShelfPageResponse<UserCard> getSubscription(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -38,7 +40,7 @@ public class ShortsMypageController {
         return shortsMypageService.getSubscriptions(userId, cursor, limit);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/all") // 좋아요 한 영상 전체보기
     public ShelfPageResponse<VideoCard> getLikedVideos(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -47,7 +49,7 @@ public class ShortsMypageController {
         return shortsMypageService.getLikedVideos(userId, cursor, limit);
     }
 
-    @GetMapping("/comments")
+    @GetMapping("/comments") // 댓글 단 영상 전체보기
     public ShelfPageResponse<VideoCard> getCommentedVideos(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -55,4 +57,15 @@ public class ShortsMypageController {
     ) {
         return shortsMypageService.getCommentedVideos(userId, cursor, limit);
     }
+    @DeleteMapping("/subscription")
+    public ResponseEntity<Void> deleteSubscription(@RequestParam Long userId, @RequestParam Long targetId) {
+        long result = shortsMypageService.deleteSubscription(userId, targetId);
+        if(result > 0) {
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

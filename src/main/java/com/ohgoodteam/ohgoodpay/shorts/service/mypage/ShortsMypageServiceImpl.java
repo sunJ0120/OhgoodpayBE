@@ -63,7 +63,6 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
             .commentedVideos(commented)
             .build();
 
-
     }
     @Override
     public ShelfPageResponse<UserCard> getSubscriptions(Long userId, String cursor, int limit) {
@@ -156,6 +155,7 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
             Long lastCursorId = raw.get(raw.size() - 1).getCursorId();
             next = CursorUtil.encode(new Cursor(lastCursorId, null, null));
         }
+        // 유저 카드 리스트 생성
         List<UserCard> items = raw.stream()
             .map(r -> UserCard.builder()
                 .userId(r.getFollowingId())
@@ -177,7 +177,7 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
         if (hasNext) {
             raw = raw.subList(0, limit);
         }
-
+        // 다음 페이지 커서 생성
         String next = null;
         if (hasNext) {
             Long lastCursorId = raw.get(raw.size() - 1).getCursorId();
@@ -188,6 +188,7 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
                 .map(this::toVideoCardFromJoinRow)
                 .toList();
 
+        // response 객체 생성
         return Shelf.<VideoCard>builder()
                 .title(title)
                 .items(items)
@@ -215,9 +216,14 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
                         .build())
                 .build();
     }
-    
+    // 닉네임, 이름 선택 로직
     private String prefer(String nickname, String name) {
         return (nickname != null && !nickname.isBlank()) ? nickname : name;
     }
-
+    // 구독 취소 
+    @Override
+    public long deleteSubscription(Long userId, Long targetId) {
+        long result = subscriptionRepository.deleteByFollowerCustomerIdAndFollowingCustomerId(userId, targetId);
+        return result;
+    }
 }

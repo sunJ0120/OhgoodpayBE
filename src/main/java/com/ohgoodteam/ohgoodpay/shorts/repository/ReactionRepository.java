@@ -2,7 +2,6 @@ package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.List;
 import java.util.Optional;
-
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,7 +35,7 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
         WHERE r.customer_id = :meId AND r.react = 'LIKE'
         ORDER BY r.reaction_id DESC
         LIMIT :size
-    """, nativeQuery = true)
+    """, nativeQuery = true) 
     List<VideoJoinRow> findLikedShortsPreview(@Param("meId") Long meId, @Param("size") int size);
 
     // 좋아요 페이지
@@ -63,10 +62,10 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
           AND (:lastId IS NULL OR r.reaction_id < :lastId)
         ORDER BY r.reaction_id DESC
         LIMIT :size
-    """, nativeQuery = true)
+    """, nativeQuery = true) 
     List<VideoJoinRow> findLikedShortsPage(@Param("meId") Long meId, @Param("lastId") Long lastReactionId, @Param("size") int size);
 
-    // 댓글 미리보기
+    // 댓글 단 영상 미리보기
     @Query(value = """
         SELECT
           cm.comment_id AS cursorId,
@@ -89,10 +88,10 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
         WHERE cm.customer_id = :meId
         ORDER BY cm.comment_id DESC
         LIMIT :size
-    """, nativeQuery = true)
+    """, nativeQuery = true) 
     List<VideoJoinRow> findCommentedShortsPreview(@Param("meId") Long meId, @Param("size") int size);
 
-    // 댓글 페이지
+    // 댓글 단 영상 전체보기
     @Query(value = """
         SELECT
           cm.comment_id AS cursorId,
@@ -116,11 +115,10 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long> 
           AND (:lastId IS NULL OR cm.comment_id < :lastId)
         ORDER BY cm.comment_id DESC
         LIMIT :size
-    """, nativeQuery = true)
+    """, nativeQuery = true) 
     List<VideoJoinRow> findCommentedShortsPage(@Param("meId") Long meId, @Param("lastId") Long lastReactionId, @Param("size") int size);
 
-
-    // Projection
+    // Protection 으로 반환
     interface VideoJoinRow {
         Long getCursorId();          
         String getContext();
