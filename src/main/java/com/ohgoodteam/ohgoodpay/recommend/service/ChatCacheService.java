@@ -90,7 +90,7 @@ public class ChatCacheService {
     // 세션별 플로우 조회
     public String getFlowBySession(String sessionId) {
         String flow = cacheStore.getBySession(CacheSpec.FLOW, sessionId, String.class);
-        return flow != null ? flow : "mood_check"; // 플로우 없을 경우 기본값: 첫 번째 플로우
+        return flow != null ? flow : "start"; // 플로우 없을 경우 기본값: 첫 번째 플로우
     }
 
     // 세션별 플로우 저장

@@ -38,16 +38,32 @@ public class ChatServiceImpl implements ChatService {
         // 0. flow를 redis에서 가져오기
         String currentFlow = chatCacheService.getFlowBySession(sessionId);
 
-        // 1. Validation 및 재시도 체크
+        // start 플로우는 유효성 검증 없이 바로 LLM 처리
+        if (currentFlow.equals("start")) {
+            // 2. 플로우 전환 및 전처리
+            String nextFlow = flowService.getNextFlow(currentFlow);
+            chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
+            chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
+            log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
+
+            // 3. 캐싱된 데이터 수집
+            CustomerContextWrapper context = collectCachedData(customerId, sessionId);
+            // 4. LLM 요청
+            BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
+            // 5. 응답 후처리
+            processAfterResponse(response, customerId, sessionId, nextFlow);
+            return response;
+        }
+
+        // 일반 플로우는 유효성 검증 후 처리
         ValidInputResponseDTO validated = validCheckService.validateInput(customerId, sessionId, message, currentFlow);
         ValidationResult validationResult = processValidationResult(validated, customerId, sessionId, currentFlow);
         if (validationResult.shouldReturn()) { //바로 리턴 해야 한다면, 플로우 변환 없이 처리
             return validationResult.getResponse();
         }
 
-        // 2. 플로우 전환 및 전처리, 동일한 플로우를 위해 위에 추가함.
+        // 2. 플로우 전환 및 전처리
         String nextFlow = flowService.getNextFlow(currentFlow);
-        // 카운트 리셋만 하고 invalid 데이터는 저장하지 않음
         chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
         chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
         log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
