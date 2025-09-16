@@ -33,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional(readOnly = true)
     public BasicChatResponseDTO chat(Long customerId, String sessionId, String message) {
-        log.debug("세션 아이디와 고객 아이디 체크 sessionId: {} for customerId: {}", sessionId, customerId);
+        log.info("세션 아이디와 고객 아이디 체크 sessionId: {} for customerId: {}", sessionId, customerId);
 
         // 0. flow를 redis에서 가져오기
         String currentFlow = chatCacheService.getFlowBySession(sessionId);
@@ -45,23 +45,24 @@ public class ChatServiceImpl implements ChatService {
             return validationResult.getResponse();
         }
 
-        // 2. 플로우 전환 및 전처리
-        String nextFlow;
-        if (!validated.isValid() && chatCacheService.getCntBySession(sessionId) == 2) {
-            // cnt == 2인 경우, processValidationResult에서 이미 플로우 변경됨
-            nextFlow = chatCacheService.getFlowBySession(sessionId);
-        } else {
-            // 정상적인 플로우 전환
-            nextFlow = flowService.getNextFlow(currentFlow);
+        // 2. 플로우 전환 및 전처리, 동일한 플로우를 위해 위에 추가함.
+        String nextFlow = flowService.getNextFlow(currentFlow);
+        // 카운트 리셋만 하고 invalid 데이터는 저장하지 않음
+        chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
+        chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
+        log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
+
+        if (validated.isValid()) {
             saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
         }
         // 3. 캐싱된 데이터 수집
         CustomerContextWrapper context = collectCachedData(customerId, sessionId);
         // 4. LLM 요청
         BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
-        // 5. 응답 후처리
-        processAfterResponse(response, customerId, sessionId, nextFlow);
-
+        // 5. 응답 후처리, 강제로 넘어간 경우는 저장 무시한다.
+        if (validated.isValid()) {
+            processAfterResponse(response, customerId, sessionId, nextFlow);
+        }
         return response;
     }
 
@@ -70,6 +71,7 @@ public class ChatServiceImpl implements ChatService {
      */
     private ValidationResult processValidationResult(ValidInputResponseDTO validated, Long customerId, String sessionId, String currentFlow) {
         if (!validated.isValid()) {
+            log.info("----------isValid = false라고 잘못오는 거임! : {}----------", validated.isValid());
             int cnt = chatCacheService.getCntBySession(sessionId);
             // 두 번 이하로 유효하지 않은 응답이 들어왔을경우, 다시 같은 플로우를 실행
             if (cnt < 2) {
@@ -84,13 +86,10 @@ public class ChatServiceImpl implements ChatService {
             } else if(cnt == 2){
                 // cnt == 2면 다음 플로우로 강제 진행하고 LLM 요청 계속 진행
                 log.info("Validation 실패 {}번, 다음 플로우로 넘어가서 LLM 요청 진행", cnt);
-                String nextFlow = flowService.getNextFlow(currentFlow);
-                // 카운트 리셋만 하고 invalid 데이터는 저장하지 않음
-                chatCacheService.saveCntBySession(sessionId, 1);
-                chatCacheService.saveFlowBySession(sessionId, nextFlow);
                 return ValidationResult.continueFlow();
             }
         }
+        log.info("------------isValid True로 인해 플로우를 그대로 이어나간다.----------");
         return ValidationResult.continueFlow();
     }
 
@@ -114,11 +113,11 @@ public class ChatServiceImpl implements ChatService {
         // 플로우 전환시 카운트 리셋
         chatCacheService.saveCntBySession(sessionId, 1);
         // 특정 플로우에서 mood 저장, 유효한 경우엔 캐싱하고 아닌 경우엔 저장 없이 플로우만 넘기도록 한다.
-        if (!validated.isValid() && "hobby_check".equals(nextFlow) && validated != null) {
+        if ("hobby_check".equals(nextFlow) && validated != null) {
             chatCacheService.saveMoodBySession(sessionId, validated.getInputMessage());
         }
         // 특정 플로우에서 hobby 저장
-        if (!validated.isValid() && "choose".equals(nextFlow) && validated != null) {
+        if ("choose".equals(nextFlow) && validated != null) {
             chatCacheService.saveHobby(customerId, validated.getInputMessage());
         }
     }
@@ -153,7 +152,5 @@ public class ChatServiceImpl implements ChatService {
         if (response.getSummary() != null && !response.getSummary().isEmpty()) {
             chatCacheService.saveSummaryBySession(sessionId, response.getSummary());
         }
-        // 새로 바뀐 플로우 저장
-        chatCacheService.saveFlowBySession(sessionId, nextFlow);
     }
 }
