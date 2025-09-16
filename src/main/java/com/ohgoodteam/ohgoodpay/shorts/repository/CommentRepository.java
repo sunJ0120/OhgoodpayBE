@@ -21,5 +21,5 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentEntity> findAllComments(Long shortsId);
 
     // 쇼츠 댓글 작성
-    ShortsCommentDataDto save(ShortsCommentRequestDto dto);
+//    ShortsCommentDataDto save(ShortsCommentRequestDto dto);
 }

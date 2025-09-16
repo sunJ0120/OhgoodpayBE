@@ -32,7 +32,8 @@ public class CorsConfig implements WebMvcConfigurer {
             "http://localhost:5173",  // Vite 개발 서버
             "http://localhost:3000",  // React 개발 서버
             "http://localhost:8080",   // Spring Boot 서버
-                "http://192.168.0.127:5173"   // 와이파이
+                "http://192.168.0.127:5173",   // 와이파이
+                "http://192.168.2.1:5173"   // moo
         ));
         
         // 허용할 HTTP 메서드 설정
