@@ -46,6 +46,6 @@ public class LlmServiceImpl implements LlmService {
     //TODO : FAST API 연동 필요
     @Override
     public ValidInputResponseDTO validateInput(ValidInputRequestDTO request) {
-        return fastApiClient.post("/validation", request, ValidInputResponseDTO.class);
+        return fastApiClient.post("/chat/validation", request, ValidInputResponseDTO.class);
     }
 }
