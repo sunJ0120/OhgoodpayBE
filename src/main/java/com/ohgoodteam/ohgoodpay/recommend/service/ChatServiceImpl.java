@@ -32,17 +32,20 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     @Transactional(readOnly = true)
-    public BasicChatResponseDTO chat(Long customerId, String sessionId, String message, String flow) {
+    public BasicChatResponseDTO chat(Long customerId, String sessionId, String message) {
         log.debug("세션 아이디와 고객 아이디 체크 sessionId: {} for customerId: {}", sessionId, customerId);
 
+        // 0. flow를 redis에서 가져오기
+        String currentFlow = chatCacheService.getFlowBySession(sessionId);
+
         // 1. Validation 및 재시도 체크
-        ValidInputResponseDTO validated = validCheckService.validateInput(customerId, sessionId, message, flow);
+        ValidInputResponseDTO validated = validCheckService.validateInput(customerId, sessionId, message, currentFlow);
         ValidationResult validationResult = processValidationResult(validated, customerId, sessionId);
         if (validationResult.shouldReturn()) { //바로 리턴 해야 한다면, 플로우 변환 없이 처리
             return validationResult.getResponse();
         }
         // 2. 플로우 전환 및 전처리
-        String nextFlow = flowService.getNextFlow(flow);
+        String nextFlow = flowService.getNextFlow(currentFlow);
         saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
         // 3. 캐싱된 데이터 수집
         CustomerContextWrapper context = collectCachedData(customerId, sessionId);
