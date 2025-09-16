@@ -40,13 +40,21 @@ public class ChatServiceImpl implements ChatService {
 
         // 1. Validation 및 재시도 체크
         ValidInputResponseDTO validated = validCheckService.validateInput(customerId, sessionId, message, currentFlow);
-        ValidationResult validationResult = processValidationResult(validated, customerId, sessionId);
+        ValidationResult validationResult = processValidationResult(validated, customerId, sessionId, currentFlow);
         if (validationResult.shouldReturn()) { //바로 리턴 해야 한다면, 플로우 변환 없이 처리
             return validationResult.getResponse();
         }
+
         // 2. 플로우 전환 및 전처리
-        String nextFlow = flowService.getNextFlow(currentFlow);
-        saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
+        String nextFlow;
+        if (!validated.isValid() && chatCacheService.getCntBySession(sessionId) == 2) {
+            // cnt == 2인 경우, processValidationResult에서 이미 플로우 변경됨
+            nextFlow = chatCacheService.getFlowBySession(sessionId);
+        } else {
+            // 정상적인 플로우 전환
+            nextFlow = flowService.getNextFlow(currentFlow);
+            saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
+        }
         // 3. 캐싱된 데이터 수집
         CustomerContextWrapper context = collectCachedData(customerId, sessionId);
         // 4. LLM 요청
@@ -60,7 +68,7 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 검증 결과 처리 및 재시도 로직
      */
-    private ValidationResult processValidationResult(ValidInputResponseDTO validated, Long customerId, String sessionId) {
+    private ValidationResult processValidationResult(ValidInputResponseDTO validated, Long customerId, String sessionId, String currentFlow) {
         if (!validated.isValid()) {
             int cnt = chatCacheService.getCntBySession(sessionId);
             // 두 번 이하로 유효하지 않은 응답이 들어왔을경우, 다시 같은 플로우를 실행
@@ -73,9 +81,15 @@ public class ChatServiceImpl implements ChatService {
                         .products(null)
                         .build();
                 return ValidationResult.returnResponse(errorResponse);
+            } else if(cnt == 2){
+                // cnt == 2면 다음 플로우로 강제 진행하고 LLM 요청 계속 진행
+                log.info("Validation 실패 {}번, 다음 플로우로 넘어가서 LLM 요청 진행", cnt);
+                String nextFlow = flowService.getNextFlow(currentFlow);
+                // 카운트 리셋만 하고 invalid 데이터는 저장하지 않음
+                chatCacheService.saveCntBySession(sessionId, 1);
+                chatCacheService.saveFlowBySession(sessionId, nextFlow);
+                return ValidationResult.continueFlow();
             }
-            // cnt >= 2면 다음 플로우로 강제 진행
-            log.info("Validation 실패 {}번, 다음 플로우로 바로 넘어간다.", cnt);
         }
         return ValidationResult.continueFlow();
     }
@@ -99,12 +113,12 @@ public class ChatServiceImpl implements ChatService {
     private void saveFlowSpecificData(Long customerId, String sessionId, String nextFlow, ValidInputResponseDTO validated) {
         // 플로우 전환시 카운트 리셋
         chatCacheService.saveCntBySession(sessionId, 1);
-        // 특정 플로우에서 mood 저장
-        if ("hobby_check".equals(nextFlow) && validated != null) {
+        // 특정 플로우에서 mood 저장, 유효한 경우엔 캐싱하고 아닌 경우엔 저장 없이 플로우만 넘기도록 한다.
+        if (!validated.isValid() && "hobby_check".equals(nextFlow) && validated != null) {
             chatCacheService.saveMoodBySession(sessionId, validated.getInputMessage());
         }
         // 특정 플로우에서 hobby 저장
-        if ("choose".equals(nextFlow) && validated != null) {
+        if (!validated.isValid() && "choose".equals(nextFlow) && validated != null) {
             chatCacheService.saveHobby(customerId, validated.getInputMessage());
         }
     }
