@@ -1,5 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
+import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
+import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.PaymentViewDTO;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class PayThisMonthService {
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
     private final PaymentRepository payRepo;
+    private final CustomerRepository customerRepo;
 
     @Transactional(readOnly = true)
     public Map<String, Object> getThisMonth(Long customerId) {
@@ -32,6 +35,15 @@ public class PayThisMonthService {
                 .mapToLong(Integer::longValue)
                 .sum();
 
+        long sumPointThisMonth = rows.stream()
+                .map(PaymentViewDTO::point)
+                .filter(Objects::nonNull)
+                .mapToLong(Integer::longValue)
+                .sum();
+        int currentPointBalance = customerRepo.findById(customerId)
+                .map(CustomerEntity::getPoint)
+                .orElse(0);
+
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("customerId", customerId);
         resp.put("month", today.format(DateTimeFormatter.ofPattern("yyyy-MM")));
@@ -39,7 +51,9 @@ public class PayThisMonthService {
         resp.put("to", toExclusive.minusNanos(1));
         resp.put("count", rows.size());
         resp.put("sumTotalPrice", sumTotalPrice);
-        resp.put("items", rows);                     // PaymentViewDTO 그대로 내려줌
+        resp.put("items", rows);
+        resp.put("sumPointThisMonth", sumPointThisMonth); // <- 이번 달 포인트 합계
+        resp.put("currentPointBalance", currentPointBalance); // <- 현재 보유 포인트
         return resp;
     }
 }

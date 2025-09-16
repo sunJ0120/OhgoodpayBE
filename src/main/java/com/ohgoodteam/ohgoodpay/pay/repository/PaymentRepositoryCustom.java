@@ -18,5 +18,6 @@ public interface PaymentRepositoryCustom {
     boolean existsAutoExtensionThisMonth(Long customerId, LocalDateTime from, LocalDateTime to);
     // 최근 결제 내역
     List<PaymentViewDTO> findRecentByCustomer(Long customerId, LocalDateTime start, LocalDateTime end);
-
+    // 이번달 포인트 내역
+    long sumPointValidInRange(Long customerId, LocalDateTime from, LocalDateTime to);
 }

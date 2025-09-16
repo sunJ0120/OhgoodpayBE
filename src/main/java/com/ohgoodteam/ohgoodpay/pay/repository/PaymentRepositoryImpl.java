@@ -35,7 +35,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
 
     @Override
     public long sumAmountValidInRange(Long customerId, LocalDateTime from, LocalDateTime to) {
-        // SUM(INT) -> BIGINT 반환을 안전하게 받기 위해 numberTemplate 사용
         Long sum = query.select(
                         Expressions.numberTemplate(Long.class, "COALESCE(SUM({0}),0)", paymentEntity.totalPrice)
                 )
@@ -61,7 +60,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
                         paymentEntity.date.lt(to),
                         paymentEntity.requestName.in("EXTENSION", "RENEW", "연장")
                 )
-                .fetchFirst(); // 한 건만 확인
+                .fetchFirst();
         return exists != null;
     }
 
@@ -81,7 +80,7 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
     }
 
     @PersistenceContext
-    private EntityManager em; // final 제거!
+    private EntityManager em; // final 금지
 
     @Override
     public List<PaymentViewDTO> findRecentByCustomer(Long customerId, LocalDateTime start, LocalDateTime end) {
@@ -90,13 +89,13 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
             p.paymentId,
             p.date,
             p.requestName,
-            p.totalPrice
+            p.totalPrice,
+            p.point
         )
-        
         from PaymentEntity p
         where p.customer.customerId = :cid
-          and p.isExpired = true     
-          and p.date between :start and :end
+          and p.isExpired = true
+          and p.date >= :start and p.date < :end
         order by p.date asc
     """;
         return em.createQuery(jpql, PaymentViewDTO.class)
@@ -106,4 +105,20 @@ public class PaymentRepositoryImpl implements PaymentRepositoryCustom {
                 .getResultList();
     }
 
+
+    @Override
+    public long sumPointValidInRange(Long customerId, LocalDateTime from, LocalDateTime to) {
+        Long sum = query.select(
+                        Expressions.numberTemplate(Long.class, "COALESCE(SUM({0}),0)", paymentEntity.point)
+                )
+                .from(paymentEntity)
+                .where(
+                        paymentEntity.customer.customerId.eq(customerId),
+                        paymentEntity.isExpired.isTrue(),
+                        paymentEntity.date.goe(from),
+                        paymentEntity.date.lt(to)
+                )
+                .fetchOne();
+        return sum == null ? 0L : sum;
+    }
 }

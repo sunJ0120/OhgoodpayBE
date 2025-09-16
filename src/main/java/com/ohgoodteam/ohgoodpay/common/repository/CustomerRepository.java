@@ -39,5 +39,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
          WHERE c.customerId = :customerId
     """)
     FlagsView findFlagsById(@Param("customerId") Long customerId);
+
+    @Query("select c.point from CustomerEntity c where c.customerId = :customerId")
+    Optional<Integer> findPointByCustomerId(Long customerId);
+
 }
 

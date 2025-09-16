@@ -30,7 +30,7 @@ public class SpendingAnalyzeDTO {
         @Builder @Jacksonized
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Transaction {
-            @JsonAlias({"customer_id","customerId"})
+            @JsonAlias({"payment_id","paymentId"})
             private final Long paymentId;
             private final String date;
             private final String requestName;

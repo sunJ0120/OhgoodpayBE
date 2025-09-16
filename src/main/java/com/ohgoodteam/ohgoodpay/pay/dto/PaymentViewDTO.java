@@ -7,5 +7,6 @@ public record PaymentViewDTO(
         Long paymentId,
         LocalDateTime date,
         String requestName,
-        Integer totalPrice
+        Integer totalPrice,
+        Integer point
 ) {}
