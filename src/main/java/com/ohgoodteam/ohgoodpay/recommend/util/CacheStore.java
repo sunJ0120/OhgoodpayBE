@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 
 /**
  * REDIS 캐시 저장소
+ *
+ * get, put, getOrLoad 메서드등의 redis 조작 메서드 정의
  */
 @Component
 @Slf4j
@@ -24,7 +26,7 @@ public class CacheStore {
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
-    // 기존 키 생성 메서드들은 그대로...
+    // userId 및 sessionId 기반 키 생성 메서드
     private String key(CacheSpec spec, Object userId){
         return spec.getPrefix() + ":user:" + userId;
     }
@@ -33,7 +35,6 @@ public class CacheStore {
         return spec.getPrefix() + ":session:" + sessionId;
     }
 
-    // put 메서드들은 그대로...
     public void put(CacheSpec spec, Object userId, Object value) {
         put(spec, userId, value, spec.getTtl());
     }
@@ -66,7 +67,7 @@ public class CacheStore {
                     return objectMapper.readValue(stringValue, type);
                 }
             } catch (Exception ex) {
-                log.error("문자열 역직렬화도 실패: {}", ex.getMessage());
+                log.error("문자열 역직렬화 실패: {}", ex.getMessage());
             }
             return null;
         } catch (Exception e) {
@@ -76,6 +77,7 @@ public class CacheStore {
     }
 
     // sessionId 기반 get 메서드도 동일하게 수정
+    // sessionId 기반 get 메서드들은 db 조회를 하지 않기 때문에 getOrLoad는 만들지 않음
     public <T> T getBySession(CacheSpec spec, String sessionId, Class<T> type) {
         try {
             log.info("Redis GET 시도 (session): {}", sessionKey(spec, sessionId));
@@ -99,21 +101,7 @@ public class CacheStore {
         }
     }
 
-    // 나머지 메서드들은 그대로...
-    public void pushList(CacheSpec spec, Object userId, List<?> values) {
-        redis.opsForList().rightPushAll(key(spec, userId), values.toArray());
-        redis.expire(key(spec, userId), spec.getTtl());
-    }
-
-    public <T> T getByIndex(CacheSpec spec, Object userId, int index, Class<T> type) {
-        Object raw = redis.opsForList().index(key(spec, userId), index);
-        return raw != null ? type.cast(raw) : null;
-    }
-
-    public void evict(CacheSpec spec, Object userId) {
-        redis.delete(key(spec, userId));
-    }
-
+    // Read-through 패턴 구현
     public <T> T getOrLoad(CacheSpec spec, Object userId, Class<T> type, Supplier<T> loader) {
         T cached = this.get(spec, userId, type);
         if (cached != null) {

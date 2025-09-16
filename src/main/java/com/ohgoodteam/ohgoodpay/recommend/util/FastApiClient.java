@@ -22,6 +22,7 @@ public class FastApiClient {
         this.restTemplate = new RestTemplate();
     }
 
+    // post 메서드: 제네릭 타입 T 요청을 받아서 제네릭 타입 R 응답을 반환
     public <T, R> R post(String endpoint, T request, Class<R> responseType) {
         try {
             String url = fastApiBaseUrl + endpoint;

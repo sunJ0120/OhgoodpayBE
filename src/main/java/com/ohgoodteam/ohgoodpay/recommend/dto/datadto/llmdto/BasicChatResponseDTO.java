@@ -19,8 +19,6 @@ public class BasicChatResponseDTO{
     private String message;
 
     private String newHobby;       // 새로 파악한 취미
-    private boolean shouldUpdateHobbyDB; // DB 저장 신호
-
     private List<ProductDTO> products; // 추천 상품 목록
 
     // TODO : 성공하면 이거 정적 팩토리 메서드 생성하기

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
  * 고객 정보 캐싱 서비스 (REDIS)
  *
  * CacheStore Read-through 패턴 사용
+ * 세션별 관리와 고객별 관리 메서드를 분리하여 세션별로 초기화 해야 하는 정보와 고객별 정보를 명확히 구분
  */
 @Service
 @Slf4j
@@ -61,7 +62,7 @@ public class ChatCacheService {
     // 세션별 기분 조회
     public String getMoodBySession(String sessionId) {
         String mood = cacheStore.getBySession(CacheSpec.MOOD, sessionId, String.class);
-        return mood != null ? mood : "";
+        return mood != null ? mood : "쏘쏘";
     }
 
     // 세션별 대화 요약 조회
