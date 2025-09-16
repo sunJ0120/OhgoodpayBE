@@ -45,6 +45,7 @@ public class CheckInServiceImpl implements CheckInService {
         pointHistoryRepository.save(history);
     }
 
+    // 오늘 출석 체크 여부 확인
     @Override
     public boolean hasCheckedInToday(Long customerId) {
         return pointHistoryRepository.countByCustomerAndToday(customerId) > 0;
