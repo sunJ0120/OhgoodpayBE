@@ -40,7 +40,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     private static final int LAP_SECONDS   = 60;
     private static final int POINT_PER_LAP = 10;
     private static final int DAILY_CAP     = 100;
-    private static final long MAX_DELTA_SEC = 5; 
+    private static final long MAX_DELTA_SEC = 5;
 
     private static final String REASON = "숏폼";
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");

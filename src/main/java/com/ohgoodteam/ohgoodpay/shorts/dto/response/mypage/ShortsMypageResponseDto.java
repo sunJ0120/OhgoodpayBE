@@ -58,7 +58,7 @@ public class ShortsMypageResponseDto {
         private String videoUrl;      
         private Long likeCount; 
         private Long commentCount; 
-        private String context;
+        private String context; //댓글
         
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime createdAt;
