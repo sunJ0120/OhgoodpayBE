@@ -2,23 +2,116 @@ package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
 public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
 
+    /**
+     * 전체 쇼츠 피드 조회
+     * @param keyword
+     * @param customerId
+     * @param offset
+     * @param size
+     * @return
+     */
+//    @Query("""
+//        SELECT s,
+//               (SELECT r.react FROM ReactionEntity r WHERE r.shorts.shortsId = s.shortsId AND r.customer.customerId = :customerId ) AS myReaction
+//        FROM ShortsEntity s
+//        LEFT JOIN FETCH s.customer c
+//        WHERE s.shortsName LIKE CONCAT('%', :keyword, '%')\s
+//           OR s.shortsExplain LIKE CONCAT('%', :keyword, '%')
+//    """)
+//    List<ShortsFeedDataDto> findAllFeeds(@Param("keyword") String keyword, @Param("customerId") Long customerId, Pageable pageable);
+    @Query(value = """
+        SELECT 
+            s.shorts_id,
+            s.video_name,
+            s.thumbnail,
+            s.shorts_name,
+            s.shorts_explain,
+            s.date,
+            c.customer_id,
+            c.nickname,
+            c.profile_img,
+            s.like_count,
+            s.comment_count,
+            r.react as myReaction
+        FROM shorts s
+        LEFT JOIN customer c ON s.customer_id = c.customer_id
+        LEFT JOIN reaction r ON s.shorts_id = r.shorts_id AND r.customer_id = :customerId
+        WHERE (:keyword IS NULL
+               OR s.shorts_name LIKE CONCAT('%', :keyword, '%')
+               OR s.shorts_explain LIKE CONCAT('%', :keyword, '%'))
+    """, nativeQuery = true)
+    Page<Object[]> findAllFeeds(@Param("keyword") String keyword,
+                               @Param("customerId") Long customerId,
+                               Pageable pageable);
+
+
+    /**
+     * 전체 쇼츠 피드 조회 v2 (Page 객체 반환)
+     * @param keyword
+     * @param pageable
+     * @return
+     */
     @Query("""
         SELECT s FROM ShortsEntity s
         LEFT JOIN FETCH s.customer c
-        WHERE s.shortsName LIKE %:keyword% OR s.shortsExplain LIKE %:keyword%
+        WHERE s.shortsName LIKE CONCAT('%', :keyword, '%')\s
+           OR s.shortsExplain LIKE CONCAT('%', :keyword, '%')
     """)
-    List<ShortsEntity> findAllFeeds(@Param("keyword") String keyword, Pageable pageable);
+    Page<ShortsEntity> findAllFeedsV2(@Param("keyword") String keyword, Pageable pageable);
+
+    /**
+     * 현재 쇼츠 댓글 수 증가
+     */
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE ShortsEntity s
+        SET s.commentCount = s.commentCount + 1
+        WHERE s.shortsId = :shortsId
+        """)
+    int incrementCommentCount(@Param("shortsId") Long shortsId);
+
+
+    /**
+     * 현재 쇼츠 좋아요 수 + 1
+     */
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE ShortsEntity s
+    SET s.likeCount = s.likeCount + 1
+    WHERE s.shortsId = :shortsId
+    """)
+    int incrementLikeCount(@Param("shortsId") Long shortsId);
+
+
+    /**
+     * 현재 쇼츠 좋아요 수 - 1
+     */
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE ShortsEntity s
+    SET s.likeCount = s.likeCount - 1
+    WHERE s.shortsId = :shortsId
+    """)
+    int decrementLikeCount(@Param("shortsId")Long shortsId);
+
 
 
 
@@ -59,5 +152,17 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
         ORDER BY s.date DESC
         """, nativeQuery = true)
     List<ShortsCommonResponse> findShortsFeedByCustomerId(@Param("customerId") Long customerId);
+
+    /**
+     * 특정 쇼츠의 좋아요 수
+     * @param shortsId
+     * @return
+     */
+    @Query("""
+        SELECT s.likeCount
+        FROM ShortsEntity s
+        WHERE s.shortsId = :shortsId
+    """)
+    int findLikeCountById(@Param("shortsId") Long shortsId);
 
 }
