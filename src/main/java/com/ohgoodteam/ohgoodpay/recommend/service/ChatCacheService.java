@@ -114,7 +114,7 @@ public class ChatCacheService {
     }
 
     // 세션별 상품 리스트 저장
-    public void saveProductsBySession(String sessionId, ProductDTO products){
+    public void saveProductsBySession(String sessionId, List<ProductDTO> products){
         cacheStore.saveBySession(CacheSpec.PRODUCTS, sessionId, products);
     }
 

@@ -75,6 +75,12 @@ public class ChatServiceImpl implements ChatService {
         CustomerContextWrapper context = collectCachedData(customerId, sessionId);
         // 4. LLM 요청
         BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
+
+        // + nextFlow가 re-recommendation일 경우, products 캐싱
+        if(response.getFlow().equals("re-recommendation")){
+            chatCacheService.saveProductsBySession(sessionId, response.getProducts());
+        }
+
         // 5. 응답 후처리, 강제로 넘어간 경우는 저장 무시한다.
         if (validated.isValid()) {
             processAfterResponse(response, customerId, sessionId, nextFlow);
