@@ -5,12 +5,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import jakarta.transaction.Transactional;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.ohgoodteam.ohgoodpay.common.dto.CustomerDTO;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
-import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
@@ -18,6 +15,9 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     // customerId로 회원 조회
     CustomerEntity findByCustomerId(Long customerId);
+
+    // emailId로 회원 조회
+    CustomerEntity findByEmailId(String emailId);
 
     // customerId로 회원 연장 상태 업데이트
     @Transactional

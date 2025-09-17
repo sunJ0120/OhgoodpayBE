@@ -23,7 +23,7 @@ public class PaymentController {
      * @param dto 결제요청 생성에 필요한 정보
      * @return 생성된 요청의 ID, QR/PIN 코드 등
      */
-    @PostMapping("/payment/requestment")
+    @PostMapping("/public/payment/requestment")
     public PaymentResponseDTO createCode(@RequestBody PaymentRequestDTO dto) {
         return paymentService.createCode(dto);
     }
@@ -34,7 +34,7 @@ public class PaymentController {
      * @param id 만료할 결제요청 ID
      * @return 만료 처리 결과
      */
-    @PostMapping("/payment/expiration/{id}")
+    @PostMapping("/public/payment/expiration/{id}")
     public PaymentResponseDTO expireCode(@PathVariable Long id) {
         return paymentService.expireCode(id);
     }
@@ -86,7 +86,7 @@ public class PaymentController {
      * @return 결제 존재 여부(success/result=true/false)
      *
      */
-    @GetMapping("/payment/check/{orderId}")
+    @GetMapping("/public/payment/check/{orderId}")
     public PaymentConfirmDTO checkPayment(@PathVariable String orderId) {
         return paymentService.checkPayment(orderId);
     }
