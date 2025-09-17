@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
-public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
+public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>, CustomerQueryRepository{
 
     Optional<CustomerEntity> findByCustomerId(Long customerId);
     
@@ -42,6 +42,12 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 
     @Query("select c.point from CustomerEntity c where c.customerId = :customerId")
     Optional<Integer> findPointByCustomerId(Long customerId);
+
+    @Query("SELECT c.hobby FROM CustomerEntity c WHERE c.customerId = :customerId")
+    Optional<String> findHobbyByCustomerId(@Param("customerId") Long customerId);
+
+    @Query("SELECT c.balance FROM CustomerEntity c WHERE c.customerId = :customerId")
+    Optional<Integer> findBalanceByCustomerId(@Param("customerId") Long customerId);
 
 }
 

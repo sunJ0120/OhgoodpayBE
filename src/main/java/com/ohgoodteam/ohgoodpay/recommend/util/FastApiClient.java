@@ -26,12 +26,19 @@ public class FastApiClient {
         try {
             String url = fastApiBaseUrl + endpoint;
 
+            // FastApiClient.java의 post 메서드에 로그 추가
+            System.out.println("FastAPI Base URL: " + fastApiBaseUrl);
+            System.out.println("Endpoint: " + endpoint);
+            System.out.println("Full URL: " + url);
+            System.out.println("Request body: " + request.toString());
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<T> entity = new HttpEntity<>(request, headers);
 
             // RestTemplate이 JSON을 BasicChatResponse로 자동 변환해서 우리 responseType에 맞게 반환해준다.
             ResponseEntity<R> response = restTemplate.postForEntity(url, entity, responseType);
+
             // response.getBody()로 실제 객체 추출
             return response.getBody();
         } catch (Exception e) {

@@ -1,8 +1,8 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.basedto.BaseLlmResponseDTO;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+import java.util.List;
+import com.ohgoodteam.ohgoodpay.recommend.dto.cache.ProductDTO;
 
 /**
  * FAST API - LLM 응답 기본 DTO
@@ -10,8 +10,19 @@ import lombok.experimental.SuperBuilder;
  * LLM이 주는 챗봇 응답 메세지를 담는 DTO
  */
 @Getter
-@ToString(callSuper = true)
-@SuperBuilder
+@ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class BasicChatResponseDTO extends BaseLlmResponseDTO {
+public class BasicChatResponseDTO{
+    private String sessionId;
+    private String message;
+
+    private String newHobby;       // 새로 파악한 취미
+    private boolean shouldUpdateHobbyDB; // DB 저장 신호
+
+    private List<ProductDTO> products; // 추천 상품 목록
+
+    // TODO : 성공하면 이거 정적 팩토리 메서드 생성하기
+    // TODO : 시간 남으면 ChatStartResponseDTO 생성해서 응답용으로 감싸기
 }
