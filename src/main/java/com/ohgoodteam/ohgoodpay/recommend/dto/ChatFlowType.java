@@ -7,6 +7,7 @@ package com.ohgoodteam.ohgoodpay.recommend.dto;
  * 흐름 : 인사 & 기분 체크 > 취미 체크 > 뭐가 필요한지 체크 (추천 or 대시보드) > 다시 추천
  */
 public enum ChatFlowType {
+    START("start"),
     MOODCHECK("mood_check"), // 기분 체크하는 단계
     HOBBYCHECK("hobby_check"), // 취미 체크하는 단계
     CHOOSE("choose"), // 추천 or 대시보드 정의하는 단계

@@ -20,6 +20,7 @@ public class FlowService {
      * 현재 플로우 → 다음 플로우 매핑 (DASHBOARD 제외)
      */
     private static final Map<ChatFlowType, ChatFlowType> FLOW_TRANSITION = Map.of(
+            ChatFlowType.START, ChatFlowType.MOODCHECK,
             ChatFlowType.MOODCHECK, ChatFlowType.HOBBYCHECK,
             ChatFlowType.HOBBYCHECK, ChatFlowType.CHOOSE,
             ChatFlowType.CHOOSE, ChatFlowType.RECOMMENDATION,
