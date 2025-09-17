@@ -2,6 +2,7 @@ package com.ohgoodteam.ohgoodpay.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -11,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.ohgoodteam.ohgoodpay.config.CorsConfig;
 import com.ohgoodteam.ohgoodpay.security.filter.ApiLoginFilter;
@@ -36,14 +39,23 @@ public class SecurityConfig {
         
         http.authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**", "/api/public/**").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 요청 허용
             .anyRequest().authenticated());
         
         http.csrf(csrf -> csrf.disable());
 
         http.cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()));
 
-        http.formLogin(login -> login.loginPage("/"));
-        http.logout(logout -> logout.logoutSuccessUrl("/"));
+        // 기본 로그인 페이지 리다이렉트 비활성화
+        http.formLogin(login -> login.disable());
+        http.logout(logout -> logout.disable());
+        
+        // 인증 실패 시 리다이렉트 대신 401 에러 반환
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().print("{\"error\":\"Unauthorized\",\"message\":\"Authentication required\"}");
+        }));
 
         // JWT 관련 설정
 		// AuthenticationManager 설정

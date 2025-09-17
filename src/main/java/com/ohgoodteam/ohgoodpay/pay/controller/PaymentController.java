@@ -2,6 +2,9 @@ package com.ohgoodteam.ohgoodpay.pay.controller;
 
 import com.ohgoodteam.ohgoodpay.pay.dto.*;
 import com.ohgoodteam.ohgoodpay.pay.service.PaymentService;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
-
+    private final JWTUtil jwtUtil;
     /**
      * [POST] /api/payment/requestment
      * 결제 요청 생성 : QR코드/Pin코드 발급
@@ -46,11 +49,12 @@ public class PaymentController {
      * @return 상점명, 총금액, 보유포인트, 잔액/한도, requestId 등 모달 표시 데이터
      */
     @PostMapping("/payment/validate")
-    public PaymentModalDTO validateCode(@RequestBody ValidateRequestDTO req) {
+    public PaymentModalDTO validateCode(@RequestBody ValidateRequestDTO req, HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
         return paymentService.validateCode(
                 req.getCodeType(),
                 req.getValue(),
-                req.getCustomerId()
+                Long.parseLong(customerId)
         );
     }
     /**
@@ -59,10 +63,10 @@ public class PaymentController {
      * @param customerId 고객 ID
      * @return 모달 표시 데이터
      */
-    @GetMapping("/payment/modal/{requestId}/{customerId}")
-    public PaymentModalDTO getModalInfo(@PathVariable Long requestId, @PathVariable Long customerId) {
-        return paymentService.getModalInfo(requestId, customerId);
-    }
+    // @GetMapping("/payment/modal/{requestId}/{customerId}")
+    // public PaymentModalDTO getModalInfo(@PathVariable Long requestId, @PathVariable Long customerId) {
+    //     return paymentService.getModalInfo(requestId, customerId);
+    // }
 
     /**
      * [POST] /api/payment/final
@@ -73,10 +77,11 @@ public class PaymentController {
      * @return 성공/실패 결과
      */
     @PostMapping("/payment/final")
-    public PaymentConfirmDTO finalPayment(@RequestParam Long customerId,
+    public PaymentConfirmDTO finalPayment(HttpServletRequest request,
                                           @RequestParam int point,
-                                          @RequestParam Long requestId) {
-        return paymentService.finalPayment(customerId, point, requestId);
+                                          @RequestParam Long requestId) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        return paymentService.finalPayment(Long.parseLong(customerId), point, requestId);
     }
 
     /**

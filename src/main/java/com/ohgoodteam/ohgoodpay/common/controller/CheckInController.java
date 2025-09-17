@@ -1,6 +1,9 @@
 package com.ohgoodteam.ohgoodpay.common.controller;
 
 import com.ohgoodteam.ohgoodpay.common.service.CheckInService;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class CheckInController {
 
     private final CheckInService checkInService;
-
+    private final JWTUtil jwtUtil;
     /**
      * [POST] /api/checkin/roulette
      * 출석 체크 포인트 적립
@@ -24,8 +27,9 @@ public class CheckInController {
      * @return 적립된 포인트 값
      */
     @PostMapping("/roulette")
-    public int rouletteCheckIn(@RequestParam int point) {
-        checkInService.saveCheckInPoint(point);
+    public int rouletteCheckIn(HttpServletRequest request, @RequestParam int point) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        checkInService.saveCheckInPoint(point, Long.parseLong(customerId));
         return point;
     }
 
@@ -37,7 +41,8 @@ public class CheckInController {
      * @return true: 이미 출석 체크 완료, false: 출석 체크 안 함
      */
     @GetMapping("/today")
-    public boolean checkToday(@RequestParam Long customerId) {
-        return checkInService.hasCheckedInToday(customerId);
+    public boolean checkToday(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        return checkInService.hasCheckedInToday(Long.parseLong(customerId));
     }
 }

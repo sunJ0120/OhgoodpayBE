@@ -3,12 +3,15 @@ package com.ohgoodteam.ohgoodpay.security.filter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ohgoodteam.ohgoodpay.security.exception.AccessTokenException;
 import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 
-
+import java.util.List;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +41,17 @@ public class TokenCheckFilter extends OncePerRequestFilter {
 
         // AccessToken 검증
         try {
-            validateAccessToken(request);
+            Map<String, Object> claims = validateAccessToken(request);
+            
+            // SecurityContext에 인증 정보 설정
+            String customerId = (String) claims.get("customerId");
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                customerId, 
+                null, 
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            );
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            
             filterChain.doFilter(request, response);
         } catch (AccessTokenException e) {
             // e.printStackTrace();
