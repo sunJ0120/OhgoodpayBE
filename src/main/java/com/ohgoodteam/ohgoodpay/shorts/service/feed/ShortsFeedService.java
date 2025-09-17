@@ -38,4 +38,6 @@ public interface ShortsFeedService {
     // 쇼츠 시청 포인트 적립
     ShortsPointResponseDto watchFeed(Long customerId, ShortsPointRequestDto requestDto);
 
+    ShortsFeedDataDto getSpecificShorts(Long shortsId);
+
 }

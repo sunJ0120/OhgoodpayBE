@@ -27,7 +27,7 @@ import lombok.extern.log4j.Log4j2;
 public class PointHistoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long pointId; 
+    private Long pointHistoryId; 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)

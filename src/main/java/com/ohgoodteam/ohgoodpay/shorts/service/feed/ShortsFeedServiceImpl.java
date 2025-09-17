@@ -478,4 +478,10 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 .myReaction(requestedType)
                 .build();
     }
+
+    @Override
+    public ShortsFeedDataDto getSpecificShorts(Long shortsId) {
+        ShortsEntity shorts = shortsRepository.findById(shortsId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
+        return new ShortsFeedDataDto(shorts);
+    }
 }
