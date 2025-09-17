@@ -28,9 +28,11 @@ public enum CacheSpec {
     // 4) 기분 데이터(String) - 10분, 세션 초기화 시 초기화 하도록 구성
     MOOD("v1:mood", Duration.ofMinutes(10)),
     // 5) 대화 요약본 - 1시간, 세션 초기화 시 초기화 하도록 구성
-    SUMMARY("v1:summary", Duration.ofHours(1)); //메세지들 캐싱을 위해서 선언
-    // TODO : 플로우 관리 REDIS KEY 추가 (session 기반)
-    // TODO : CNT 로직 추가 (session 기반)
+    SUMMARY("v1:summary", Duration.ofHours(1)), //메세지들 캐싱을 위해서 선언
+    // 6) 플로우 - 1시간, 세션 초기화 시 초기화 하도록 구성
+    FLOW("v1:flow", Duration.ofHours(1)), //플로우 캐싱을 위해 선언
+    // 7) 카운트 - 1시간, 세션 초기화 시 초기화 하도록 구성
+    COUNT("v1:count", Duration.ofHours(1)); //플로우 카운트를 위해 선언
 
     private final String prefix; //키 네임 스페이스
     private final Duration ttl;

@@ -101,6 +101,15 @@ public class CacheStore {
         }
     }
 
+    // saveBySession 메서드 (putBySession과 동일, 네이밍 일관성을 위해 추가)
+    public void saveBySession(CacheSpec spec, String sessionId, Object value) {
+        putBySession(spec, sessionId, value);
+    }
+
+    public void saveBySession(CacheSpec spec, String sessionId, Object value, Duration ttl) {
+        putBySession(spec, sessionId, value, ttl);
+    }
+
     // Read-through 패턴 구현
     public <T> T getOrLoad(CacheSpec spec, Object userId, Class<T> type, Supplier<T> loader) {
         T cached = this.get(spec, userId, type);

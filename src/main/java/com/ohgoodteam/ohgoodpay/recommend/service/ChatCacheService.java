@@ -45,6 +45,12 @@ public class ChatCacheService {
         );
     }
 
+    // 고객 취미 정보 저장
+    public void saveHobby(Long customerId, String hobby) {
+        cacheStore.put(CacheSpec.HOBBY, customerId, hobby);
+        log.debug("취미를 customerId: {}로 저장 -> {}", customerId, hobby);
+    }
+
     // 고객 잔액 조회 (Read-through)
     // 잔액 정보가 없을 경우 50000원 기본값 반환 (일단은...)
     public Integer getBalance(Long customerId) {
@@ -65,9 +71,41 @@ public class ChatCacheService {
         return mood != null ? mood : "쏘쏘";
     }
 
+    // 세션별 기분 저장
+    public void saveMoodBySession(String sessionId, String mood) {
+        cacheStore.saveBySession(CacheSpec.MOOD, sessionId, mood);
+    }
+
     // 세션별 대화 요약 조회
     public String getSummaryBySession(String sessionId) {
         String summary = cacheStore.getBySession(CacheSpec.SUMMARY, sessionId, String.class);
         return summary != null ? summary : ""; // 기본값
+    }
+
+    // 세션별 대화 요약 저장
+    public void saveSummaryBySession(String sessionId, String summary) {
+        cacheStore.saveBySession(CacheSpec.SUMMARY, sessionId, summary);
+    }
+
+    // 세션별 플로우 조회
+    public String getFlowBySession(String sessionId) {
+        String flow = cacheStore.getBySession(CacheSpec.FLOW, sessionId, String.class);
+        return flow != null ? flow : "mood_check"; // 플로우 없을 경우 기본값: 첫 번째 플로우
+    }
+
+    // 세션별 플로우 저장
+    public void saveFlowBySession(String sessionId, String flow) {
+        cacheStore.saveBySession(CacheSpec.FLOW, sessionId, flow);
+    }
+
+    // 세션별 플로우 count 조회
+    public Integer getCntBySession(String sessionId) {
+        Integer cnt = cacheStore.getBySession(CacheSpec.COUNT, sessionId, Integer.class);
+        return cnt != null ? cnt : 1; // count 없을 경우 기본이 1
+    }
+
+    // 세션별 플로우 count 저장
+    public void saveCntBySession(String sessionId, Integer count) {
+        cacheStore.saveBySession(CacheSpec.COUNT, sessionId, count);
     }
 }

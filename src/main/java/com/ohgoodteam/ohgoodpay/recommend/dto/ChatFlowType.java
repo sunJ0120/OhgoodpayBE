@@ -11,7 +11,6 @@ public enum ChatFlowType {
     HOBBYCHECK("hobby_check"), // 취미 체크하는 단계
     CHOOSE("choose"), // 추천 or 대시보드 정의하는 단계
     RECOMMENDATION("recommendation"), // 추천하는 단계
-    DASHBOARD("dashboard"), // 대시보드 보여주는 단계
     RE_RECOMMENDATION("re-recommendation"); // 재추천하는 단계
 
     private final String value;
