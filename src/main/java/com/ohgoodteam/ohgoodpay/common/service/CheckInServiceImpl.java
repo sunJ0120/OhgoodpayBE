@@ -20,9 +20,8 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Override
     @Transactional
-    public void saveCheckInPoint(int point) {
-        Long customerId = 1L; // 테스트용 ID
-
+    public void saveCheckInPoint(int point, Long customerId) {
+        
         // 오늘 이미 출석 체크 했는지 확인
         if (hasCheckedInToday(customerId)) {
             throw new IllegalStateException("오늘 이미 출석 체크 완료!");

@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ohgoodteam.ohgoodpay.common.dto.MypageDTO;
 import com.ohgoodteam.ohgoodpay.common.service.MypageService;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,10 +27,12 @@ import lombok.RequiredArgsConstructor;
 public class MypageController {
     
     private final MypageService mypageService;
+    private final JWTUtil jwtUtil;
 
-    @GetMapping("/mypage/{customerId}")
-    public ResponseEntity<MypageDTO> getMypage(@PathVariable Long customerId) {
-        MypageDTO mypageDTO = mypageService.getMypageInfo(customerId);
+    @GetMapping("/mypage")
+    public ResponseEntity<MypageDTO> getMypage(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        MypageDTO mypageDTO = mypageService.getMypageInfo(Long.parseLong(customerId));
         if(mypageDTO == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

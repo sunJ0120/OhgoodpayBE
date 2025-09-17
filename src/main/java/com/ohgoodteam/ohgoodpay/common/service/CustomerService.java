@@ -30,6 +30,7 @@ public interface CustomerService {
             .gradePoint(customerEntity.getGradePoint())
             .gradeName(customerEntity.getGrade().getGradeName())
             .balance(customerEntity.getBalance())
+            .pwd(customerEntity.getPwd())
             .build();
     }
 
@@ -39,6 +40,7 @@ public interface CustomerService {
             .customerId(customerDTO.getCustomerId())
             .name(customerDTO.getName())
             .emailId(customerDTO.getEmailId())
+            .pwd(customerDTO.getPwd())
             .birth(customerDTO.getBirth())
             .account(customerDTO.getAccount())
             .accountName(customerDTO.getAccountName())
@@ -57,6 +59,6 @@ public interface CustomerService {
             .gradePoint(customerDTO.getGradePoint())
             .grade(GradeEntity.builder().gradeName(customerDTO.getGradeName()).build())
             .balance(customerDTO.getBalance())
-            .build();
+            .build();   
     }
 }

@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ohgoodteam.ohgoodpay.pay.dto.PointHistoryDTO;
 import com.ohgoodteam.ohgoodpay.pay.service.PointHistoryService;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -20,15 +22,16 @@ import lombok.RequiredArgsConstructor;
 public class PointHistoryController {
     
     private final PointHistoryService pointHistoryService;
-
+    private final JWTUtil jwtUtil;
     /**
      * [GET] /api/point/history/{customerId}
      * @param customerId
      * @return 포인트 내역 리스트
      */
-    @GetMapping("/point/history/{customerId}")
-    public ResponseEntity<List<PointHistoryDTO>> getPointHistory(@PathVariable Long customerId) {
-        List<PointHistoryDTO> pointHistoryDTOs = pointHistoryService.getPointHistory(customerId);
+    @GetMapping("/point/history")
+    public ResponseEntity<List<PointHistoryDTO>> getPointHistory(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        List<PointHistoryDTO> pointHistoryDTOs = pointHistoryService.getPointHistory(Long.parseLong(customerId));
         return new ResponseEntity<>(pointHistoryDTOs, HttpStatus.OK);
     }
 }

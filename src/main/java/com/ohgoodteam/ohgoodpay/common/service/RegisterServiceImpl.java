@@ -1,5 +1,7 @@
 package com.ohgoodteam.ohgoodpay.common.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +26,21 @@ public class RegisterServiceImpl implements RegisterService {
         }
     
         customerDTO.setPwd(passwordEncoder.encode(customerDTO.getPwd()));
-
+        customerDTO.setJoinDate(LocalDateTime.now());
+        customerDTO.setGradePoint(0);
+        customerDTO.setBlockedCnt(0);
+        customerDTO.setExtensionCnt(0);
+        customerDTO.setScore(0);
+        customerDTO.setHobby("");
+        customerDTO.setIntroduce("");
+        customerDTO.setNickname("");
+        customerDTO.setProfileImg("");
+        customerDTO.setPoint(0);
         customerDTO.setGradeName("bronze");
         customerDTO.setBalance(100000);
+        customerDTO.setBlocked(false);
+        customerDTO.setExtension(false);
+        customerDTO.setAuto(false);
 
         CustomerEntity customer = customerRepository.save(customerService.dtoToEntity(customerDTO));
 

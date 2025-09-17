@@ -20,7 +20,9 @@ import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.dto.PayImmediatelyResponseDTO;
 import com.ohgoodteam.ohgoodpay.pay.dto.PaymentDTO;
 import com.ohgoodteam.ohgoodpay.pay.service.PayImmediatelyService;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,20 +31,23 @@ import lombok.RequiredArgsConstructor;
 public class PayImmediatelyController {
 
     private final PayImmediatelyService payImmediatelyService;
+    private final JWTUtil jwtUtil;
 
     // 납부 페이지 진입시 초기 정보 조회
-    @GetMapping("/payment/info/{customerId}")
-    public ResponseEntity<PayImmediatelyResponseDTO> getPayImmediately(@PathVariable Long customerId) {
+    @GetMapping("/payment/info")
+    public ResponseEntity<PayImmediatelyResponseDTO> getPayImmediately(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
 
-        PayImmediatelyResponseDTO response = payImmediatelyService.classifyUnpaidBills(customerId);
+        PayImmediatelyResponseDTO response = payImmediatelyService.classifyUnpaidBills(Long.parseLong(customerId));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 즉시 납부 요청
-    @PostMapping("/payment/immediately/{customerId}")
-    public ResponseEntity<PayImmediatelyResponseDTO> payImmediately(@PathVariable Long customerId, @RequestBody Long[] lists) {
-        boolean isPayImmediately = payImmediatelyService.payImmediately(customerId, lists);
+    @PostMapping("/payment/immediately")
+    public ResponseEntity<PayImmediatelyResponseDTO> payImmediately(HttpServletRequest request, @RequestBody Long[] lists) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        boolean isPayImmediately = payImmediatelyService.payImmediately(Long.parseLong(customerId), lists);
         if(isPayImmediately) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
@@ -51,9 +56,10 @@ public class PayImmediatelyController {
     }
 
     // 수동 연장 요청
-    @PostMapping("/payment/extension/{customerId}")
-    public ResponseEntity<PayImmediatelyResponseDTO> requestCustomerExtension(@PathVariable Long customerId) {
-        boolean isRequestCustomerExtension = payImmediatelyService.requestCustomerExtension(customerId);
+    @PostMapping("/payment/extension")
+    public ResponseEntity<PayImmediatelyResponseDTO> requestCustomerExtension(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        boolean isRequestCustomerExtension = payImmediatelyService.requestCustomerExtension(Long.parseLong(customerId));
         if(isRequestCustomerExtension) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
@@ -62,9 +68,10 @@ public class PayImmediatelyController {
     }
 
     // 결제 상세 내역 페이지 진입시 초기 정보 조회
-    @GetMapping("/payment/history/{customerId}")
-    public ResponseEntity<List<PaymentDTO>> getPaymentDetail(@PathVariable Long customerId) {
-        List<PaymentDTO> response = payImmediatelyService.getAllPayment(customerId);
+    @GetMapping("/payment/history")
+    public ResponseEntity<List<PaymentDTO>> getPaymentDetail(HttpServletRequest request) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        List<PaymentDTO> response = payImmediatelyService.getAllPayment(Long.parseLong(customerId));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
