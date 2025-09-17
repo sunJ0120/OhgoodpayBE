@@ -76,9 +76,21 @@ public class ChatServiceImpl implements ChatService {
         // 4. LLM 요청
         BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
 
-        // + nextFlow가 re-recommendation일 경우, products 캐싱
-        if(response.getFlow().equals("re-recommendation")){
+        // + currentFlow가 recommendation이었는데, nextFlow가 re-recommendation일 경우, products 캐싱
+        if(currentFlow.equals("recommendation") && nextFlow.equals("re-recommendation")){
             chatCacheService.saveProductsBySession(sessionId, response.getProducts());
+
+            // 3개 제한된 새 응답 객체 생성
+            response = BasicChatResponseDTO.builder()
+                    .sessionId(response.getSessionId())
+                    .message(response.getMessage())
+                    .newHobby(response.getNewHobby())
+                    .products(chatCacheService.getProductsBySession(sessionId)) // 3개 제한
+                    .summary(response.getSummary())
+                    .flow(response.getFlow())
+                    .build();
+
+            // TODO : 캐싱 할 상품 모자랄 경우에 대한 해결책 및 로직 정의 필요.
         }
 
         // 5. 응답 후처리, 강제로 넘어간 경우는 저장 무시한다.
