@@ -16,6 +16,7 @@ import lombok.Setter;
 public class CustomerDTO {
     
     private Long customerId;
+    private String pwd;
     private String name;
     private String emailId;
     private String birth;

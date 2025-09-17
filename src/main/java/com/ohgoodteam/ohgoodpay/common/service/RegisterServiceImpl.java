@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.common.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ohgoodteam.ohgoodpay.common.dto.CustomerDTO;
@@ -14,13 +15,16 @@ public class RegisterServiceImpl implements RegisterService {
 
     private final CustomerRepository customerRepository;
     private final CustomerService customerService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public boolean register(CustomerDTO customerDTO) {
         if (checkEmail(customerDTO.getEmailId())) {
             return false;
         }
-        
+    
+        customerDTO.setPwd(passwordEncoder.encode(customerDTO.getPwd()));
+
         customerDTO.setGradeName("bronze");
         customerDTO.setBalance(100000);
 
