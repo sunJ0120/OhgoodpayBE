@@ -21,6 +21,13 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         super(defaultFilterProcessesUrl);
     }
 
+    /**
+     * 인증 처리 (JSON 요청에서 emailId, pwd 추출)
+     * @param request 요청
+     * @param response 응답
+     * @return 인증 정보
+     * @throws AuthenticationException
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         Map<String, Object> map = new HashMap<>();

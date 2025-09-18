@@ -19,6 +19,12 @@ public class JWTUtil {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
+    /**
+     * 토큰 생성
+     * @param claims 토큰 페이로드
+     * @param days 토큰 유효기간 (일)
+     * @return
+     */
     public String generateToken(Map<String, Object> claims, int days) {
         // header
         Map<String, Object> headers = new HashMap<>();
@@ -40,6 +46,12 @@ public class JWTUtil {
             .compact();
     }
 
+    /**
+     * 토큰 검증 (페이로드 반환)
+     * @param token 토큰
+     * @return
+     * @throws Exception
+     */
     public Map<String, Object> validateToken(String token) throws Exception {
 
         return Jwts.parser()
@@ -49,12 +61,24 @@ public class JWTUtil {
                 .getBody();
     }
 
+    /**
+     * 토큰에서 사용자 ID 추출
+     * @param request 요청
+     * @return 사용자 ID
+     * @throws Exception
+     */
     public String extractCustomerId(HttpServletRequest request) throws Exception {
         String token = extractTokenFromRequest(request);
         Map<String, Object> claims = validateToken(token);
         return (String) claims.get("customerId");
     }
     
+    /**
+     * 요청에서 토큰 추출 후 Bearer 확인
+     * @param request 요청
+     * @return 토큰
+     * @throws AccessTokenException
+     */
     private String extractTokenFromRequest(HttpServletRequest request) throws AccessTokenException {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {

@@ -25,6 +25,14 @@ public class TokenCheckFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
     
+    /**
+     * 토큰 검증
+     * @param request 요청
+     * @param response 응답
+     * @param filterChain 필터 체인
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
@@ -64,6 +72,12 @@ public class TokenCheckFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 토큰 값 검증 (페이로드 반환)
+     * @param request
+     * @return
+     * @throws AccessTokenException
+     */
     private Map<String, Object> validateAccessToken(HttpServletRequest request) throws AccessTokenException {
         String headerStr = request.getHeader("Authorization");
         if (headerStr == null || headerStr.length() < 8) {
