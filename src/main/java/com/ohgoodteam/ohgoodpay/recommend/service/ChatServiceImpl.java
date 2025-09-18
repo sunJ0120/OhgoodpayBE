@@ -76,8 +76,8 @@ public class ChatServiceImpl implements ChatService {
         // 4. LLM 요청
         BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
 
-        // + currentFlow가 recommendation이었는데, nextFlow가 re-recommendation일 경우, products 캐싱
-        if(currentFlow.equals("recommendation") && nextFlow.equals("re-recommendation")){
+        // + currentFlow가 recommendation이었는데, nextFlow가 recommendation일 경우, products 캐싱
+        if(response.getFlow().equals("recommendation")){
             chatCacheService.saveProductsBySession(sessionId, response.getProducts());
 
             // 3개 제한된 새 응답 객체 생성

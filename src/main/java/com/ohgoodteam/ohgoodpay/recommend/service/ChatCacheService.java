@@ -72,7 +72,7 @@ public class ChatCacheService {
     // 세션별 기분 조회
     public String getMoodBySession(String sessionId) {
         String mood = cacheStore.getBySession(CacheSpec.MOOD, sessionId, String.class);
-        return mood != null ? mood : "쏘쏘";
+        return mood != null ? mood : "";
     }
 
     // 세션별 기분 저장
