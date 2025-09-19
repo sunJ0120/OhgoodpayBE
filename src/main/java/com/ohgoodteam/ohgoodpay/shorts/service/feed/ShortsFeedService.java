@@ -41,4 +41,6 @@ public interface ShortsFeedService {
     //포인트 게이지 포인트 적립
     ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto);
 
+    // 댓글 삭제
+    ShortsCommentDeleteDataDto deleteComment(Long shortsId, Long commentId, Long customerId);
 }

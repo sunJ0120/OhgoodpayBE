@@ -115,7 +115,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     /**
      * 전체 쇼츠 피드 조회 (페이징 정보 포함)
      */
-    public ShortsFeedListDataDto findAllFeedsWithPaging(int page, int size, String keyword, Long customerId) {
+    public ShortsFeedListDataDto  findAllFeedsWithPaging(int page, int size, String keyword, Long customerId) {
         log.info("findAllFeedsWithPaging 호출 : page={}, size={}, keyword={}, customerId={}", page, size, keyword, customerId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
@@ -387,8 +387,14 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
             rewardedNow
         );
     }
+
+
+
+
+
         */
     
+
     /**
      * 좋아요/싫어요 반응처리
      * @param dto
@@ -486,6 +492,37 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 .build();
     }
 
+
+    /**
+     * 댓글 삭제
+     * @param shortsId
+     * @param commentId
+     * @param customerId
+     * @return
+     */
+    @Override
+    public ShortsCommentDeleteDataDto deleteComment(Long shortsId, Long commentId, Long customerId) {
+
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (!comment.getShorts().getShortsId().equals(shortsId)) {
+            throw new IllegalArgumentException("해당 피드에 속한 댓글이 아닙니다.");
+        }
+
+        if (!comment.getCustomer().getCustomerId().equals(customerId)) {
+            throw new IllegalArgumentException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
+
+        commentRepository.deleteById(commentId);
+
+        return ShortsCommentDeleteDataDto.builder()
+                .commentId(commentId)
+                .shortsId(shortsId)
+                .customerId(customerId)
+                .deleted(true)
+                .build();
+    }
+
     @Override
     public ShortsFeedDataDto getSpecificShorts(Long shortsId) {
         ShortsEntity shorts = shortsRepository.findById(shortsId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
@@ -541,5 +578,9 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 remainingLimit == 0 ? "일일 포인트 한도 초과" : "적립 가능한 포인트 없음"
             );
         }
+
     }
 }
+
+
+

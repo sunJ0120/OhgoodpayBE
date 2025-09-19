@@ -169,11 +169,33 @@ public class ShortsFeedController {
 
     }
 
+
+    /**
+     * 댓글 삭제
+     */
+    @DeleteMapping("/feeds/{shortsId}/comments/{commentId}/delete")
+    public ApiResponseWrapper<ShortsCommentDeleteDataDto> deleteComment(
+            @PathVariable (value="shortsId") Long shortsId,
+            @PathVariable (value ="commentId" ) Long commentId,
+            @RequestParam (value="customerId") Long customerId
+    ){
+        log.info("댓글 삭제 요청: shortsId={}, commentId={}, customerId={}", shortsId, commentId, customerId);
+        try {
+            ShortsCommentDeleteDataDto dto = shortsFeedService.deleteComment(shortsId, commentId, customerId);
+            return ApiResponseWrapper.ok(dto);
+        } catch (IllegalArgumentException e){
+            return ApiResponseWrapper.error(400, e.getMessage());
+        }
+    }
+
+
+
     @GetMapping("/{shortsId}")
     public ResponseEntity<ShortsFeedDataDto> getSpecificShorts(
         @PathVariable (value = "shortsId") Long shortsId
     ){
         return ResponseEntity.ok(shortsFeedService.getSpecificShorts(shortsId));
     }
+
 
 }
