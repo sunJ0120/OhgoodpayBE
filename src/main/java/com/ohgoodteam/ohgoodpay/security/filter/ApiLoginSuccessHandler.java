@@ -24,6 +24,14 @@ public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler{
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * 인증 성공 시 토큰 생성
+     * @param request 요청
+     * @param response 응답
+     * @param authentication 인증 정보
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setContentType("application/json;charset=UTF-8");
