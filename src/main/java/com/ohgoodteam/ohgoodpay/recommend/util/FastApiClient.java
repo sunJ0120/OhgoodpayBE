@@ -2,6 +2,7 @@ package com.ohgoodteam.ohgoodpay.recommend.util;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.ProductDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * FastAPI 서버와 통신하는 클라이언트
  */
 @Component
+@Slf4j
 public class FastApiClient {
     @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
@@ -53,6 +55,13 @@ public class FastApiClient {
             // response.getBody()로 실제 객체 추출
             R responseBody = response.getBody();
 
+            // JSON 응답 로그 추가
+            log.info("RestTemplate 원본 응답: {}", response.getBody());
+            if (responseBody instanceof BasicChatResponseDTO) {
+                BasicChatResponseDTO chatResponse = (BasicChatResponseDTO) responseBody;
+                log.info("역직렬화 후 products 개수: {}", chatResponse.getProducts() != null ? chatResponse.getProducts().size() : "null");
+            }
+
             // BasicChatResponseDTO인 경우 이미지 URL을 프록시 URL로 변환
             if (responseBody instanceof BasicChatResponseDTO) {
                 BasicChatResponseDTO chatResponse = (BasicChatResponseDTO) responseBody;
@@ -70,9 +79,13 @@ public class FastApiClient {
      */
     private void processImageProxyUrls(BasicChatResponseDTO chatResponse) {
         if (chatResponse.getProducts() != null && !chatResponse.getProducts().isEmpty()) {
+            log.info("FastAPI 응답에서 받은 products 개수: {}", chatResponse.getProducts().size());
+
             List<ProductDTO> updatedProducts = chatResponse.getProducts().stream()
                 .map(this::convertToProxyUrl)
                 .collect(Collectors.toList());
+
+            log.info("프록시 URL 변환 후 products 개수: {}", updatedProducts.size());
 
             // products 필드를 업데이트 (reflection 또는 builder 패턴 사용)
             try {
@@ -80,8 +93,9 @@ public class FastApiClient {
                 java.lang.reflect.Field productsField = chatResponse.getClass().getDeclaredField("products");
                 productsField.setAccessible(true);
                 productsField.set(chatResponse, updatedProducts);
+                log.info("Reflection 후 products 개수: {}", chatResponse.getProducts().size());
             } catch (Exception e) {
-                System.err.println("이미지 프록시 URL 변환 실패: " + e.getMessage());
+                log.info("이미지 프록시 URL 변환 실패: {}", e.getMessage());
             }
         }
     }

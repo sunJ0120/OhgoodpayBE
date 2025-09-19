@@ -2,11 +2,15 @@ package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.recommend.dto.cache.ProductDTO;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheSpec;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 고객 정보 캐싱 서비스 (REDIS)
@@ -68,7 +72,7 @@ public class ChatCacheService {
     // 세션별 기분 조회
     public String getMoodBySession(String sessionId) {
         String mood = cacheStore.getBySession(CacheSpec.MOOD, sessionId, String.class);
-        return mood != null ? mood : "쏘쏘";
+        return mood != null ? mood : "";
     }
 
     // 세션별 기분 저장
@@ -107,5 +111,30 @@ public class ChatCacheService {
     // 세션별 플로우 count 저장
     public void saveCntBySession(String sessionId, Integer count) {
         cacheStore.saveBySession(CacheSpec.COUNT, sessionId, count);
+    }
+
+    // 세션별 상품 리스트 저장
+    public void saveProductsBySession(String sessionId, List<ProductDTO> products){
+        cacheStore.saveBySession(CacheSpec.PRODUCTS, sessionId, products);
+    }
+
+    // 세션별 상품 가져오기
+    // React에서 카드식으로 하기 위해 최대 3개씩 가져오기
+    public List<ProductDTO> getProductsBySession(String sessionId) {
+        List<ProductDTO> products = (List<ProductDTO>) cacheStore.getBySession(
+                CacheSpec.PRODUCTS,
+                sessionId,
+                List.class
+        );
+
+        // 상품이 없을 경우, emptyList를 내보내도록 한다.
+        // TODO : 이거...재 추천시 없으면 다시 관심사 물어보는 플로우로 이동해야 할 것 같은데 그건 생각 좀 해보기.....
+        if (products == null || products.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return products.size() > 3
+                ? products.subList(0, 3)
+                : products;
     }
 }
