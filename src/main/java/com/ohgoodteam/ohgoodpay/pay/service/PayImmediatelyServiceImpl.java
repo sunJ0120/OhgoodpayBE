@@ -1,17 +1,18 @@
-package com.ohgoodteam.ohgoodpay.pay.service;
 
-import java.time.YearMonth;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
-import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
-import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
-
-import lombok.RequiredArgsConstructor;
-
+//package com.ohgoodteam.ohgoodpay.pay.service;
+//
+//import java.time.YearMonth;
+//import java.util.List;
+//import java.util.Map;
+//import java.util.stream.Collectors;
+//
+//import org.springframework.stereotype.Service;
+//
+//import com.ohgoodteam.ohgoodpay.common.entity.PaymentEntity;
+//import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
+//
+//import lombok.RequiredArgsConstructor;
+//
 //@Service
 //@RequiredArgsConstructor
 //public class PayImmediatelyServiceImpl implements PayImmediatelyService {

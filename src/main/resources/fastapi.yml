@@ -1,2 +1,13 @@
 fastapi:
-  base-url: ${FASTAPI_BASE_URL}/ml
+    base-url: ${FASTAPI_BASE_URL:http://localhost:8000}
+    internal-token: ${FASTAPI_INTERNAL_TOKEN:dev-token}
+    api-prefix: /ml
+    #    internal-token: ${OHGOODPAY_INTERNAL_TOKEN}
+    http:
+      connect-timeout: 2000
+      read-timeout: 25000
+    paths:
+      sayMyName: /dash/saymyname
+      analyzeSpending: /dash/analyze
+      advice: /dash/advice
+
