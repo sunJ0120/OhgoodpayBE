@@ -7,6 +7,7 @@ import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 // import com.ohgoodteam.ohgoodpay.shorts.Converter;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
@@ -45,38 +46,42 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
 
-    private static final int LAP_SECONDS   = 60;
-    private static final int POINT_PER_LAP = 10;
-    private static final int DAILY_CAP     = 100;
-    private static final long MAX_DELTA_SEC = 5;
+    private static final int POINTS_PER_60_SECONDS = 10;
+    private static final int DAILY_POINT_LIMIT = 100;
+    private static final String POINT_REASON = "숏폼 시청";
 
-    private static final String REASON = "숏폼";
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    // private static final int LAP_SECONDS   = 60;
+    // private static final int POINT_PER_LAP = 10;
+    // private static final int DAILY_CAP     = 100;
+    // private static final long MAX_DELTA_SEC = 5;
+
+    // private static final String REASON = "숏폼";
+    // private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 
     // 서버 메모리 상태(서버 재시작 시 초기화됨)
-    private final Map<Long, Long> lastBeatMs = new ConcurrentHashMap<>();          // 고객별 마지막 수신(ms)
-    private final Map<String, Integer> carrySecMap = new ConcurrentHashMap<>();    // key: customerId:yyyyMMdd → 0~59
+    // private final Map<Long, Long> lastBeatMs = new ConcurrentHashMap<>();          // 고객별 마지막 수신(ms)
+    // private final Map<String, Integer> carrySecMap = new ConcurrentHashMap<>();    // key: customerId:yyyyMMdd → 0~59
 
-    private String key(Long customerId, LocalDate day) {
-        return customerId + ":" + day.toString();
-    }
+    // private String key(Long customerId, LocalDate day) {
+    //     return customerId + ":" + day.toString();
+    // }
 
-    private LocalDateTime kstNow() {
-        return LocalDateTime.now(KST);
-    }
+    // private LocalDateTime kstNow() {
+    //     return LocalDateTime.now(KST);
+    // }
 
-    private LocalDate todayKST() {
-        return LocalDate.now(KST);
-    }
+    // private LocalDate todayKST() {
+    //     return LocalDate.now(KST);
+    // }
 
-    private LocalDateTime startOfToday() {
-        return todayKST().atStartOfDay();
-    }
+    // private LocalDateTime startOfToday() {
+    //     return todayKST().atStartOfDay();
+    // }
 
-    private LocalDateTime startOfTomorrow() {
-        return startOfToday().plusDays(1);
-    }
+    // private LocalDateTime startOfTomorrow() {
+    //     return startOfToday().plusDays(1);
+    // }
 
     // private final Converter converter;
 
@@ -299,6 +304,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
         return new ShortsCommentDataDto(saved);
     }
 
+    /* 
     @Override
     @Transactional(readOnly = true)
     public ShortsPointResponseDto getPointStatus(Long customerId) {
@@ -381,6 +387,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
             rewardedNow
         );
     }
+        */
     
     /**
      * 좋아요/싫어요 반응처리
@@ -483,5 +490,56 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     public ShortsFeedDataDto getSpecificShorts(Long shortsId) {
         ShortsEntity shorts = shortsRepository.findById(shortsId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
         return new ShortsFeedDataDto(shorts);
+    }
+
+    // 포인트 게이지 적립
+
+    
+
+    @Override
+    @Transactional
+    public ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto) {
+        Long customerId = requestDto.customerId();
+        int watchedSeconds = requestDto.watchedSeconds();
+        Long shortsId = requestDto.shortsId();
+        
+        // 1. 오늘 적립된 포인트 합계 조회
+        LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+        LocalDateTime startOfTomorrow = startOfToday.plusDays(1);
+        
+        int todayTotalPoints = shortsRepository.sumTodayPoints(
+            customerId, POINT_REASON, startOfToday, startOfTomorrow);
+        
+        // 2. 적립 가능한 포인트 계산
+        int calculatedPoints = (int) Math.round((double) watchedSeconds * POINTS_PER_60_SECONDS / 60);
+        int remainingLimit = DAILY_POINT_LIMIT - todayTotalPoints;
+        int earnedPoints = Math.min(calculatedPoints, remainingLimit);
+        log.info("calculatedPoints", calculatedPoints);
+        log.info("remainingLimit", remainingLimit);
+        log.info("earnedPoints", earnedPoints);
+        
+        // 3. 포인트 적립 
+        if (earnedPoints > 0) {
+            // 포인트 히스토리 저장
+            shortsRepository.insertPointHistory(
+                customerId, earnedPoints, POINT_REASON, LocalDateTime.now());
+            
+            // 사용자 포인트 업데이트
+            shortsRepository.updateCustomerPoints(customerId, earnedPoints);
+            
+            return new ShortsPointEarnResponseDto(
+                earnedPoints,
+                todayTotalPoints + earnedPoints,
+                true,
+                earnedPoints + "포인트 적립 완료!"
+            );
+        } else {
+            return new ShortsPointEarnResponseDto(
+                0,
+                todayTotalPoints,
+                false,
+                remainingLimit == 0 ? "일일 포인트 한도 초과" : "적립 가능한 포인트 없음"
+            );
+        }
     }
 }

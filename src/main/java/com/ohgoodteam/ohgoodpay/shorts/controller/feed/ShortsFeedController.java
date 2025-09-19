@@ -1,6 +1,7 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.feed;
 
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ApiResponseWrapper;
@@ -110,6 +111,18 @@ public class ShortsFeedController {
 
     }
 
+
+    @PostMapping("/point/earn")
+    public ResponseEntity<ShortsPointEarnResponseDto> earnPoint(
+        @RequestBody ShortsPointEarnRequestDto requestDto
+    ) {
+        log.info("포인트 적립 요청 : requestDto={}", requestDto);
+        ShortsPointEarnResponseDto response = shortsFeedService.earnPoint(requestDto);
+        return ResponseEntity.ok(response);
+    }
+
+
+    /* 
     // 5초마다 호출해서 포인트 지급 가능한지 체크
     @GetMapping("/pointstatus")
     public ResponseEntity<ShortsPointResponseDto> getPointStatus(
@@ -126,6 +139,9 @@ public class ShortsFeedController {
     ){
         return ResponseEntity.ok(shortsFeedService.watchFeed(customerId, requestDto));
     }
+        */
+
+
     @PostMapping("/feeds-v2/{shortsId}/comments")
     public ApiResponseWrapper<ShortsCommentDataDto> createCommentV2(
             @PathVariable (value = "shortsId") Long shortsId,

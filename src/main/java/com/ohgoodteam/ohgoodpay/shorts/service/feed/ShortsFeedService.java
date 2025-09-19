@@ -1,10 +1,8 @@
 package com.ohgoodteam.ohgoodpay.shorts.service.feed;
 
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsPointResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
 import java.util.List;
@@ -32,12 +30,15 @@ public interface ShortsFeedService {
     // 좋아요 반응 처리
     ShortsReactionDataDto reactToShorts(ShortsReactionRequestDto shortsReactionRequestDto);
 
-    // 포인트 적립 가능한지 조회
-    ShortsPointResponseDto getPointStatus(Long customerId);
+    // // 포인트 적립 가능한지 조회
+    // ShortsPointResponseDto getPointStatus(Long customerId);
 
-    // 쇼츠 시청 포인트 적립
-    ShortsPointResponseDto watchFeed(Long customerId, ShortsPointRequestDto requestDto);
+    // // 쇼츠 시청 포인트 적립
+    // ShortsPointResponseDto watchFeed(Long customerId, ShortsPointRequestDto requestDto);
 
     ShortsFeedDataDto getSpecificShorts(Long shortsId);
+
+    //포인트 게이지 포인트 적립
+    ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto);
 
 }
