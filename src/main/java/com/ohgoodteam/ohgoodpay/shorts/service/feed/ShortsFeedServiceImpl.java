@@ -381,7 +381,9 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
             rewardedNow
         );
     }
-    
+
+
+
     /**
      * 좋아요/싫어요 반응처리
      * @param dto
@@ -478,4 +480,37 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 .myReaction(requestedType)
                 .build();
     }
+
+    /**
+     * 댓글 삭제
+     * @param shortsId
+     * @param commentId
+     * @param customerId
+     * @return
+     */
+    @Override
+    public ShortsCommentDeleteDataDto deleteComment(Long shortsId, Long commentId, Long customerId) {
+
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if(!comment.getShorts().getShortsId().equals(shortsId)){
+            throw new IllegalArgumentException("해당 피드에 속한 댓글이 아닙니다.");
+        }
+
+        if(!comment.getCustomer().getCustomerId().equals(customerId)){
+            throw new IllegalArgumentException("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        }
+
+        commentRepository.deleteById(commentId);
+
+        return ShortsCommentDeleteDataDto.builder()
+                .commentId(commentId)
+                .shortsId(shortsId)
+                .customerId(customerId)
+                .deleted(true)
+                .build();
+    }
 }
+
+
+
