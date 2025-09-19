@@ -49,7 +49,7 @@ public class ShortsUploadService {
         if (file.isEmpty() || thumbnail.isEmpty()) throw new IllegalArgumentException("파일을 다시 업로드해주세요.");
         if (file.getSize() > 200L * 1024 * 1024) throw new IllegalArgumentException("허용용량이 초과되었습니다.");
 
-        // 임시 파일 생성해서 변환 작업 수행행
+        // 임시 파일 생성해서 변환 작업 수행
         Path tmpVid = Files.createTempFile("upload-", ".mp4");
         Path tmpImg = Files.createTempFile("thumb-", ".jpg");
 
