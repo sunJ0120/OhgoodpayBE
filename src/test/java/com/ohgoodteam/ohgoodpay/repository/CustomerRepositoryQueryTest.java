@@ -28,16 +28,16 @@ public class CustomerRepositoryQueryTest {
             CustomerCacheDTO result = customerRepository.findCustomerCacheInfoById(testCustomerId);
             
             if (result != null) {
-                System.out.println("✅ findCustomerCacheInfoById 성공!");
+                System.out.println("findCustomerCacheInfoById 성공!");
                 System.out.println("Customer ID: " + result.getCustomerId());
                 System.out.println("Name: " + result.getName());
                 System.out.println("Credit Limit: " + result.getCreditLimit());
             } else {
-                System.out.println("⚠️ Customer ID " + testCustomerId + "가 존재하지 않습니다.");
+                System.out.println("Customer ID " + testCustomerId + "가 존재하지 않습니다.");
             }
             
         } catch (Exception e) {
-            System.err.println("❌ findCustomerCacheInfoById 실패: " + e.getMessage());
+            System.err.println("findCustomerCacheInfoById 실패: " + e.getMessage());
             e.printStackTrace();
             fail("findCustomerCacheInfoById 테스트 실패: " + e.getMessage());
         }
@@ -50,11 +50,11 @@ public class CustomerRepositoryQueryTest {
             
             Optional<String> hobby = customerRepository.findHobbyByCustomerId(testCustomerId);
             
-            System.out.println("✅ findHobbyByCustomerId 성공!");
+            System.out.println("findHobbyByCustomerId 성공!");
             System.out.println("Hobby: " + hobby.orElse("취미 없음"));
             
         } catch (Exception e) {
-            System.err.println("❌ findHobbyByCustomerId 실패: " + e.getMessage());
+            System.err.println("findHobbyByCustomerId 실패: " + e.getMessage());
             e.printStackTrace();
             fail("findHobbyByCustomerId 테스트 실패: " + e.getMessage());
         }
@@ -67,11 +67,11 @@ public class CustomerRepositoryQueryTest {
             
             Optional<Integer> balance = customerRepository.findBalanceByCustomerId(testCustomerId);
             
-            System.out.println("✅ findBalanceByCustomerId 성공!");
+            System.out.println("findBalanceByCustomerId 성공!");
             System.out.println("Balance: " + balance.orElse(0));
             
         } catch (Exception e) {
-            System.err.println("❌ findBalanceByCustomerId 실패: " + e.getMessage());
+            System.err.println("findBalanceByCustomerId 실패: " + e.getMessage());
             e.printStackTrace();
             fail("findBalanceByCustomerId 테스트 실패: " + e.getMessage());
         }
@@ -104,7 +104,7 @@ public class CustomerRepositoryQueryTest {
             }
             
         } catch (Exception e) {
-            System.err.println("❌ 전체 고객 쿼리 테스트 실패: " + e.getMessage());
+            System.err.println("전체 고객 쿼리 테스트 실패: " + e.getMessage());
             e.printStackTrace();
         }
     }
