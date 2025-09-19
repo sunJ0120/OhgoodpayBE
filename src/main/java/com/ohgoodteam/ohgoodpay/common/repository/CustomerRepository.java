@@ -1,5 +1,7 @@
 package com.ohgoodteam.ohgoodpay.common.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -68,4 +70,21 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     @Query("UPDATE CustomerEntity c SET c.balance = c.balance - :balance WHERE c.customerId = :customerId")
     int minusCustomerBalance(int balance, Long customerId);
 
+    //customerId로 회원 등급으로 balance 초기화
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.balance = :balance WHERE c.customerId = :customerId")
+    int updateCustomerBalance(int balance, Long customerId);
+
+    //연장 신청 상태 유저 조회
+    List<CustomerEntity> findByIsExtensionTrue();
+
+    //연장 미신청 상태 유저 조회
+    List<CustomerEntity> findByIsExtensionFalse(); 
+
+    //customerId로 회원 제재 상태 업데이트
+    @Transactional
+    @Modifying
+    @Query("UPDATE CustomerEntity c SET c.isBlocked = :isBlocked WHERE c.customerId = :customerId")
+    int updateCustomerIsBlocked(boolean isBlocked, Long customerId);
 }
