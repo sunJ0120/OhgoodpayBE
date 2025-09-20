@@ -51,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
             // 4. LLM 요청
             BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
             // 5. 응답 후처리
-            processAfterResponse(response, customerId, sessionId, nextFlow);
+            processAfterResponse(response, customerId, sessionId);
             return response;
         }
 
@@ -68,6 +68,7 @@ public class ChatServiceImpl implements ChatService {
         chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
         log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
 
+        // valid하지 않아서 해당 플로우를 스킵해야 할 경우, 정보를 저장하면 안 되기 때문이다.
         if (validated.isValid()) {
             saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
         }
@@ -76,26 +77,15 @@ public class ChatServiceImpl implements ChatService {
         // 4. LLM 요청
         BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
 
-        // + currentFlow가 recommendation이었는데, nextFlow가 recommendation일 경우, products 캐싱
-        if(response.getFlow().equals("recommendation")){
-            chatCacheService.saveProductsBySession(sessionId, response.getProducts());
-
-            // 3개 제한된 새 응답 객체 생성
-            response = BasicChatResponseDTO.builder()
-                    .sessionId(response.getSessionId())
-                    .message(response.getMessage())
-                    .newHobby(response.getNewHobby())
-                    .products(chatCacheService.getProductsBySession(sessionId)) // 3개 제한
-                    .summary(response.getSummary())
-                    .flow(response.getFlow())
-                    .build();
-
+        // flow가 recommendation or re_recommendation 일 경우, products 캐싱 및 응답 처리
+        if("recommendation".equals(response.getFlow()) || "re_recommendation".equals(response.getFlow())){
+            response = handleRecommendationFlow(sessionId, response);
             // TODO : 캐싱 할 상품 모자랄 경우에 대한 해결책 및 로직 정의 필요.
         }
 
         // 5. 응답 후처리, 강제로 넘어간 경우는 저장 무시한다.
         if (validated.isValid()) {
-            processAfterResponse(response, customerId, sessionId, nextFlow);
+            processAfterResponse(response, customerId, sessionId);
         }
         return response;
     }
@@ -143,16 +133,9 @@ public class ChatServiceImpl implements ChatService {
      * 플로우별 특정 데이터 저장
      */
     private void saveFlowSpecificData(Long customerId, String sessionId, String nextFlow, ValidInputResponseDTO validated) {
-        // 플로우 전환시 카운트 리셋
-        // TODO : 이거 0으로 만들고 세는 방향으로 가야할 것 같아서 고민중
-        chatCacheService.saveCntBySession(sessionId, 1);
         // 특정 플로우에서 mood 저장, 유효한 경우엔 캐싱하고 아닌 경우엔 저장 없이 플로우만 넘기도록 한다.
         if ("hobby_check".equals(nextFlow) && validated != null) {
             chatCacheService.saveMoodBySession(sessionId, validated.getInputMessage());
-        }
-        // 특정 플로우에서 hobby 저장
-        if ("choose".equals(nextFlow) && validated != null) {
-            chatCacheService.saveHobby(customerId, validated.getInputMessage());
         }
     }
 
@@ -175,16 +158,38 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 응답 후처리 (DB 업데이트, 캐싱)
      */
-    private void processAfterResponse(BasicChatResponseDTO response, Long customerId, String sessionId, String nextFlow) {
-        // DB 업데이트
+    private void processAfterResponse(BasicChatResponseDTO response, Long customerId, String sessionId) {
+        // 취미의 경우는 db에 저장하는 값으로, 차후 llm이 한 번 처리한 다음 저장할 수 있도록 리팩터링 하기 위해 요청 후 처리하도록 하였다.
         if (!response.getNewHobby().equals("")) {
             customerRepository.updateHobbyByCustomerId(customerId, response.getNewHobby());
+            chatCacheService.saveHobby(customerId, response.getNewHobby()); //취미 저장
             log.info("취미 DB 업데이트 완료 - customerId: {}, hobby: {}", customerId, response.getNewHobby());
         }
         // 캐싱
         // 요약본 저장
         if (response.getSummary() != null && !response.getSummary().isEmpty()) {
             chatCacheService.saveSummaryBySession(sessionId, response.getSummary());
+            // TODO : 요약본 DB에 저장하는 로직 필요 (우선순위 낮음)
         }
+    }
+
+    /**
+     * 추천 플로우 처리 (상품 캐싱 및 응답 재생성)
+     */
+    private BasicChatResponseDTO handleRecommendationFlow(String sessionId, BasicChatResponseDTO response) {
+        if ("recommendation".equals(response.getFlow())) {
+            // 새 상품 캐싱
+            chatCacheService.saveProductsBySession(sessionId, response.getProducts());
+            // TODO : 캐싱 할 상품 모자랄 경우에 대한 해결책 및 로직 정의 필요.
+        }
+
+        return BasicChatResponseDTO.builder()
+                .sessionId(response.getSessionId())
+                .message(response.getMessage())
+                .newHobby(response.getNewHobby())
+                .products(chatCacheService.getProductsBySession(sessionId)) // 3개 제한
+                .summary(response.getSummary())
+                .flow(response.getFlow())
+                .build();
     }
 }

@@ -5,8 +5,9 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDT
 import com.ohgoodteam.ohgoodpay.recommend.service.ChatService;
 import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,21 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Tag(name = "Chat")
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/chat")
 public class ChatController {
-
     private final ChatService chatService;
 
-    // TODO : 에러 정의를 좀 더 세분화 하는 방향 고려
     @PostMapping()
     public ApiResponseWrapper<BasicChatResponseDTO> chat(
             @RequestBody ChatStartRequestDTO request,
-            HttpServletRequest httpRequest) {
+            @AuthenticationPrincipal(expression = "customerId") Long customerId) {
         try {
-            // JWT에서 customerId 추출하는 파트 미리 만들어 놓음
-//            String customerId = jwtUtil.getCustomerIdFromToken(httpRequest);
-
             BasicChatResponseDTO response = chatService.chat(
 //                    customerId,
                     request.getCustomerId(),
@@ -39,11 +36,14 @@ public class ChatController {
                     request.getInputMessage()
             );
             return ApiResponseWrapper.ok(response);
-
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
-
+        } catch (RuntimeException e) {
+            // 로깅만 추가해서 추적 가능하도록 설정
+            log.warn("Chat service runtime error: {}", e.getMessage());
+            return ApiResponseWrapper.error(500, "일시적인 서비스 오류가 발생했습니다");
         } catch (Exception e) {
+            log.error("Unexpected error in chat controller", e);
             return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
         }
     }
