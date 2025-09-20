@@ -15,13 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.upload.ShortsUploadRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.service.upload.ShortsUploadService;
-
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-)
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

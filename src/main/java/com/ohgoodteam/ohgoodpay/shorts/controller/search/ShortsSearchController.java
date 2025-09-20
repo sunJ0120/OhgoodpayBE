@@ -11,10 +11,7 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseD
 import com.ohgoodteam.ohgoodpay.shorts.service.search.ShortsSearchService;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-)
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
