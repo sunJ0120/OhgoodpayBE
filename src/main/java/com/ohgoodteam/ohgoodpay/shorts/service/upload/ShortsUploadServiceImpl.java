@@ -44,6 +44,7 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
     // 변환 타임아웃
     private static final int FFMPEG_TIMEOUT_SEC = 1200;
 
+    // 비디오 업로드
     @Override
     @Transactional
     public ShortsUploadResponseDto upload(MultipartFile file, MultipartFile thumbnail, String title, String content) throws IOException {

@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository;
+package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CommentEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
@@ -6,7 +6,6 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
