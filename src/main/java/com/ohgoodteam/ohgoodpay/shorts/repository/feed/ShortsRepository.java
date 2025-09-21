@@ -1,8 +1,7 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository;
+package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
 
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,12 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
+public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, ShortsRepositoryCustom {
 
     /**
      * 전체 쇼츠 피드 조회
@@ -199,31 +196,4 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
         WHERE customer_id = :customerId
         """, nativeQuery = true)
     void updateCustomerPoints(Long customerId, int points);
-
-
-    // point_history 테이블에 포인트 적립 내역 저장
-    @Modifying
-    @Transactional
-    @Query(value = """
-        INSERT INTO point_history (customer_id, point, point_explain, date)
-        VALUES (:customerId, :points, :reason, :date)
-        """, nativeQuery = true)
-    void insertPointHistory(@Param("customerId") Long customerId,
-                            @Param("points") int points,
-                            @Param("reason") String reason,
-                            @Param("date") LocalDateTime date);
-
-
-    // 오늘 적립된 포인트 합계 내역 조회
-    @Query(value = """
-    SELECT COALESCE(SUM(ph.point), 0)
-    FROM point_history ph
-    WHERE ph.customer_id = :customerId
-      AND ph.point_explain = :reason
-      AND ph.date >= :start
-      AND ph.date < :end
-    """, nativeQuery = true)
-    int sumTodayPoints(Long customerId, String reason, LocalDateTime start, LocalDateTime end);
-
-
 }

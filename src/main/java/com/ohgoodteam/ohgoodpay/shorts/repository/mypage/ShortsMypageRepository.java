@@ -7,5 +7,6 @@ import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 @Repository
 public interface ShortsMypageRepository extends JpaRepository<ShortsEntity, Long>{
 
+    // 내가 구독하는 사람 수
     long countByCustomerCustomerId(Long userId);
 }
