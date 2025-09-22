@@ -20,15 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class QuestionFlowProcessor implements FlowProcessor{
+public class UnifiedFlowProcessor implements FlowProcessor{
     private final ValidCheckService validCheckService; // 입력 검증 서비스
     private final ChatCacheService chatCacheService; // 캐싱 서비스
     private final FlowConfiguration flowConfiguration; // next flow 정의
     private final LlmService llmService; //llm에 요청 보내기 위함
 
-    /**
-     * QUESTION 타입에서 전체 검증 & 요청 프로세스를 정의
-     */
+    // 검증을 위한 객체인 context에서 값을 뽑아서 request 생성 > response 받기
+    // 이를 통해 코어 로직이 변했어도 api 명세를 바꾸지 않을 수 있다.
     @Override
     public BasicChatResponseDTO process(FlowContext context) {
         // 1. 현재 플로우에 대한 입력 검증
@@ -48,14 +47,17 @@ public class QuestionFlowProcessor implements FlowProcessor{
         // 여기는 validated에서 값을 뽑아야 하므로 validated를 같이 보낸다.
         saveFlowSpecificData(context.getSessionId(), context.getCurrentFlow(), validated);
 
-        // 4. 다음 플로우로 전환
+        // 4. 현재 플로우로 LLM 생성 요청
+        CustomerContextWrapper contextWrapper = collectCacheData(context);
+
+        // 5. 다음 플로우로 전환, 이 값은 LLM 요청에는 쓰이지 않음
         FlowConfig config = flowConfiguration.getFlowConfig(context.getCurrentFlow());
         ChatFlowType nextFlow = config.getNextFlow();
         chatCacheService.saveFlowBySession(context.getSessionId(), nextFlow.getValue()); //사용을 위해 다음 플로우를 저장
         chatCacheService.saveCntBySession(context.getSessionId(), 1); //카운트가 있었다면 초기화
 
-        // 5. 다음 플로우에 대한 질문 생성
-        CustomerContextWrapper contextWrapper = collectCacheData(context);
+        // 6. QUESTION vs RESPONSE에 따라서 LLM에 주입할 플로우 분기
+        String flow = getTargetFlow(context);
 
         return llmService.generateChat(
                 context.getSessionId(),
@@ -65,16 +67,15 @@ public class QuestionFlowProcessor implements FlowProcessor{
                 contextWrapper.getBalance(),
                 context.getMessage(),
                 contextWrapper.getSummary(),
-                nextFlow.getValue()
+                flow
         );
+        // TODO : LLM 요청 후에 상품을 캐싱 하므로, 상품 캐싱 로직은 이후에 작성한다.
     }
 
-    /**
-     * QUESTION 타입에서 사용한다는 것을 명시하기 위함이다.
-     */
     @Override
     public boolean canHandle(FlowType flowType) {
-        return FlowType.QUESTION.equals(flowType);
+        // 모든 FlowType을 처리할 수 있다고 명시, 차후 확장을 위해 우선 canHandle 메서드를 살려둔다.
+        return true; // 또는 FlowType.QUESTION.equals(flowType) || FlowType.RESPONSE.equals(flowType);
     }
 
     /**
@@ -130,6 +131,21 @@ public class QuestionFlowProcessor implements FlowProcessor{
     }
 
     /**
+     * 캐시된 데이터 수집
+     *
+     * 유효성 검증된 후 진행하므로 context에서 뺀다.
+     */
+    private CustomerContextWrapper collectCacheData(FlowContext context){
+        return CustomerContextWrapper.builder()
+                .customerInfo(chatCacheService.getCustomerInfo(context.getCustomerId()))
+                .hobby(chatCacheService.getHobby(context.getCustomerId()))
+                .mood(chatCacheService.getMoodBySession(context.getSessionId()))
+                .balance(chatCacheService.getBalance(context.getCustomerId()))
+                .summary(chatCacheService.getSummaryBySession(context.getSessionId()))
+                .build();
+    }
+
+    /**
      * 플로우별 특정 데이터 저장, 입력이 valid일 경우 이 입력을 저장하고, 다음 플로우를 위한 응답 생성으로 넘어가야 하기 때문이다.
      */
     private void saveFlowSpecificData(String sessionId, ChatFlowType currentFlow, ValidInputResponseDTO validated) {
@@ -144,17 +160,12 @@ public class QuestionFlowProcessor implements FlowProcessor{
     }
 
     /**
-     * 캐시된 데이터 수집
-     *
-     * 유효성 검증된 후 진행하므로 context에서 뺀다.
+     * FlowType.QUESTION vs FlowType.RESPONSE 둘 중 하나의 결과에 따라 getNextFlow()일지 getCurrentFlow()일지 선택
      */
-    private CustomerContextWrapper collectCacheData(FlowContext context){
-        return CustomerContextWrapper.builder()
-                .customerInfo(chatCacheService.getCustomerInfo(context.getCustomerId()))
-                .hobby(chatCacheService.getHobby(context.getCustomerId()))
-                .mood(chatCacheService.getMoodBySession(context.getSessionId()))
-                .balance(chatCacheService.getBalance(context.getCustomerId()))
-                .summary(chatCacheService.getSummaryBySession(context.getSessionId()))
-                .build();
+    private String getTargetFlow(FlowContext context) {
+        FlowConfig config = flowConfiguration.getFlowConfig(context.getCurrentFlow());
+        return config.getProcessingType() == FlowType.QUESTION
+                ? config.getNextFlow().getValue()     // 다음 플로우 질문
+                : context.getCurrentFlow().getValue(); // 현재 플로우 응답
     }
 }
