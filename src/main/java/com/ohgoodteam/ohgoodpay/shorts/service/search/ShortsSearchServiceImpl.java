@@ -19,7 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ShortsSearchServiceImpl implements ShortsSearchService {
 
     private final ShortsSearchRepository shortsSearchRepository;
-    @Value("${ranking.w.like:1.5}")    private double wLike;
+
+    // application.properties에 해당 값들이 없으면 기본값으로 설정
+    @Value("${ranking.w.like:1.5}")    private double wLike; 
     @Value("${ranking.w.comment:1.2}") private double wComment;
     @Value("${ranking.w.hashtag:1.2}") private double wHashtag;
     @Value("${ranking.w.recency:1.5}") private double wRecency;
@@ -34,40 +36,25 @@ public class ShortsSearchServiceImpl implements ShortsSearchService {
         LocalDateTime lastDate,
         BigDecimal lastScore
     ){
-        log.info("📊 가중치 설정 - wLike: {}, wComment: {}, wHashtag: {}, wRecency: {}, tauHours: {}", 
-                wLike, wComment, wHashtag, wRecency, tauHours);
-        
         int pageSize = (limit == null ? 24 : Math.min(limit, 50));
-        log.info("📄 페이지 설정 - pageSize: {}, limitPlusOne: {}", pageSize, pageSize + 1);
-
         List<ShortsSearchResponse> rows = shortsSearchRepository.fetchExposure(
                 (q == null || q.isBlank()) ? null : q,
                 wLike, wComment, wHashtag, wRecency, tauHours,
                 lastScore, lastDate, lastId,
                 pageSize + 1
         );
-
-        log.info("🔍 DB 조회 결과 - 조회된 개수: {}", rows.size());
-
         boolean hasNext = rows.size() > pageSize;
         if (hasNext) {
             rows = rows.subList(0, pageSize);
-            log.info("✂️ 페이징 처리 - 실제 반환 개수: {}", rows.size());
         }
-
         List<LayoutItem> items = rows.stream()
                 .map(r -> new LayoutItem(r.getShortsId(), r.getThumbnail(), r.getLikeCount()))
                 .toList();
-
         NextCursor next = null;
         if (hasNext && !rows.isEmpty()) {
             var last = rows.get(rows.size() - 1);
             next = new NextCursor(last.getShortsId(), last.getDate(), last.getScore());
-            log.info("➡️ 다음 커서 생성 - lastId: {}, lastDate: {}, lastScore: {}", 
-                    last.getShortsId(), last.getDate(), last.getScore());
         }
-
-        log.info("🎯 최종 결과 - items: {}, hasNext: {}", items.size(), hasNext);
         return new CursorResponse(items, next, hasNext);
     }
 }

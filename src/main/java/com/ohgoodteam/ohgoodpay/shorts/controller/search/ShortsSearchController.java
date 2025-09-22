@@ -30,17 +30,6 @@ public class ShortsSearchController {
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
         @RequestParam(required = false) BigDecimal lastScore
     ){
-        log.info("🔍 검색 요청 - q: {}, limit: {}, lastId: {}, lastDate: {}, lastScore: {}", 
-                q, limit, lastId, lastDate, lastScore);
-        
-        try {
-            CursorResponse result = shortsSearchService.getFeed(q, limit, lastId, lastDate, lastScore);
-            log.info("✅ 검색 성공 - 결과 개수: {}, hasNext: {}", 
-                    result.items().size(), result.hasNext());
-            return result;
-        } catch (Exception e) {
-            log.error("❌ 검색 실패", e);
-            throw e;
-        }
+        return shortsSearchService.getFeed(q, limit, lastId, lastDate, lastScore);
     }
 }

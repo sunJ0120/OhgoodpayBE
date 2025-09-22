@@ -67,10 +67,6 @@ public class ShortsSearchRepositoryImpl implements ShortsSearchRepositoryCustom 
             LIMIT :limitPlusOne
             """;
         
-        log.info("🗄️ SQL 실행 시작");
-        log.info("📝 SQL: {}", sql);
-        log.info("🔧 파라미터 - q: {}, wLike: {}, wComment: {}, wHashtag: {}, wRecency: {}, tauHours: {}, lastScore: {}, lastDate: {}, lastId: {}, limitPlusOne: {}", 
-                q, wLike, wComment, wHashtag, wRecency, tauHours, lastScore, lastDate, lastId, limitPlusOne);
         
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("q", q);
@@ -86,25 +82,17 @@ public class ShortsSearchRepositoryImpl implements ShortsSearchRepositoryCustom 
         
         @SuppressWarnings("unchecked")
         List<Object[]> rawResults = query.getResultList();
-        log.info("✅ SQL 실행 완료 - 결과 개수: {}", rawResults.size());
         
         List<ShortsSearchResponse> result = rawResults.stream()
                 .map(row -> {
                     try {
-                        log.info("🔍 Row 데이터 타입 확인 - row[0]: {} ({}), row[1]: {} ({}), row[2]: {} ({}), row[3]: {} ({}), row[4]: {} ({})", 
-                                row[0], row[0] != null ? row[0].getClass().getSimpleName() : "null",
-                                row[1], row[1] != null ? row[1].getClass().getSimpleName() : "null",
-                                row[2], row[2] != null ? row[2].getClass().getSimpleName() : "null",
-                                row[3], row[3] != null ? row[3].getClass().getSimpleName() : "null",
-                                row[4], row[4] != null ? row[4].getClass().getSimpleName() : "null");
-                        
-                        // 안전한 타입 변환
+                        // 밑에 전부 다 안전하게 타입 변환 하는 것
+                        // 예로 들어, DB의 BIGINT가 long, Integer, BigInteger 등 다양한 타입으로 저장될 수 있기 때문에
                         Long shortsId = null;
                         if (row[0] != null) {
-                            if (row[0] instanceof Number) {
-                                shortsId = ((Number) row[0]).longValue();
+                            if (row[0] instanceof Number) { // Number 타입인 경우
+                                shortsId = ((Number) row[0]).longValue(); // Long 타입으로 변환
                             } else {
-                                log.warn("⚠️ shortsId 타입 예상치 못함: {}", row[0].getClass());
                                 shortsId = Long.parseLong(row[0].toString());
                             }
                         }
@@ -116,7 +104,6 @@ public class ShortsSearchRepositoryImpl implements ShortsSearchRepositoryCustom 
                             if (row[2] instanceof Number) {
                                 likeCount = ((Number) row[2]).longValue();
                             } else {
-                                log.warn("⚠️ likeCount 타입 예상치 못함: {}", row[2].getClass());
                                 likeCount = Long.parseLong(row[2].toString());
                             }
                         }
@@ -128,7 +115,6 @@ public class ShortsSearchRepositoryImpl implements ShortsSearchRepositoryCustom 
                             } else if (row[3] instanceof java.sql.Date) {
                                 date = ((java.sql.Date) row[3]).toLocalDate().atStartOfDay();
                             } else {
-                                log.warn("⚠️ date 타입 예상치 못함: {}", row[3].getClass());
                                 // 문자열로 파싱 시도
                                 date = java.time.LocalDateTime.parse(row[3].toString().replace(" ", "T"));
                             }
@@ -141,14 +127,12 @@ public class ShortsSearchRepositoryImpl implements ShortsSearchRepositoryCustom 
                             } else if (row[4] instanceof Number) {
                                 score = BigDecimal.valueOf(((Number) row[4]).doubleValue());
                             } else {
-                                log.warn("⚠️ score 타입 예상치 못함: {}", row[4].getClass());
                                 score = new BigDecimal(row[4].toString());
                             }
                         }
                         
                         return new ShortsSearchResponse(shortsId, thumbnail, likeCount, date, score);
                     } catch (Exception e) {
-                        log.error("❌ Row 매핑 오류 - row: {}", java.util.Arrays.toString(row), e);
                         throw new RuntimeException("Row 매핑 실패", e);
                     }
                 })

@@ -8,7 +8,6 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseD
 public interface ShortsSearchRepositoryCustom {
     
     //검색 결과 조회 (가중치 로직, 점수 계산, 정렬, 페이징 처리)
-    
     List<ShortsSearchResponse> fetchExposure(
         String q,
         double wLike,

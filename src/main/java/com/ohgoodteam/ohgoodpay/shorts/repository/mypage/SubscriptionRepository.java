@@ -30,12 +30,16 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     """, nativeQuery = true) // 구독 미리보기
     List<FollowingRow> findFollowingPreview(@Param("meId") Long meId, @Param("size") int size); // 구독 미리보기
 
-        interface FollowingRow {
-        Long getCursorId();
-        Long getFollowingId();
-        String getNickname();
-        String getName();
-        String getProfileImg();
+    // 별도의 DTO로 매핑할 수도 있지만 화면,응답에 필요한 필드만 선택적으로 매핑하기 위해서.  DTO 파일을 따로 안만드는게 장점. 
+    @lombok.Data
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class FollowingRow {
+        private Long cursorId;
+        private Long followingId;
+        private String nickname;
+        private String name;
+        private String profileImg;
     }
 
     // 구독 취소
