@@ -25,6 +25,9 @@ public class FastApiClient {
     @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
 
+//    @Value("${fastapi.api-prefix}")
+//    private String apiPrefix;
+
     @Value("${server.port:8081}")
     private String serverPort;
 
@@ -37,6 +40,7 @@ public class FastApiClient {
     // post 메서드: 제네릭 타입 T 요청을 받아서 제네릭 타입 R 응답을 반환
     public <T, R> R post(String endpoint, T request, Class<R> responseType) {
         try {
+            // apiPrefix 더하게끔 수정
             String url = fastApiBaseUrl + endpoint;
 
             // FastApiClient.java의 post 메서드에 로그 추가

@@ -22,11 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
 
-    @PostMapping("/chat")
+    @PostMapping("")
     public ApiResponseWrapper<BasicChatResponseDTO> chat(
             @RequestBody ChatStartRequestDTO request
 //            @AuthenticationPrincipal(expression = "customerId") Long customerId

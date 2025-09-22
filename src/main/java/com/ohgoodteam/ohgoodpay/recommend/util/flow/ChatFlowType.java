@@ -10,6 +10,7 @@ public enum ChatFlowType {
     START("start"),
     MOODCHECK("mood_check"), // 기분 체크하는 단계
     HOBBYCHECK("hobby_check"), // 취미 체크하는 단계
+    CHOOSE("choose"), // 플로우 체크하는 단계
     RECOMMENDATION("recommendation"), // 추천하는 단계
     RE_RECOMMENDATION("re-recommendation"); // 재추천하는 단계
 

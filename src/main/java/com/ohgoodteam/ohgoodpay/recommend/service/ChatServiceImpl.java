@@ -1,11 +1,8 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
-import com.ohgoodteam.ohgoodpay.recommend.dto.CustomerContextWrapper;
 import com.ohgoodteam.ohgoodpay.recommend.dto.FlowContext;
-import com.ohgoodteam.ohgoodpay.recommend.dto.ValidationResult;
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
-import com.ohgoodteam.ohgoodpay.recommend.service.fastapi.LlmService;
 import com.ohgoodteam.ohgoodpay.recommend.service.flow.FlowProcessor;
 import com.ohgoodteam.ohgoodpay.recommend.service.flow.FlowProcessorFactory;
 import com.ohgoodteam.ohgoodpay.recommend.util.flow.ChatFlowType;

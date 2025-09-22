@@ -47,7 +47,7 @@ public class UnifiedFlowProcessor implements FlowProcessor{
         // 여기는 validated에서 값을 뽑아야 하므로 validated를 같이 보낸다.
         saveFlowSpecificData(context.getSessionId(), context.getCurrentFlow(), validated);
 
-        // 4. 현재 플로우로 LLM 생성 요청
+        // 4. 데이터 캐싱
         CustomerContextWrapper contextWrapper = collectCacheData(context);
 
         // 5. 다음 플로우로 전환, 이 값은 LLM 요청에는 쓰이지 않음
@@ -56,7 +56,7 @@ public class UnifiedFlowProcessor implements FlowProcessor{
         chatCacheService.saveFlowBySession(context.getSessionId(), nextFlow.getValue()); //사용을 위해 다음 플로우를 저장
         chatCacheService.saveCntBySession(context.getSessionId(), 1); //카운트가 있었다면 초기화
 
-        // 6. QUESTION vs RESPONSE에 따라서 LLM에 주입할 플로우 분기
+        // 6. QUESTION vs RESPONSE에 따라서 LLM에 주입할 플로우 분기, 지금은 QUESTION만 존재.
         String flow = getTargetFlow(context);
 
         return llmService.generateChat(
@@ -74,8 +74,8 @@ public class UnifiedFlowProcessor implements FlowProcessor{
 
     @Override
     public boolean canHandle(FlowType flowType) {
-        // 모든 FlowType을 처리할 수 있다고 명시, 차후 확장을 위해 우선 canHandle 메서드를 살려둔다.
-        return FlowType.QUESTION.equals(flowType) || FlowType.RESPONSE.equals(flowType);
+        // QUESTION 플로우를 처리할 수 있다고 명시, 차후 확장을 위해 우선 canHandle 메서드를 살려둔다.
+        return FlowType.QUESTION.equals(flowType);
     }
 
     /**
