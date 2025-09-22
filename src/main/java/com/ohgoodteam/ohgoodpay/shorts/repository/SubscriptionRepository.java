@@ -1,6 +1,8 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,7 +48,11 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
         LIMIT :size
     """, nativeQuery = true) // 구독 전체보기
     List<FollowingRow> findFollowingPage(@Param("meId") Long meId, @Param("lastId") Long lastSubscriptionId, @Param("size") int size);
-        interface FollowingRow {
+
+    // 구독 신청 (중복 구독 방지)
+    boolean existsByFollowerCustomerIdAndFollowingCustomerId(Long followerId, Long followingId);
+
+    interface FollowingRow {
         Long getCursorId();
         Long getFollowingId();
         String getNickname();
