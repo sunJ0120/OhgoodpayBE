@@ -2,7 +2,6 @@ package com.ohgoodteam.ohgoodpay.shorts.controller.feed;
 
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ApiResponseWrapper;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -66,6 +66,32 @@ public class ShortsFeedController {
     }
 
     /**
+     * 커서 기반 페이징을 사용한 전체 쇼츠 피드 조회 (가중치 적용)
+     * @param limit 조회할 개수
+     * @param lastScore 마지막 점수 (커서)
+     * @param lastDate 마지막 날짜 (커서)
+     * @param lastId 마지막 ID (커서)
+     * @param customerId 고객 ID
+     * @return 커서 기반 페이징 결과
+     */
+    @GetMapping("/feeds-cursor")
+    public ApiResponseWrapper<ShortsFeedCursorResponseDto> getAllFeedWithCursor(
+            @RequestParam (value = "limit", defaultValue = "24", required = false) Integer limit,
+            @RequestParam (value = "lastScore", required = false) Double lastScore,
+            @RequestParam (value = "lastDate", required = false) LocalDateTime lastDate,
+            @RequestParam (value = "lastId", required = false) Long lastId,
+            @RequestParam (value = "customerId", required = false) Long customerId
+    ){
+        log.info("커서 기반 쇼츠 피드 조회 요청 : limit={}, lastScore={}, lastDate={}, lastId={}, customerId={}", 
+                limit, lastScore, lastDate, lastId, customerId);
+
+        ShortsFeedCursorResponseDto data = shortsFeedService.findAllFeedsWithCursor(
+                limit, lastScore, lastDate, lastId, customerId);
+
+        return ApiResponseWrapper.ok(data);
+    }
+
+    /**
      * 쇼츠 댓글 조회
      * @param shortsId 쇼츠 아이디
      * @return
@@ -100,7 +126,7 @@ public class ShortsFeedController {
      * @return
      */
     @PostMapping("/feeds/{shortsId}/comments")
-    public ResponseEntity createComment(
+    public ResponseEntity<Boolean> createComment(
             @RequestBody ShortsCommentRequestDto requestDto,
             @PathVariable (value = "shortsId") Long shortsId
     ){

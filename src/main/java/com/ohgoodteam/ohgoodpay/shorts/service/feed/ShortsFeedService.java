@@ -5,6 +5,7 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDt
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ShortsFeedService {
@@ -14,6 +15,10 @@ public interface ShortsFeedService {
 
     // 전체 쇼츠 피드 조회 (v2)
     ShortsFeedListDataDto findAllFeedsV2(int page, int size, String keyword);
+
+    // 커서 기반 페이징을 사용한 전체 쇼츠 피드 조회 (가중치 적용)
+    ShortsFeedCursorResponseDto findAllFeedsWithCursor(Integer limit, Double lastScore, 
+                                                       LocalDateTime lastDate, Long lastId, Long customerId);
 
     // 댓글 조회
     List<ShortsCommentDataDto> findAllComments(Long shortsId);

@@ -8,10 +8,8 @@ import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 // import com.ohgoodteam.ohgoodpay.shorts.Converter;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsPointResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
 import com.ohgoodteam.ohgoodpay.shorts.repository.CommentRepository;
@@ -19,22 +17,18 @@ import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,6 +39,13 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     private final ShortsRepository shortsRepository;
     private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
+
+    @Value("${ranking.w.like:1.5}")    private double wLike;
+    @Value("${ranking.w.comment:1.2}") private double wComment;
+    @Value("${ranking.w.hashtag:1.2}") private double wHashtag;
+    @Value("${ranking.w.recency:1.5}") private double wRecency;
+    @Value("${ranking.tau.hours:72}")  private double tauHours;
+
 
     private static final int POINTS_PER_60_SECONDS = 10;
     private static final int DAILY_POINT_LIMIT = 100;
@@ -86,7 +87,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     // private final Converter converter;
 
     /**
-     * 전체 쇼츠 피드 조회
+     * 전체 쇼츠 피드 조회 (기존 Pageable 방식)
      * @param page
      * @param size
      * @param keyword
@@ -97,7 +98,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
         log.info("findAllFeeds 호출 : page={}, size={}, keyword={}, customerId={}", page, size, keyword, customerId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Object[]> results = shortsRepository.findAllFeeds(keyword, customerId, pageable);
+        Page<Object[]> results = shortsRepository.findAllFeeds(wLike, wComment, wHashtag, wRecency, tauHours, customerId, pageable);
 
         // Object[] 배열을 ShortsFeedDataDto로 변환
         List<ShortsFeedDataDto> result = new ArrayList<>();
@@ -113,13 +114,65 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     }
 
     /**
+     * 커서 기반 페이징을 사용한 전체 쇼츠 피드 조회 (가중치 적용)
+     * @param limit 조회할 개수
+     * @param lastScore 마지막 점수 (커서)
+     * @param lastDate 마지막 날짜 (커서)
+     * @param lastId 마지막 ID (커서)
+     * @param customerId 고객 ID
+     * @return 커서 기반 페이징 결과
+     */
+    public ShortsFeedCursorResponseDto findAllFeedsWithCursor(Integer limit, Double lastScore, 
+                                                             LocalDateTime lastDate, Long lastId, Long customerId) {
+        log.info("findAllFeedsWithCursor 호출 : limit={}, lastScore={}, lastDate={}, lastId={}, customerId={}", 
+                limit, lastScore, lastDate, lastId, customerId);
+
+        int pageSize = (limit == null ? 24 : Math.min(limit, 50));
+        
+        List<Object[]> rows = shortsRepository.findAllFeedsWithCursor(
+                wLike, wComment, wHashtag, wRecency, tauHours, 
+                customerId, lastScore, lastDate, lastId, pageSize + 1);
+
+        boolean hasNext = rows.size() > pageSize;
+        if (hasNext) {
+            rows = rows.subList(0, pageSize);
+        }
+
+        // Object[] 배열을 ShortsFeedDataDto로 변환
+        List<ShortsFeedDataDto> feeds = new ArrayList<>();
+        for (Object[] row : rows) {
+            feeds.add(convertToShortsFeedDataDtoWithScore(row));
+        }
+
+        // 다음 커서 정보 생성
+        ShortsFeedCursorResponseDto.NextCursor next = null;
+        if (hasNext && !rows.isEmpty()) {
+            Object[] lastRow = rows.get(rows.size() - 1);
+            Double score = ((Number) lastRow[12]).doubleValue(); // score는 12번째 인덱스
+            next = new ShortsFeedCursorResponseDto.NextCursor(
+                (Long) lastRow[0], // shortsId
+                ((Timestamp) lastRow[5]).toLocalDateTime(), // date
+                score
+            );
+        }
+
+        log.info("커서 기반 조회 결과: {}개, hasNext: {}", feeds.size(), hasNext);
+
+        return ShortsFeedCursorResponseDto.builder()
+                .feeds(feeds)
+                .next(next)
+                .hasNext(hasNext)
+                .build();
+    }
+
+    /**
      * 전체 쇼츠 피드 조회 (페이징 정보 포함)
      */
     public ShortsFeedListDataDto  findAllFeedsWithPaging(int page, int size, String keyword, Long customerId) {
         log.info("findAllFeedsWithPaging 호출 : page={}, size={}, keyword={}, customerId={}", page, size, keyword, customerId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Object[]> results = shortsRepository.findAllFeeds(keyword, customerId, pageable);
+        Page<Object[]> results = shortsRepository.findAllFeeds(wLike, wComment, wHashtag, wRecency, tauHours, customerId, pageable);
 
         // Object[] 배열을 ShortsFeedDataDto로 변환
         List<ShortsFeedDataDto> shortsFeedList = new ArrayList<>();
@@ -154,6 +207,50 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
         int likeCount = ((Number) row[9]).intValue();
         int commentCount = ((Number) row[10]).intValue();
         String myReaction = (String) row[11];
+        Double score = ((Number) row[12]).doubleValue(); // score는 12번째 인덱스
+        
+        // 점수 콘솔 출력
+        log.info("쇼츠 ID: {}, 제목: {}, 좋아요: {}, 댓글: {}, 점수: {}", 
+                shortsId, shortsName, likeCount, commentCount, String.format("%.6f", score));
+        
+        return ShortsFeedDataDto.builder()
+                .shortsId(shortsId)
+                .videoName(videoName)
+                .thumbnail(thumbnail)
+                .shortsName(shortsName)
+                .shortsExplain(shortsExplain)
+                .date(date)
+                .customerId(customerId)
+                .customerNickname(customerNickname)
+                .profileImg(profileImg)
+                .likeCount(likeCount)
+                .commentCount(commentCount)
+                .myReaction(myReaction)
+                .build();
+    }
+
+    /**
+     * Object[] 배열을 ShortsFeedDataDto로 변환 (score 포함)
+     */
+    private ShortsFeedDataDto convertToShortsFeedDataDtoWithScore(Object[] row) {
+        // 각 컬럼을 의미있는 변수명으로 추출
+        Long shortsId = (Long) row[0];
+        String videoName = (String) row[1];
+        String thumbnail = (String) row[2];
+        String shortsName = (String) row[3];
+        String shortsExplain = (String) row[4];
+        LocalDateTime date = ((Timestamp) row[5]).toLocalDateTime();
+        Long customerId = (Long) row[6];
+        String customerNickname = (String) row[7];
+        String profileImg = (String) row[8];
+        int likeCount = ((Number) row[9]).intValue();
+        int commentCount = ((Number) row[10]).intValue();
+        String myReaction = (String) row[11];
+        Double score = ((Number) row[12]).doubleValue(); // score는 12번째 인덱스
+        
+        // 점수 콘솔 출력
+        log.info("쇼츠 ID: {}, 제목: {}, 좋아요: {}, 댓글: {}, 점수: {}", 
+                shortsId, shortsName, likeCount, commentCount, String.format("%.6f", score));
         
         return ShortsFeedDataDto.builder()
                 .shortsId(shortsId)
@@ -538,7 +635,6 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     public ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto) {
         Long customerId = requestDto.customerId();
         int watchedSeconds = requestDto.watchedSeconds();
-        Long shortsId = requestDto.shortsId();
         
         // 1. 오늘 적립된 포인트 합계 조회
         LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
