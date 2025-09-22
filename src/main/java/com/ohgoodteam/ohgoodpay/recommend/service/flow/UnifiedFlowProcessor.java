@@ -75,7 +75,7 @@ public class UnifiedFlowProcessor implements FlowProcessor{
     @Override
     public boolean canHandle(FlowType flowType) {
         // 모든 FlowType을 처리할 수 있다고 명시, 차후 확장을 위해 우선 canHandle 메서드를 살려둔다.
-        return true; // 또는 FlowType.QUESTION.equals(flowType) || FlowType.RESPONSE.equals(flowType);
+        return FlowType.QUESTION.equals(flowType) || FlowType.RESPONSE.equals(flowType);
     }
 
     /**
