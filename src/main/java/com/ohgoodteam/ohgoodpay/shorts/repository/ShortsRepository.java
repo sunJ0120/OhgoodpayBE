@@ -1,7 +1,9 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
+package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ShortsRepositoryCustom;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

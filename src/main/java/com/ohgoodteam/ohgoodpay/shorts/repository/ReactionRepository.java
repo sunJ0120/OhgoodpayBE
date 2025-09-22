@@ -1,8 +1,10 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
+package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.Optional;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepositoryCustom;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

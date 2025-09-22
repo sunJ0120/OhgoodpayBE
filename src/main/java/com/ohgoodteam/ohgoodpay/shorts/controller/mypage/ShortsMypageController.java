@@ -23,12 +23,14 @@ public class ShortsMypageController {
 
     private final ShortsMypageService shortsMypageService;
     
+    // 마이페이지 미리보기
     @GetMapping("/{userId}/overview")
     public ShortsMypageResponseDto getOverview(@PathVariable Long userId, @RequestParam(defaultValue="8") Integer limit) {
         return shortsMypageService.getOverview(userId, limit);
     }
 
-    @GetMapping("/subscribe") // 구독 전체보기
+    // 구독 전체보기
+    @GetMapping("/subscribe") 
     public ShelfPageResponse<UserCard> getSubscription(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -37,7 +39,8 @@ public class ShortsMypageController {
         return shortsMypageService.getSubscriptions(userId, cursor, limit);
     }
 
-    @GetMapping("/all") // 좋아요 한 영상 전체보기
+    // 좋아요 한 영상 전체보기
+    @GetMapping("/all") 
     public ShelfPageResponse<VideoCard> getLikedVideos(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -46,7 +49,8 @@ public class ShortsMypageController {
         return shortsMypageService.getLikedVideos(userId, cursor, limit);
     }
 
-    @GetMapping("/comments") // 댓글 단 영상 전체보기
+    // 댓글 단 영상 전체보기
+    @GetMapping("/comments") 
     public ShelfPageResponse<VideoCard> getCommentedVideos(
         @RequestParam Long userId,
         @RequestParam(required=false) String cursor,
@@ -54,6 +58,8 @@ public class ShortsMypageController {
     ) {
         return shortsMypageService.getCommentedVideos(userId, cursor, limit);
     }
+
+    // 구독 취소
     @DeleteMapping("/subscription")
     public ResponseEntity<Void> deleteSubscription(@RequestParam Long userId, @RequestParam Long targetId) {
         long result = shortsMypageService.deleteSubscription(userId, targetId);
@@ -64,5 +70,4 @@ public class ShortsMypageController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }

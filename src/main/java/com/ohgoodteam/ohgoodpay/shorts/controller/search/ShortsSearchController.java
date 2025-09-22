@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class ShortsSearchController {
     private final ShortsSearchService shortsSearchService;
 
+    // 쇼츠 검색
     @GetMapping("/search")
     public CursorResponse search(
         @RequestParam(required = false) String q,
