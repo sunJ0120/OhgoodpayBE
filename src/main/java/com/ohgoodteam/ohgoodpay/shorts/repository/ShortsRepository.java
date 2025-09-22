@@ -2,6 +2,8 @@ package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ShortsRepositoryCustom;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ShortsRepository extends JpaRepository<ShortsEntity, Long> {
+public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, ShortsRepositoryCustom {
 
     /**
      * 전체 쇼츠 피드 조회 (가중치 적용)

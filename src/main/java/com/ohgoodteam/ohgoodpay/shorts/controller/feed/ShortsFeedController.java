@@ -137,7 +137,7 @@ public class ShortsFeedController {
 
     }
 
-
+    // 포인트 적립 요청
     @PostMapping("/point/earn")
     public ResponseEntity<ShortsPointEarnResponseDto> earnPoint(
         @RequestBody ShortsPointEarnRequestDto requestDto
@@ -214,14 +214,11 @@ public class ShortsFeedController {
         }
     }
 
-
-
+    // 특정 쇼츠 조회
     @GetMapping("/{shortsId}")
     public ResponseEntity<ShortsFeedDataDto> getSpecificShorts(
         @PathVariable (value = "shortsId") Long shortsId
     ){
         return ResponseEntity.ok(shortsFeedService.getSpecificShorts(shortsId));
     }
-
-
 }

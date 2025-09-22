@@ -11,16 +11,14 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseD
 import com.ohgoodteam.ohgoodpay.shorts.service.search.ShortsSearchService;
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-)
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ShortsSearchController {
     private final ShortsSearchService shortsSearchService;
 
+    // 쇼츠 검색
     @GetMapping("/search")
     public CursorResponse search(
         @RequestParam(required = false) String q,

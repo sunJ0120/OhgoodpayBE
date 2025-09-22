@@ -15,19 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.upload.ShortsUploadRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.service.upload.ShortsUploadService;
-
 import lombok.RequiredArgsConstructor;
 
-@CrossOrigin(
-    origins = "http://localhost:5173",
-    allowCredentials = "true"
-)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ShortsUploadController {
     private final ShortsUploadService s3VideoService;
 
+    // s3 업로드
     @PostMapping("/upload")
     public ResponseEntity<ShortsUploadResponseDto> upload(
         @RequestPart("video") MultipartFile video, 
@@ -50,20 +46,18 @@ public class ShortsUploadController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> delete() throws Exception {
-        try {
-            // 실제로는 shorts_id를 클라이언트에서 받아서 그것에 해당하는 aws key값(video_name)을 조회후 삭제요청
-            Path filePath = Paths.get("C:\\samplevideo.mp4");
-            String fileName = filePath.getFileName().toString(); 
-            System.out.println("fileName: " + fileName);
-            s3VideoService.delete(fileName);
-            return ResponseEntity.ok("삭제 성공");
-        }catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("삭제 실패");
-        }
-    }
-    
-
+    // @DeleteMapping("/delete")
+    // public ResponseEntity<String> delete() throws Exception {
+    //     try {
+    //         // 실제로는 shorts_id를 클라이언트에서 받아서 그것에 해당하는 aws key값(video_name)을 조회후 삭제요청
+    //         Path filePath = Paths.get("C:\\samplevideo.mp4");
+    //         String fileName = filePath.getFileName().toString(); 
+    //         System.out.println("fileName: " + fileName);
+    //         s3VideoService.delete(fileName);
+    //         return ResponseEntity.ok("삭제 성공");
+    //     }catch (Exception e) {
+    //         e.printStackTrace();
+    //         return ResponseEntity.status(500).body("삭제 실패");
+    //     }
+    // }
 }
