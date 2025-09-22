@@ -36,9 +36,10 @@ public interface ShortsFeedService {
     // // 쇼츠 시청 포인트 적립
     // ShortsPointResponseDto watchFeed(Long customerId, ShortsPointRequestDto requestDto);
 
+    // 공유기능 -> 특정 영상에 대한 정보 반환
     ShortsFeedDataDto getSpecificShorts(Long shortsId);
 
-    //포인트 게이지 포인트 적립
+    // 포인트 게이지 포인트 적립
     ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto);
 
     // 댓글 삭제

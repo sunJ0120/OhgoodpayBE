@@ -22,6 +22,7 @@ public class ShortsSearchServiceImpl implements ShortsSearchService {
     @Value("${ranking.w.recency:1.5}") private double wRecency;
     @Value("${ranking.tau.hours:72}")  private double tauHours;
 
+    // 검색 피드 조회
     @Override
     public CursorResponse getFeed(
         String q,

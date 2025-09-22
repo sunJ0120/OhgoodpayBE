@@ -17,6 +17,7 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
 import com.ohgoodteam.ohgoodpay.shorts.repository.CommentRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -49,39 +50,6 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     private static final int POINTS_PER_60_SECONDS = 10;
     private static final int DAILY_POINT_LIMIT = 100;
     private static final String POINT_REASON = "숏폼 시청";
-
-    // private static final int LAP_SECONDS   = 60;
-    // private static final int POINT_PER_LAP = 10;
-    // private static final int DAILY_CAP     = 100;
-    // private static final long MAX_DELTA_SEC = 5;
-
-    // private static final String REASON = "숏폼";
-    // private static final ZoneId KST = ZoneId.of("Asia/Seoul");
-
-
-    // 서버 메모리 상태(서버 재시작 시 초기화됨)
-    // private final Map<Long, Long> lastBeatMs = new ConcurrentHashMap<>();          // 고객별 마지막 수신(ms)
-    // private final Map<String, Integer> carrySecMap = new ConcurrentHashMap<>();    // key: customerId:yyyyMMdd → 0~59
-
-    // private String key(Long customerId, LocalDate day) {
-    //     return customerId + ":" + day.toString();
-    // }
-
-    // private LocalDateTime kstNow() {
-    //     return LocalDateTime.now(KST);
-    // }
-
-    // private LocalDate todayKST() {
-    //     return LocalDate.now(KST);
-    // }
-
-    // private LocalDateTime startOfToday() {
-    //     return todayKST().atStartOfDay();
-    // }
-
-    // private LocalDateTime startOfTomorrow() {
-    //     return startOfToday().plusDays(1);
-    // }
 
     // private final Converter converter;
 
@@ -387,14 +355,8 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
             rewardedNow
         );
     }
-
-
-
-
-
         */
     
-
     /**
      * 좋아요/싫어요 반응처리
      * @param dto
@@ -523,6 +485,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 .build();
     }
 
+    // 숏폼 피드 공유 기능 -> 특정 영상에 대한 정보 반환
     @Override
     public ShortsFeedDataDto getSpecificShorts(Long shortsId) {
         ShortsEntity shorts = shortsRepository.findById(shortsId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
@@ -530,9 +493,6 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     }
 
     // 포인트 게이지 적립
-
-    
-
     @Override
     @Transactional
     public ShortsPointEarnResponseDto earnPoint(ShortsPointEarnRequestDto requestDto) {
@@ -578,7 +538,6 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
                 remainingLimit == 0 ? "일일 포인트 한도 초과" : "적립 가능한 포인트 없음"
             );
         }
-
     }
 }
 
