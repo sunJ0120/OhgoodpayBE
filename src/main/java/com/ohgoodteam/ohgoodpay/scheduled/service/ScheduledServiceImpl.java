@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
 import com.ohgoodteam.ohgoodpay.pay.repository.PaymentRepository;
+import com.ohgoodteam.ohgoodpay.pay.service.PayImmediatelyService;
 
 import jakarta.transaction.Transactional;
 
@@ -22,6 +23,7 @@ public class ScheduledServiceImpl implements ScheduledService {
     
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
+    private final PayImmediatelyService payImmediatelyService;
 
     /**
      * 매월 1일 등급 업데이트, 등급으로 한도 초기화
@@ -75,8 +77,8 @@ public class ScheduledServiceImpl implements ScheduledService {
         for (CustomerEntity customer : customers) {
             List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(customer.getCustomerId());
             if (payments.size() > 0) {
-                if(YearMonth.from(payments.get(0).getDate()).equals(YearMonth.now())) {
-                    customerRepository.updateCustomerIsExtension(true, customer.getCustomerId());
+                if(!YearMonth.from(payments.get(0).getDate()).equals(YearMonth.now())) {
+                    payImmediatelyService.requestCustomerAutoExtension(customer.getCustomerId());
                 }
             }
         }

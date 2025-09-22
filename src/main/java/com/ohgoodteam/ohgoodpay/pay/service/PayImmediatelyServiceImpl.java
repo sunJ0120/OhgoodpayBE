@@ -187,8 +187,8 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
                 // 이번 달 결제건이면 balance 업데이트 (한도 풀어줌)
                 customerRepository.plusCustomerBalance(sumPrice, customerId);
             }
-            //지금 년월과 납부된 결제건의 년월이 다른 경우 연장 상태 해제 검토
-            if (!paymentYearMonth.equals(nowYearMonth)) {
+            //납부 후 최근 미납건 확인하여 연장 상태 해제
+            if (checkUnpaidBills(customerId)) {
                 releaseExtension(customerId);
             }
         }
