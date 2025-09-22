@@ -18,7 +18,7 @@ import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository.VideoJoinRow;
 import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository.FollowingRow;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.ShortsMypageRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsMypageRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
