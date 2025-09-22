@@ -14,11 +14,12 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseD
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.ShelfPageResponse;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.UserCard;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.VideoCard;
-import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository.VideoJoinRow;
-import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository.FollowingRow;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.ShortsMypageRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository.VideoJoinRow;
+import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsMypageRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository.FollowingRow;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.service.search;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,9 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseD
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.CursorResponse.NextCursor;
 import com.ohgoodteam.ohgoodpay.shorts.repository.search.ShortsSearchRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShortsSearchServiceImpl implements ShortsSearchService {
@@ -29,9 +32,13 @@ public class ShortsSearchServiceImpl implements ShortsSearchService {
         Integer limit,
         Long lastId,
         LocalDateTime lastDate,
-        Double lastScore
+        BigDecimal lastScore
     ){
+        log.info("📊 가중치 설정 - wLike: {}, wComment: {}, wHashtag: {}, wRecency: {}, tauHours: {}", 
+                wLike, wComment, wHashtag, wRecency, tauHours);
+        
         int pageSize = (limit == null ? 24 : Math.min(limit, 50));
+        log.info("📄 페이지 설정 - pageSize: {}, limitPlusOne: {}", pageSize, pageSize + 1);
 
         List<ShortsSearchResponse> rows = shortsSearchRepository.fetchExposure(
                 (q == null || q.isBlank()) ? null : q,
@@ -40,8 +47,13 @@ public class ShortsSearchServiceImpl implements ShortsSearchService {
                 pageSize + 1
         );
 
+        log.info("🔍 DB 조회 결과 - 조회된 개수: {}", rows.size());
+
         boolean hasNext = rows.size() > pageSize;
-        if (hasNext) rows = rows.subList(0, pageSize);
+        if (hasNext) {
+            rows = rows.subList(0, pageSize);
+            log.info("✂️ 페이징 처리 - 실제 반환 개수: {}", rows.size());
+        }
 
         List<LayoutItem> items = rows.stream()
                 .map(r -> new LayoutItem(r.getShortsId(), r.getThumbnail(), r.getLikeCount()))
@@ -51,8 +63,11 @@ public class ShortsSearchServiceImpl implements ShortsSearchService {
         if (hasNext && !rows.isEmpty()) {
             var last = rows.get(rows.size() - 1);
             next = new NextCursor(last.getShortsId(), last.getDate(), last.getScore());
+            log.info("➡️ 다음 커서 생성 - lastId: {}, lastDate: {}, lastScore: {}", 
+                    last.getShortsId(), last.getDate(), last.getScore());
         }
 
+        log.info("🎯 최종 결과 - items: {}, hasNext: {}", items.size(), hasNext);
         return new CursorResponse(items, next, hasNext);
     }
 }

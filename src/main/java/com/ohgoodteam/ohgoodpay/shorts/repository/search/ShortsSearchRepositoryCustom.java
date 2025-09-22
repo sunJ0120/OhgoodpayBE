@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository.search;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.ShortsSearchResponse;
@@ -15,7 +16,7 @@ public interface ShortsSearchRepositoryCustom {
         double wHashtag,
         double wRecency,
         double tauHours,
-        Double lastScore,
+        BigDecimal lastScore,
         LocalDateTime lastDate,
         Long lastId,
         int limitPlusOne

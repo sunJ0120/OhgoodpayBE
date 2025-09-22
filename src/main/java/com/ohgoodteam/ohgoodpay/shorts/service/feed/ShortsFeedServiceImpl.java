@@ -14,9 +14,9 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsPointResponseDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
-import com.ohgoodteam.ohgoodpay.shorts.repository.CommentRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.CommentRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
