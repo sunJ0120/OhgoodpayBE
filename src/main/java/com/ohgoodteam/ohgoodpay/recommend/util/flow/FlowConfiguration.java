@@ -6,6 +6,8 @@ import java.util.Map;
 
 /**
  * FlowConfig를 이용해서 다음 처리 방식을 결정한다.
+ *
+ * next flow에 대한 것 명시 되어 있음.
  */
 @Component
 public class FlowConfiguration {
