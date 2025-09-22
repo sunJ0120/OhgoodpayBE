@@ -1,12 +1,13 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.ChatFlowType;
+import com.ohgoodteam.ohgoodpay.recommend.util.flow.ChatFlowType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 /**
+ * TODO : 삭제 예정!!!!! 이제 플로우 관리 따로 만들어서 이거 필요 없음~
  * 채팅 플로우 관리 서비스
  *
  * 채팅 플로우의 전환 로직을 담당하며, validation 결과에 따라 다음 플로우 결정
@@ -22,10 +23,8 @@ public class FlowService {
     private static final Map<ChatFlowType, ChatFlowType> FLOW_TRANSITION = Map.of(
             ChatFlowType.START, ChatFlowType.MOODCHECK,
             ChatFlowType.MOODCHECK, ChatFlowType.HOBBYCHECK,
-            ChatFlowType.HOBBYCHECK, ChatFlowType.CHOOSE,
-            ChatFlowType.CHOOSE, ChatFlowType.RECOMMENDATION,
-            ChatFlowType.RECOMMENDATION, ChatFlowType.RE_RECOMMENDATION,
-            ChatFlowType.RE_RECOMMENDATION, ChatFlowType.RE_RECOMMENDATION // 재추천은 계속 재추천
+            ChatFlowType.HOBBYCHECK, ChatFlowType.RECOMMENDATION,
+            ChatFlowType.RECOMMENDATION, ChatFlowType.RE_RECOMMENDATION
     );
 
     /**

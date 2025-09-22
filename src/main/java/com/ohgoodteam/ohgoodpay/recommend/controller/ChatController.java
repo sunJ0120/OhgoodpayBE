@@ -15,19 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * AI 추천 채팅 컨트롤러
+ *
+ * TODO : JwtUtil에서 가져오는 방식인데, 이거 @AuthenticationPrincipal(expression = "customerId") Long customerId 이거 쓸껀지 맞출건지는 고민 해봐야 할듯...
  */
 @Tag(name = "Chat")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/chat")
+@RequestMapping("/api")
 public class ChatController {
     private final ChatService chatService;
 
-    @PostMapping()
+    @PostMapping("/chat")
     public ApiResponseWrapper<BasicChatResponseDTO> chat(
-            @RequestBody ChatStartRequestDTO request,
-            @AuthenticationPrincipal(expression = "customerId") Long customerId) {
+            @RequestBody ChatStartRequestDTO request
+//            @AuthenticationPrincipal(expression = "customerId") Long customerId
+            ) {
         try {
             BasicChatResponseDTO response = chatService.chat(
 //                    customerId,

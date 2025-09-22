@@ -40,14 +40,15 @@ public class ChatServiceImpl implements ChatService {
 
         // start 플로우는 유효성 검증 없이 바로 LLM 처리
         if (currentFlow.equals("start")) {
-            // 2. 플로우 전환 및 전처리
+            // 3. 캐싱된 데이터 수집
+            CustomerContextWrapper context = collectCachedData(customerId, sessionId);
+
+            // 플로우 전환 및 전처리
             String nextFlow = flowService.getNextFlow(currentFlow);
             chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
             chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
             log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
 
-            // 3. 캐싱된 데이터 수집
-            CustomerContextWrapper context = collectCachedData(customerId, sessionId);
             // 4. LLM 요청
             BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
             // 5. 응답 후처리
@@ -62,23 +63,24 @@ public class ChatServiceImpl implements ChatService {
             return validationResult.getResponse();
         }
 
-        // 2. 플로우 전환 및 전처리
+        // valid하지 않아서 해당 플로우를 스킵해야 할 경우, 정보를 저장하면 안 되기 때문이다.
+        if (validated.isValid()) {
+            saveFlowSpecificData(sessionId, currentFlow, validated);
+        }
+        // 3. 캐싱된 데이터 수집
+        CustomerContextWrapper context = collectCachedData(customerId, sessionId);
+
+        // 플로우 전환 및 전처리, 응답이 맞으므로 다음 플로우를 위한 질문을 만들어야 한다.
         String nextFlow = flowService.getNextFlow(currentFlow);
         chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
         chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
         log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
 
-        // valid하지 않아서 해당 플로우를 스킵해야 할 경우, 정보를 저장하면 안 되기 때문이다.
-        if (validated.isValid()) {
-            saveFlowSpecificData(customerId, sessionId, nextFlow, validated);
-        }
-        // 3. 캐싱된 데이터 수집
-        CustomerContextWrapper context = collectCachedData(customerId, sessionId);
         // 4. LLM 요청
-        BasicChatResponseDTO response = requestToLLM(sessionId, context, message, nextFlow);
+        BasicChatResponseDTO response = requestToLLM(sessionId, context, message, currentFlow);
 
         // flow가 recommendation or re_recommendation 일 경우, products 캐싱 및 응답 처리
-        if("recommendation".equals(response.getFlow()) || "re_recommendation".equals(response.getFlow())){
+        if("recommendation".equals(response.getFlow()) || "re-recommendation".equals(response.getFlow())){
             response = handleRecommendationFlow(sessionId, response);
             // TODO : 캐싱 할 상품 모자랄 경우에 대한 해결책 및 로직 정의 필요.
         }
@@ -130,11 +132,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     /**
-     * 플로우별 특정 데이터 저장
+     * 플로우별 특정 데이터 저장, 입력이 valid일 경우 이 입력을 저장하고, 다음 플로우를 위한 응답 생성으로 넘어가야 하기 때문이다.
      */
-    private void saveFlowSpecificData(Long customerId, String sessionId, String nextFlow, ValidInputResponseDTO validated) {
+    private void saveFlowSpecificData(String sessionId, String nextFlow, ValidInputResponseDTO validated) {
         // 특정 플로우에서 mood 저장, 유효한 경우엔 캐싱하고 아닌 경우엔 저장 없이 플로우만 넘기도록 한다.
-        if ("hobby_check".equals(nextFlow) && validated != null) {
+        if ("mood_check".equals(nextFlow) && validated != null) {
             chatCacheService.saveMoodBySession(sessionId, validated.getInputMessage());
         }
     }
@@ -180,6 +182,12 @@ public class ChatServiceImpl implements ChatService {
         if ("recommendation".equals(response.getFlow())) {
             // 새 상품 캐싱
             chatCacheService.saveProductsBySession(sessionId, response.getProducts());
+
+            // 플로우 전환 및 전처리, 해당 플로우에 대한 valid를 체크하는 것인데, 다른 상품의 경우 질문에 대한 답이 아니고 다음으로 넘어가는거라 하나 넘겨줌.
+            String nextFlow = flowService.getNextFlow(response.getFlow());
+            chatCacheService.saveCntBySession(sessionId, 1); //count 초기화
+            chatCacheService.saveFlowBySession(sessionId, nextFlow); //nextflow 초기화
+            log.info("캐싱되어 있는 바뀐 플로우 확인하기 : {}", chatCacheService.getFlowBySession(sessionId));
             // TODO : 캐싱 할 상품 모자랄 경우에 대한 해결책 및 로직 정의 필요.
         }
 
