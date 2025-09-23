@@ -60,7 +60,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     @Override
     public PayImmediatelyResponseDTO classifyUnpaidBills(Long customerId) {
         // 고객 정보 조회
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
         CustomerDTO customerDTO = customerService.entityToDto(customer);
 
         // 고객 등급 조회
@@ -116,7 +116,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     @Override
     @Transactional
     public boolean requestCustomerExtension(Long customerId) {
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
         // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
         if(customer.isExtension() || !checkUnpaidBills(customerId)) {
@@ -134,7 +134,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     @Override
     @Transactional
     public boolean requestCustomerAutoExtension(Long customerId) {
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
         // 이미 연장 상태면 신청 불가, 전월 미납부건이 없으면 신청 불가
         if(customer.isExtension() || !checkUnpaidBills(customerId)) {
@@ -148,7 +148,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
     // 고객 등급 및 한도 조회
     @Override
     public GradeEntity findbyCustomerGradeName(Long customerId) {
-        String gradeName = customerRepository.findByCustomerId(customerId).getGrade().getGradeName();
+        String gradeName = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found")).getGrade().getGradeName();
         return gradeRepository.findByGradeName(gradeName);
     }
 
@@ -171,7 +171,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
         
         // 결제건 납부 처리가 제대로 되었으면
         if(result > 0) {
-            CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+            CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
             // 등급 포인트 적립 처리
             if (customer.getGradePoint() < 150){
                 int gradePoint = sumPrice / 10000;
@@ -208,7 +208,7 @@ public class PayImmediatelyServiceImpl implements PayImmediatelyService {
 
     // 고객이 연장 상태면 해제
     public void releaseExtension(Long customerId) {
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
         if(customer.isExtension()) {
             customerRepository.updateCustomerIsExtension(false, customerId);
             customerRepository.updateCustomerIsAuto(false, customerId);

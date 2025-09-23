@@ -4,6 +4,8 @@ import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.BasicChatResponseDT
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.ProductDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,30 +23,33 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
+// @PropertySource("classpath:fastapi.yml")
+// @ConfigurationProperties(prefix = "fastapi")
 public class FastApiClient {
-    @Value("${fastapi.base-url}")
-    private String fastApiBaseUrl;
+
+    private String baseUrl;
 
 //    @Value("${fastapi.api-prefix}")
 //    private String apiPrefix;
 
-    @Value("${server.port:8081}")
     private String serverPort;
 
     private final RestTemplate restTemplate;
 
     public FastApiClient() {
         this.restTemplate = new RestTemplate();
+        this.baseUrl = "http://localhost:8000";
+        this.serverPort = "8080";
     }
 
     // post 메서드: 제네릭 타입 T 요청을 받아서 제네릭 타입 R 응답을 반환
     public <T, R> R post(String endpoint, T request, Class<R> responseType) {
         try {
             // apiPrefix 더하게끔 수정
-            String url = fastApiBaseUrl + endpoint;
+            String url = baseUrl + endpoint;
 
             // FastApiClient.java의 post 메서드에 로그 추가
-            System.out.println("FastAPI Base URL: " + fastApiBaseUrl);
+            System.out.println("FastAPI Base URL: " + baseUrl);
             System.out.println("Endpoint: " + endpoint);
             System.out.println("Full URL: " + url);
             System.out.println("Request body: " + request.toString());
@@ -110,7 +115,7 @@ public class FastApiClient {
     private ProductDTO convertToProxyUrl(ProductDTO product) {
         if (product.getImage() != null && !product.getImage().isEmpty()) {
             try {
-                String proxyUrl = "http://localhost:" + serverPort + "/api/image-proxy?url=" +
+                String proxyUrl = "http://localhost:" + serverPort + "/ml/api/image-proxy?url=" +
                     java.net.URLEncoder.encode(product.getImage(), "UTF-8");
 
                 return ProductDTO.builder()

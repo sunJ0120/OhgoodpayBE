@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.dto.cache;
+package com.ohgoodteam.ohgoodpay.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

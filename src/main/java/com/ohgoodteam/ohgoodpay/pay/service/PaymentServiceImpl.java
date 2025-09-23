@@ -140,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("유효하지 않은 코드");
         }
 
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
         if (customer == null) throw new RuntimeException("고객 없음");
 
         return PaymentModalDTO.builder()
@@ -156,7 +156,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentModalDTO getModalInfo(Long requestId, Long customerId) {
         PaymentRequestEntity request = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
         return PaymentModalDTO.builder()
                 .requestName(request.getRequestName())
@@ -174,7 +174,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentConfirmDTO finalPayment(Long customerId, int point, Long requestId) {
         PaymentRequestEntity request = paymentRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("요청 없음"));
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
         int totalPrice = request.getTotalPrice();
         int actualPrice = totalPrice - point; // 포인트 사용 후 실결제 금액

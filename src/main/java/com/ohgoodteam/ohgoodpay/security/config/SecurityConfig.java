@@ -38,7 +38,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/api/public/**").permitAll()
+            .requestMatchers("/auth/**", "/api/public/**","http://localhost:8000/ml/**").permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 요청 허용
             .anyRequest().authenticated());
         

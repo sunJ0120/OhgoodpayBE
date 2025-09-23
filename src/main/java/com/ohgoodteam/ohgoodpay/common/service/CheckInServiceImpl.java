@@ -31,7 +31,7 @@ public class CheckInServiceImpl implements CheckInService {
         customerRepository.plusCustomerPoint(point, customerId);
 
         // 고객 조회
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
         // 포인트 내역 저장
         PointHistoryEntity history = PointHistoryEntity.builder()

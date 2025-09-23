@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.service.fastapi;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
 import com.ohgoodteam.ohgoodpay.recommend.util.FastApiClient;
@@ -40,12 +40,12 @@ public class LlmServiceImpl implements LlmService {
                 summary,
                 flow
         );
-        return fastApiClient.post("/chat", request, BasicChatResponseDTO.class);
+        return fastApiClient.post("/ml/chat", request, BasicChatResponseDTO.class);
     }
 
     //TODO : FAST API 연동 필요
     @Override
     public ValidInputResponseDTO validateInput(ValidInputRequestDTO request) {
-        return fastApiClient.post("/chat/validation", request, ValidInputResponseDTO.class);
+        return fastApiClient.post("/ml/chat/validation", request, ValidInputResponseDTO.class);
     }
 }
