@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
+package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CommentEntity;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;

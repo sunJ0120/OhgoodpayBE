@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.shorts.repository.mypage;
+package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.List;
 import java.util.Optional;
