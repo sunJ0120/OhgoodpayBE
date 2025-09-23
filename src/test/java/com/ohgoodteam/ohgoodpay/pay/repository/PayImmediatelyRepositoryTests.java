@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.pay.repository;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class PayImmediatelyRepositoryTests {
     @Test
     public void testFindByCustomerId() {
         // CustomerEntity customer = customerRepository.findById(1L).orElseThrow(() -> new RuntimeException("Customer not found"));
-        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerId(1L);
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdOrderByDateDesc(1L);
         System.out.println("--------------------------------");
         for (PaymentEntity payment : payments) {
             System.out.println(payment);
@@ -40,7 +41,7 @@ public class PayImmediatelyRepositoryTests {
     // 고객의 결제 내역 조회 (만료되지 않은 결제 내역)
     @Test
     public void testFindByCustomerIdAndIsExpiredFalse() {
-        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalse(1L);
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseOrderByDateAsc(1L);
         System.out.println("--------------------------------");
         for (PaymentEntity payment : payments) {
             System.out.println(payment);
@@ -51,9 +52,14 @@ public class PayImmediatelyRepositoryTests {
     // 결제 단일 건 조회
     @Test
     public void testFindByPaymentId() {
-        PaymentEntity payment = paymentRepository.findByPaymentId(1L);
+        PaymentEntity payment = paymentRepository.findByPaymentId(21L);
         System.out.println("--------------------------------");
         System.out.println(payment);
+        System.out.println(payment.getDate());
+        System.out.println(YearMonth.from(payment.getDate()));
+        System.out.println(YearMonth.now());
+        System.out.println(YearMonth.from(payment.getDate()).equals(YearMonth.now()));
+        System.out.println();
         System.out.println("--------------------------------");
     }
 
@@ -68,30 +74,41 @@ public class PayImmediatelyRepositoryTests {
         System.out.println("--------------------------------");
     }
 
-    // 결제건 납부 업데이트
-    // @Test
-    // public void testUpdatePaymentIsExpired() {
-    //     int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, new Long[] { 19L,20L });
-    //     System.out.println("--------------------------------");
-    //     System.out.println(result);
-    //     System.out.println("--------------------------------");
-    // }
-
-    // 회원 수동 연장 업데이트
+    //결제건 납부 업데이트
     @Test
-    public void testUpdateCustomerIsExtension() {
-        int result = customerRepository.updateCustomerIsExtension(true, 1L);
+    public void testUpdatePaymentIsExpired() {
+        int result = paymentRepository.updatePaymentIsExpiredByPaymentId(true, new Long[] { 19L,20L });
         System.out.println("--------------------------------");
         System.out.println(result);
         System.out.println("--------------------------------");
     }
 
+    // 회원 수동 연장 업데이트
+    // @Test
+    // public void testUpdateCustomerIsExtension() {
+    //     int result = customerRepository.updateCustomerIsExtension(true, 1L);
+    //     System.out.println("--------------------------------");
+    //     System.out.println(result);
+    //     System.out.println("--------------------------------");
+    // }
+
     // 회원 자동 연장 업데이트
+    // @Test
+    // public void testUpdateCustomerIsAuto() {
+    //     int result = customerRepository.updateCustomerIsAuto(true, 1L);
+    //     System.out.println("--------------------------------");
+    //     System.out.println(result);
+    //     System.out.println("--------------------------------");
+    // }
+
+    // 해당 월 미납부 결제 조회
     @Test
-    public void testUpdateCustomerIsAuto() {
-        int result = customerRepository.updateCustomerIsAuto(true, 1L);
+    public void testFindByCustomerIdAndIsExpiredFalseAndDate() {
+        List<PaymentEntity> payments = paymentRepository.findByCustomerCustomerIdAndIsExpiredFalseAndYearMonth(1L, 2024, 8);
         System.out.println("--------------------------------");
-        System.out.println(result);
+        for (PaymentEntity payment : payments) {
+            System.out.println(payment.getDate());
+        }
         System.out.println("--------------------------------");
     }
 }
