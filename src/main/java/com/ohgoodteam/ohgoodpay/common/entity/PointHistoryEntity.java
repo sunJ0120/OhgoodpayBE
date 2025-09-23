@@ -45,5 +45,6 @@ public class PointHistoryEntity {
 
     @Column(nullable = false)
     private LocalDateTime date;
-    
+
 }
+

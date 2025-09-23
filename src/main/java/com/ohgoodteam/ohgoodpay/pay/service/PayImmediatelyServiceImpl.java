@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
 import com.ohgoodteam.ohgoodpay.common.dto.CustomerDTO;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.GradeEntity;

@@ -5,16 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
+import jakarta.transaction.Transactional;
 import java.time.YearMonth;
 import java.util.List;
-
 import java.util.Optional;
 
-import jakarta.transaction.Transactional;
-
 @Repository
-public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
+public interface PaymentRepository extends JpaRepository<PaymentEntity, Long>, PaymentRepositoryCustom  {
+
     Optional<PaymentEntity> findByPaymentRequest_OrderId(String orderId);
 
     // 결제내역 만료 처리
