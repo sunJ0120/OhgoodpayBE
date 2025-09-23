@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
+import com.ohgoodteam.ohgoodpay.recommend.dto.OhgoodScorePayload;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

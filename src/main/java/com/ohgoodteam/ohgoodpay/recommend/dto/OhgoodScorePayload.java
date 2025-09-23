@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.service;
+package com.ohgoodteam.ohgoodpay.recommend.dto;
 
 // SNAKE_CASE 설정을 쓰고 있으면 @JsonProperty 없이도 OK
 // (spring.jackson.property-naming-strategy=SNAKE_CASE)
