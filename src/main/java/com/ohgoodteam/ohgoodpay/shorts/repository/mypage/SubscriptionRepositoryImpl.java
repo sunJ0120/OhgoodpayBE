@@ -1,10 +1,11 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository.mypage;
 
 import java.util.List;
+
+import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository;
 import org.springframework.stereotype.Repository;
 import com.ohgoodteam.ohgoodpay.common.entity.QCustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.QSubscriptionEntity;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository.FollowingRow;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,9 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepositoryCustom 
     
     // 구독 목록 전체보기
     @Override
-    public List<FollowingRow> findFollowingPage(Long meId, Long lastSubscriptionId, int size) {
+    public List<SubscriptionRepository.FollowingRow> findFollowingPage(Long meId, Long lastSubscriptionId, int size) {
         return queryFactory
-            .select(Projections.bean(FollowingRow.class,
+            .select(Projections.bean(SubscriptionRepository.FollowingRow.class,
                 subscription.subscriptionId.as("cursorId"),
                 customer.customerId.as("followingId"),
                 customer.name.as("name"),

@@ -1,6 +1,8 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +19,13 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     long countFollowings(@Param("meId") Long meId); // 내가 구독하는 사람 수
 
     @Query(value = """
+        SELECT COUNT(*)
+        FROM subscription s
+        WHERE s.following_id = :targetId
+    """,nativeQuery = true)
+    long countFollwers(@Param("targetId") Long targetId); // 나를 구독하는 사람 수
+
+    @Query(value = """
         SELECT
           s.subscription_id AS cursorId,
           c.customer_id     AS followingId,
@@ -31,12 +40,18 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     """, nativeQuery = true) // 구독 미리보기
     List<FollowingRow> findFollowingPreview(@Param("meId") Long meId, @Param("size") int size); // 구독 미리보기
 
-        interface FollowingRow {
-        Long getCursorId();
+
+
+    // 구독 신청 (중복 구독 방지)
+    boolean existsByFollowerCustomerIdAndFollowingCustomerId(Long followerId, Long followingId);
+
+    interface FollowingRow {
+      Long getCursorId();
         Long getFollowingId();
         String getNickname();
         String getName();
         String getProfileImg();
+        
     }
 
     // 구독 취소

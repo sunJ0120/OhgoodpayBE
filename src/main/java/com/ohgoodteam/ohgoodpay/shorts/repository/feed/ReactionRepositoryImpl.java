@@ -6,10 +6,11 @@ import com.ohgoodteam.ohgoodpay.common.entity.QCommentEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.QCustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.QReactionEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.QShortsEntity;
-import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository.VideoJoinRow;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository.VideoJoinRow;
 
 @Repository
 @RequiredArgsConstructor

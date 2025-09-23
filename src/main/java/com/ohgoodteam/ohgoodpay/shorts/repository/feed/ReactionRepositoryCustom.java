@@ -1,7 +1,9 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository.feed;
 
+import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository.VideoJoinRow;
+
 import java.util.List;
-import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository.VideoJoinRow;
+
 
 public interface ReactionRepositoryCustom {
     

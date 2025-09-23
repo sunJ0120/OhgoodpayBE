@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository.mypage;
-
 import java.util.List;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository.FollowingRow;
+import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository.FollowingRow;
+
 
 public interface SubscriptionRepositoryCustom {
     
