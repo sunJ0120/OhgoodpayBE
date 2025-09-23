@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.recommend.service;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.ProductDTO;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheSpec;
 import com.ohgoodteam.ohgoodpay.recommend.util.CacheStore;

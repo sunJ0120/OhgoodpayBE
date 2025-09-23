@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.dto;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -2,7 +2,7 @@ package com.ohgoodteam.ohgoodpay.common.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.QCustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.QGradeEntity;
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.cache.QCustomerCacheDTO;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

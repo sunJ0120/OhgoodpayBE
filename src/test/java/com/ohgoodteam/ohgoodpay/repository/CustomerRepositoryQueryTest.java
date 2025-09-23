@@ -1,7 +1,7 @@
 package com.ohgoodteam.ohgoodpay.repository;
 
 import com.ohgoodteam.ohgoodpay.common.repository.CustomerRepository;
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

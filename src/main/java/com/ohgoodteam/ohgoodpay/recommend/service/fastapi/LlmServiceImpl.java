@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.recommend.service.fastapi;
 
-import com.ohgoodteam.ohgoodpay.recommend.dto.cache.CustomerCacheDTO;
+import com.ohgoodteam.ohgoodpay.common.dto.CustomerCacheDTO;
 
 import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
 import com.ohgoodteam.ohgoodpay.recommend.util.FastApiClient;
