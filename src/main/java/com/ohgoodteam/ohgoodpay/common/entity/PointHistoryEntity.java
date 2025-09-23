@@ -47,3 +47,4 @@ public class PointHistoryEntity {
     private LocalDateTime date;
 
 }
+

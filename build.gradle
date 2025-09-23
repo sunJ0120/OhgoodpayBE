@@ -60,6 +60,11 @@ dependencies {
 
 	// .env 파일 지원
 	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
+
+	// Qr Zing 라이브러리
+	implementation 'com.google.zxing:core:3.5.2'
+	implementation 'com.google.zxing:javase:3.5.2'
+
 }
 
 tasks.named('test') {

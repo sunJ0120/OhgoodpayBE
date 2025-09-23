@@ -15,12 +15,11 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(@org.springframework.lang.NonNull CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                // URL 끝에 슬래시(/)를 붙이면 CORS origin 매칭이 실패할 수 있으므로, 슬래시 없이 작성해야 합니다.
-                // Vite: http://localhost:5173, Live Server: http://localhost:5500
+        registry.addMapping("/**")  // 모든 경로에 대해 CORS 허용
                 .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5500")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                .allowCredentials(true)  // 인증 정보 포함 요청 허용
                 .maxAge(3600);
     }
 
@@ -30,10 +29,11 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5500"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);  // 인증 정보 포함 요청 허용
         configuration.setMaxAge(3600L);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);  // 모든 경로에 적용
         return source;
     }
 }
