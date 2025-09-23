@@ -14,12 +14,11 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseD
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.ShelfPageResponse;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.UserCard;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.mypage.ShortsMypageResponseDto.VideoCard;
-import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepository.VideoJoinRow;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsMypageRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository;
-import com.ohgoodteam.ohgoodpay.shorts.repository.mypage.SubscriptionRepository.FollowingRow;
-
+import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository.VideoJoinRow;
+import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository;
+import com.ohgoodteam.ohgoodpay.shorts.repository.SubscriptionRepository.FollowingRow;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -196,6 +195,7 @@ public class ShortsMypageServiceImpl implements ShortsMypageService {
             .seeAllPath(seeAllPath)
             .build();
     }
+    // VideoCard 리스트를 감싼 Shelf 객체 생성 (제목, 아이템, 다음 페이지 여부 등 페이징 정보 포함한 응답 포맷)
     private Shelf<VideoCard> toVideoShelf(String title, List<VideoJoinRow> raw, int limit, String seeAllPath) {
         boolean hasNext = raw.size() > limit;
         if (hasNext) {
