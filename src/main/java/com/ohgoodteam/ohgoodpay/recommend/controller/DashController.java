@@ -59,7 +59,7 @@ public class DashController {
     public ResponseEntity<ApiResponseWrapper<AdviceDTO.Out>> advice(
             @Valid @RequestBody AdviceRequestDTO req
     ) {
-        var data = dashAdviceService.generate(req.getCustomerId());
+        var data = dashAdviceService.generate(4L);
         return ResponseEntity.ok(ApiResponseWrapper.ok(data));
     }
 
