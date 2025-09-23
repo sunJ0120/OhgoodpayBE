@@ -74,4 +74,5 @@ tasks.named('test') {
 // QueryDSL 설정, 한 번 비워주고 Q클래스가 생길 수 있도록 해야 한다.
 clean {
 	delete file('src/main/generated')
+	delete file('build/generated')
 }

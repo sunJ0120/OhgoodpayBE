@@ -51,9 +51,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>,
 
     @Query("SELECT c.balance FROM CustomerEntity c WHERE c.customerId = :customerId")
     Optional<Integer> findBalanceByCustomerId(@Param("customerId") Long customerId);
-           
-    // customerId로 회원 조회
-    CustomerEntity findByCustomerId(Long customerId);
 
     // emailId로 회원 조회
     CustomerEntity findByEmailId(String emailId);

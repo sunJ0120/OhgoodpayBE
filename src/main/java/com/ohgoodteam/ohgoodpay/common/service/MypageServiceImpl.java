@@ -24,7 +24,7 @@ public class MypageServiceImpl implements MypageService {
     
     @Override
     public MypageDTO getMypageInfo(Long customerId) {
-        CustomerEntity customer = customerRepository.findByCustomerId(customerId);
+        CustomerEntity customer = customerRepository.findByCustomerId(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
         CustomerDTO customerDTO = customerService.entityToDto(customer);
 
         GradeEntity grade = gradeRepository.findByGradeName(customerDTO.getGradeName());
