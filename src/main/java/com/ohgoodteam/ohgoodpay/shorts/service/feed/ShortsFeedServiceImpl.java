@@ -572,6 +572,11 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
 
         commentRepository.deleteById(commentId);
 
+        if (!commentRepository.existsById(commentId)){
+            // 댓글 삭제 후 쇼츠의 댓글 수 감소
+            shortsRepository.decrementCommentCount(shortsId);
+        }
+
         return ShortsCommentDeleteDataDto.builder()
                 .commentId(commentId)
                 .shortsId(shortsId)
