@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ShortsMypageResponseDto {
+    // 4개는 미리보기 최종 응답
     private ChannelHeader header;
     private Shelf<UserCard> subscriptions;     
     private Shelf<VideoCard> likedVideos;      

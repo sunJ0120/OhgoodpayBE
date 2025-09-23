@@ -12,10 +12,9 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsFeedDataDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDto;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
+import com.ohgoodteam.ohgoodpay.shorts.repository.CommentRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ReactionRepository;
 import com.ohgoodteam.ohgoodpay.shorts.repository.ShortsRepository;
-
-import com.ohgoodteam.ohgoodpay.shorts.repository.feed.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +45,6 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     @Value("${ranking.w.hashtag:1.2}") private double wHashtag;
     @Value("${ranking.w.recency:1.5}") private double wRecency;
     @Value("${ranking.tau.hours:72}")  private double tauHours;
-
 
     private static final int POINTS_PER_60_SECONDS = 10;
     private static final int DAILY_POINT_LIMIT = 100;

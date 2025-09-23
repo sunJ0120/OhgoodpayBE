@@ -14,6 +14,7 @@ public class ShortsProfileRepositoryImpl implements ShortsProfileRepositoryCusto
     
     private final QCustomerEntity customer = QCustomerEntity.customerEntity;
     
+    // 프로필 수정
     @Override
     @Transactional
     public int updateProfile(Long customerId, String nickname, String introduce, String profileImg) {

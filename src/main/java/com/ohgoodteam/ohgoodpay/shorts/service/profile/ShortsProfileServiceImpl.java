@@ -24,6 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.profile.ShortsProfileEditResponseDto;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,13 +140,14 @@ public class ShortsProfileServiceImpl implements ShortsProfileService {
     @Value("${aws.s3.bucket}")
     private String bucket;
 
+    // 프로필 수정, s3에 이미지 업로드
     @Override
     @Transactional
     public ShortsProfileEditResponseDto editProfile(Long customerId, String nickname, String introduce, MultipartFile profileImg) {
         try {
             String profileImgKey = null;
             
-            // 프로필 이미지가 있으면 s3에 업로드 한다
+            // 프로필 이미지가 있으면 s3에 업로드
             if (profileImg != null && !profileImg.isEmpty()) {
                 profileImgKey = uploadProfileImageToS3(profileImg);
             }
@@ -159,6 +167,7 @@ public class ShortsProfileServiceImpl implements ShortsProfileService {
         }
     }
     
+    // 프로필 이미지 s3에 업로드 
     private String uploadProfileImageToS3(MultipartFile profileImg) throws IOException {
         // UUID + "_" + sample.jpg
         String originalFilename = profileImg.getOriginalFilename();

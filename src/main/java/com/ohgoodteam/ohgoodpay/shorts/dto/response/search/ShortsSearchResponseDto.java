@@ -1,7 +1,12 @@
 package com.ohgoodteam.ohgoodpay.shorts.dto.response.search;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class ShortsSearchResponseDto {
     public record LayoutItem(Long shortsId, String thumbnail, Long likeCount){};
@@ -10,15 +15,17 @@ public class ShortsSearchResponseDto {
         NextCursor nextCursor,
         boolean hasNext // 다음 검색이 있는지
     ) {
-        public record NextCursor(Long lastId, LocalDateTime lastDate, Double lastScore) {}
+        public record NextCursor(Long lastId, LocalDateTime lastDate, BigDecimal lastScore) {}
         // 다음 검색 시작점
     }
-    public interface ShortsSearchResponse { 
-        // dto->entity 변환 필요없이 Protection 인터페이스 기반 DTO 매핑 (ShortsEntity 전체 컬럼 가져올 필요x)
-        Long getShortsId();
-        String getThumbnail();
-        Long getLikeCount();
-        LocalDateTime getDate();
-        Double getScore();
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ShortsSearchResponse {
+        private Long shortsId;
+        private String thumbnail;
+        private Long likeCount;
+        private LocalDateTime date;
+        private BigDecimal score;
     }
 }

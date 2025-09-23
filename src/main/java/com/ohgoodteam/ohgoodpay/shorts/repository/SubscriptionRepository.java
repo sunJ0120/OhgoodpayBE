@@ -2,7 +2,6 @@ package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,18 +40,19 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     List<FollowingRow> findFollowingPreview(@Param("meId") Long meId, @Param("size") int size); // 구독 미리보기
 
 
-
+    // 별도의 DTO로 매핑할 수도 있지만 화면,응답에 필요한 필드만 선택적으로 매핑하기 위해서.  DTO 파일을 따로 안만드는게 장점. 
+    @lombok.Data
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class FollowingRow {
+        private Long cursorId;
+        private Long followingId;
+        private String nickname;
+        private String name;
+        private String profileImg;
+    }
     // 구독 신청 (중복 구독 방지)
     boolean existsByFollowerCustomerIdAndFollowingCustomerId(Long followerId, Long followingId);
-
-    interface FollowingRow {
-      Long getCursorId();
-        Long getFollowingId();
-        String getNickname();
-        String getName();
-        String getProfileImg();
-        
-    }
 
     // 구독 취소
     long deleteByFollowerCustomerIdAndFollowingCustomerId(Long userId, Long targetId);

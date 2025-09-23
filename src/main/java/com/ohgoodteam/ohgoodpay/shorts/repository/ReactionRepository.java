@@ -4,7 +4,6 @@ import java.util.Optional;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
 import com.ohgoodteam.ohgoodpay.shorts.repository.feed.ReactionRepositoryCustom;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,22 +13,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ReactionRepository extends JpaRepository<ReactionEntity, Long>, ReactionRepositoryCustom {
 
-    // Protection 으로 반환
-    interface VideoJoinRow {
-        Long getCursorId();          
-        String getContext();
-        Long getShortsId();
-        String getShortsName();
-        String getShortsExplain();
-        String getThumbnail();
-        String getVideoName();
-        Long getLikeCount();
-        Long getCommentCount();
-        java.time.LocalDateTime getDate();
-        Long getOwnerId();
-        String getOwnerName();
-        String getOwnerNickname();
-        String getOwnerProfileImg();
+    // 별도의 DTO로 매핑할 수도 있지만 화면,응답에 필요한 필드만 선택적으로 매핑하기 위해서.  DTO 파일을 따로 안만드는게 장점. 
+    @lombok.Data
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class VideoJoinRow {
+        private Long cursorId;          
+        private String context;
+        private Long shortsId;
+        private String shortsName;
+        private String shortsExplain;
+        private String thumbnail;
+        private String videoName;
+        private long likeCount;        
+        private long commentCount;     
+        private java.time.LocalDateTime date;
+        private Long ownerId;
+        private String ownerName;
+        private String ownerNickname;
+        private String ownerProfileImg;
     }
 
 
