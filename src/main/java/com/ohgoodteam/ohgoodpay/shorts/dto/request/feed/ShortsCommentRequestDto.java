@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShortsCommentRequestDto {
+public class ShortsCommentRequestDTO {
     /**
      * 댓글 작성 요청 DTO
      */

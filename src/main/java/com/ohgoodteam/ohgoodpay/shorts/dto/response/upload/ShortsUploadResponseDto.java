@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortsUploadResponseDto {
+public class ShortsUploadResponseDTO {
     private boolean success;
     private String message;
 }

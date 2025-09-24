@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortsCommentDataDto {
+public class ShortsCommentDataDTO {
     /**
      * 전체 댓글 정보 DTO
      */
@@ -28,7 +28,7 @@ public class ShortsCommentDataDto {
     private String nickname;
     private String profileImg;
 
-    public ShortsCommentDataDto(CommentEntity commentEntity){
+    public ShortsCommentDataDTO(CommentEntity commentEntity){
         this.commentId = commentEntity.getCommentId();
         this.customerId = commentEntity.getCustomer().getCustomerId();
         this.shortsId = commentEntity.getShorts().getShortsId();

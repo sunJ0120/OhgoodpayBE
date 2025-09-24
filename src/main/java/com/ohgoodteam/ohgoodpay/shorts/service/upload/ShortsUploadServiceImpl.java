@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.ohgoodteam.ohgoodpay.common.entity.CustomerEntity;
 import com.ohgoodteam.ohgoodpay.common.entity.ShortsEntity;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDto;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDTO;
 import com.ohgoodteam.ohgoodpay.shorts.repository.upload.ShortsUploadRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -44,10 +43,18 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
     // 변환 타임아웃
     private static final int FFMPEG_TIMEOUT_SEC = 1200;
 
-    // 비디오 업로드
+    /**
+     * 비디오 업로드
+     * @param file
+     * @param thumbnail
+     * @param title
+     * @param content
+     * @return
+     * @throws IOException
+     */
     @Override
     @Transactional
-    public ShortsUploadResponseDto upload(MultipartFile file, MultipartFile thumbnail, String title, String content) throws IOException {
+    public ShortsUploadResponseDTO upload(MultipartFile file, MultipartFile thumbnail, String title, String content) throws IOException {
         if (file.isEmpty() || thumbnail.isEmpty()) throw new IllegalArgumentException("파일을 다시 업로드해주세요.");
         if (file.getSize() > 200L * 1024 * 1024) throw new IllegalArgumentException("허용용량이 초과되었습니다.");
 
@@ -123,7 +130,7 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
                 .build();
             videoUploadRepository.save(shortsEntity);
 
-            return ShortsUploadResponseDto.builder()
+            return ShortsUploadResponseDTO.builder()
                 .success(true)
                 .message("업로드가 성공적으로 완료되었습니다")
                 .build();
@@ -142,7 +149,13 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
         }
     }
 
-    // 영상 해상도, 길이 추출
+    /**
+     * 영상 해상도, 길이 추출
+     * @param videoPath
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private String[] runFfprobe(Path videoPath) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(
             "ffprobe", "-v", "error",
@@ -175,7 +188,13 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
         return new String[]{width, height, duration};
     }
 
-    // 해상도 변환 로직
+    /**
+     * 해상도 변환 로직
+     * @param src
+     * @param dst
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void transcodeTo720p(Path src, Path dst) throws IOException, InterruptedException {
         // 가로,세로 자동 판단, 긴 변을 720으로 맞춤, 2의 배수
         String scaleExpr = "scale='if(gt(iw,ih),-2,720)':'if(gt(iw,ih),720,-2)'";
@@ -210,23 +229,5 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
         if (code != 0) {
             throw new IOException("ffmpeg 실패(code=" + code + "): " + log);
         }
-    }
-
-    @Override
-    public void delete(String fileName) throws IOException {
-        ListObjectsV2Response listRes = s3.listObjectsV2(ListObjectsV2Request.builder()
-            .bucket(bucket).build());
-
-        listRes.contents().stream()
-            .map(S3Object::key)
-            .filter(key -> key.endsWith(fileName))
-            .findFirst()
-            .ifPresent(key -> {
-                s3.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .build());
-                System.out.println("삭제 완료: " + key);
-            });
     }
 }

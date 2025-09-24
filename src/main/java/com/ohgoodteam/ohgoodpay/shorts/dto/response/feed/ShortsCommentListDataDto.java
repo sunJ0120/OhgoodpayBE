@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShortsCommentListDataDto {
-    private List<ShortsCommentDataDto> comments; // 댓글 리스트
+public class ShortsCommentListDataDTO {
+    private List<ShortsCommentDataDTO> comments; // 댓글 리스트
 }

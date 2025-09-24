@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.dto.response.profile;
 
-public record ShortsProfileEditResponseDto(
+public record ShortsProfileEditResponseDTO(
     String success,
     String message
 ){}

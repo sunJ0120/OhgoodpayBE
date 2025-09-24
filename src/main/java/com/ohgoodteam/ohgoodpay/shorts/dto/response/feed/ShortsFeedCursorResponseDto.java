@@ -12,8 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ShortsFeedCursorResponseDto {
-    private List<ShortsFeedDataDto> feeds; // 쇼츠 피드 리스트
+public class ShortsFeedCursorResponseDTO {
+    private List<ShortsFeedDataDTO> feeds; // 쇼츠 피드 리스트
     private NextCursor next; // 다음 커서 정보
     private boolean hasNext; // 다음 페이지 여부
 

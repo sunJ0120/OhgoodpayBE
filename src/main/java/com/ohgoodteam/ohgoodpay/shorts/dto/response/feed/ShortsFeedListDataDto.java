@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ShortsFeedListDataDto {
-    private List<ShortsFeedDataDto> shortsFeedList; // 댓글 리스트
+public class ShortsFeedListDataDTO {
+    private List<ShortsFeedDataDTO> shortsFeedList; // 댓글 리스트
     private boolean hasNext; // 다음 페이지 여부
 }

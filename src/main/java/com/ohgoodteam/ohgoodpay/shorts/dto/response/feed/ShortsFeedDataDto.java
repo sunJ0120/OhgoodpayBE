@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShortsFeedDataDto {
+public class ShortsFeedDataDTO {
     /**
      * 쇼츠 피드 정보 DTO
      */
@@ -37,8 +37,8 @@ public class ShortsFeedDataDto {
     // 반응한 상태 (예 : "like", "dislike" )
     private String myReaction;
 
-    public static ShortsFeedDataDto entityToDto(ShortsEntity shortsEntity) {
-        return  ShortsFeedDataDto.builder()
+    public static ShortsFeedDataDTO entityToDto(ShortsEntity shortsEntity) {
+        return  ShortsFeedDataDTO.builder()
                 .shortsId(shortsEntity.getShortsId())
                 .videoName(shortsEntity.getVideoName())
                 .thumbnail(shortsEntity.getThumbnail())
@@ -52,7 +52,7 @@ public class ShortsFeedDataDto {
                 .build();
     }
 
-    public ShortsFeedDataDto(ShortsEntity shortsEntity){
+    public ShortsFeedDataDTO(ShortsEntity shortsEntity){
         this.shortsId = shortsEntity.getShortsId();
         this.videoName = shortsEntity.getVideoName();
         this.thumbnail = shortsEntity.getThumbnail();

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShortsCommentDeleteDataDto {
+public class ShortsCommentDeleteDataDTO {
     private Long commentId;
     private Long shortsId;
     private Long customerId;

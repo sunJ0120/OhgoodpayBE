@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.dto.request.feed;
 
-public record ShortsPointEarnRequestDto (
+public record ShortsPointEarnRequestDTO(
     Long customerId,
     int watchedSeconds,
     Long shortsId

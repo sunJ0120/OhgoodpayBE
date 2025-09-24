@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShortsReactionDataDto {
+public class ShortsReactionDataDTO {
     private Long shortsId; // 쇼츠 ID
     private int likeCount; // 좋아요 수
     private String myReaction; // 현재 사용자의 반응 (like, dislike, none)
