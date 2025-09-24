@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Log4j2
+@ToString
 public class ShortsEntity {
 
     @Id
@@ -37,7 +38,14 @@ public class ShortsEntity {
     @Column(nullable = false)
     private LocalDateTime date;
 
+    @Column(nullable = false)
     private long likeCount;
 
+    @Column(nullable = false)
     private long commentCount;
+
+    @Transient
+    @Setter
+    private String myReaction; // transient 필드 추가
+
 }
