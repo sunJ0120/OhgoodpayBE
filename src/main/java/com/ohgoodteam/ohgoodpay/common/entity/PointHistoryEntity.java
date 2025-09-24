@@ -1,7 +1,5 @@
 package com.ohgoodteam.ohgoodpay.common.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,7 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -24,21 +25,25 @@ import lombok.extern.log4j.Log4j2;
 @AllArgsConstructor
 @Builder
 @Log4j2
+@ToString
 public class PointHistoryEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pointHistoryId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
-    private CustomerEntity customer; 
+    @ToString.Exclude
+    private CustomerEntity customer;
 
     @Column(nullable = false)
-    private int point; 
+    private int point;
 
-    @Column(name = "point_explain", nullable = false)
-    private String pointExplain; 
+    @Column(nullable = false)
+    private String pointExplain;
 
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date; 
+    @Column(nullable = false)
+    private LocalDateTime date;
+    
 }
