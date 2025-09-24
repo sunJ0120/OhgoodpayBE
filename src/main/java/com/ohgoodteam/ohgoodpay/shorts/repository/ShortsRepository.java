@@ -99,6 +99,15 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
         """)
     int incrementCommentCount(@Param("shortsId") Long shortsId);
 
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE ShortsEntity s
+        SET s.commentCount = s.commentCount - 1
+        WHERE s.shortsId = :shortsId AND s.commentCount > 0
+    """)
+    int decrementCommentCount(@Param("shortsId") Long shortsId);
+
 
     /**
      * 현재 쇼츠 좋아요 수 + 1
