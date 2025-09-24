@@ -1,8 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.repository;
 
 import com.ohgoodteam.ohgoodpay.common.entity.CommentEntity;
-import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDto;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.ShortsCommentDataDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,6 +17,4 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     """)
     List<CommentEntity> findAllComments(Long shortsId);
 
-    // 쇼츠 댓글 작성
-//    ShortsCommentDataDto save(ShortsCommentRequestDto dto);
 }

@@ -42,7 +42,7 @@ public interface ReactionRepository extends JpaRepository<ReactionEntity, Long>,
      * @param type
      * @return
      */
-    boolean existsByCustomerAndShortsAndReact(CustomerEntity customer, ShortsEntity shorts, String type);
+//    boolean existsByCustomerAndShortsAndReact(CustomerEntity customer, ShortsEntity shorts, String type);
 
 
     /**

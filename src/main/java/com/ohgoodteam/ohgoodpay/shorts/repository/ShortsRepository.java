@@ -19,26 +19,6 @@ import java.util.List;
 @Repository
 public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, ShortsRepositoryCustom {
 
-    /**
-     * 전체 쇼츠 피드 조회 (가중치 적용)
-     * @param wLike
-     * @param wComment
-     * @param wHashtag
-     * @param wRecency
-     * @param tauHours
-     * @param customerId
-     * @param pageable
-     * @return
-     */
-//    @Query("""
-//        SELECT s,
-//               (SELECT r.react FROM ReactionEntity r WHERE r.shorts.shortsId = s.shortsId AND r.customer.customerId = :customerId ) AS myReaction
-//        FROM ShortsEntity s
-//        LEFT JOIN FETCH s.customer c
-//        WHERE s.shortsName LIKE CONCAT('%', :keyword, '%')\s
-//           OR s.shortsExplain LIKE CONCAT('%', :keyword, '%')
-//    """)
-//    List<ShortsFeedDataDto> findAllFeeds(@Param("keyword") String keyword, @Param("customerId") Long customerId, Pageable pageable);
     @Query(value = """
         SELECT 
             s.shorts_id,
@@ -73,19 +53,20 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
                                Pageable pageable);
 
 
+    // 미사용
     /**
      * 전체 쇼츠 피드 조회 v2 (Page 객체 반환)
      * @param keyword
      * @param pageable
      * @return
      */
-    @Query("""
-        SELECT s FROM ShortsEntity s
-        LEFT JOIN FETCH s.customer c
-        WHERE s.shortsName LIKE CONCAT('%', :keyword, '%')\s
-           OR s.shortsExplain LIKE CONCAT('%', :keyword, '%')
-    """)
-    Page<ShortsEntity> findAllFeedsV2(@Param("keyword") String keyword, Pageable pageable);
+    //    @Query("""
+    //        SELECT s FROM ShortsEntity s
+    //        LEFT JOIN FETCH s.customer c
+    //        WHERE s.shortsName LIKE CONCAT('%', :keyword, '%')\s
+    //           OR s.shortsExplain LIKE CONCAT('%', :keyword, '%')
+    //    """)
+    //    Page<ShortsEntity> findAllFeedsV2(@Param("keyword") String keyword, Pageable pageable);
 
     /**
      * 현재 쇼츠 댓글 수 증가
@@ -135,69 +116,6 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
     int decrementLikeCount(@Param("shortsId")Long shortsId);
 
 
-
-
-    /**
-     * 특정 고객의 쇼츠 피드 조회
-     */
-    @Query(value = """
-        SELECT 
-            s.shorts_id as shortsId,
-            s.video_name as videoName,
-            s.thumbnail as thumbnail,
-            s.shorts_name as shortsName,
-            s.shorts_explain as shortsExplain,
-            s.date as date,
-            c.customer_id as customerId,
-            c.nickname as customerNickname,
-            c.profile_img as profileImg,
-            COALESCE(like_stats.like_count, 0) as likeCount,
-            COALESCE(comment_stats.comment_count, 0) as commentCount
-        FROM shorts s
-        LEFT JOIN customer c ON s.customer_id = c.customer_id
-        LEFT JOIN (
-            SELECT 
-                shorts_id,
-                COUNT(*) as like_count
-            FROM reaction 
-            WHERE react = 'LIKE'
-            GROUP BY shorts_id
-        ) like_stats ON s.shorts_id = like_stats.shorts_id
-        LEFT JOIN (
-            SELECT 
-                shorts_id,
-                COUNT(*) as comment_count
-            FROM comment 
-            GROUP BY shorts_id
-        ) comment_stats ON s.shorts_id = comment_stats.shorts_id
-        WHERE s.customer_id = :customerId
-        ORDER BY s.date DESC
-        """, nativeQuery = true)
-    List<ShortsCommonResponse> findShortsFeedByCustomerId(@Param("customerId") Long customerId);
-
-    // @Query(value = """
-    //     SELECT COALESCE(SUM(ph.point), 0)
-    //       FROM point_history ph
-    //      WHERE ph.customer_id = :customerId
-    //        AND ph.point_explain = :reason
-    //        AND ph.date >= :start
-    //        AND ph.date <  :end
-    //     """, nativeQuery = true)
-    // int sumTodayShortsPoint(Long customerId, String reason, LocalDateTime start, LocalDateTime end);
-
-
-    // @Query(value = "SELECT customer_id FROM customer WHERE customer_id = :customerId FOR UPDATE", nativeQuery = true)
-    // Long lockCustomerRow(Long customerId);
-
-
-    @Modifying
-    @Transactional
-    @Query(value = """
-        UPDATE customer
-           SET point = point + :pointPerLap
-         WHERE customer_id = :customerId
-        """, nativeQuery = true)
-    void addCustomerPoint(Long customerId, int pointPerLap);
     /**
      * 특정 쇼츠의 좋아요 수
      * @param shortsId

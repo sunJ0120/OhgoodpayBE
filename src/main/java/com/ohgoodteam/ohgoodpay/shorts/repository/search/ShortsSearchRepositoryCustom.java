@@ -3,7 +3,7 @@ package com.ohgoodteam.ohgoodpay.shorts.repository.search;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.ShortsSearchResponse;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDTO.ShortsSearchResponse;
 
 public interface ShortsSearchRepositoryCustom {
     
