@@ -102,6 +102,9 @@ public class ChatServiceImpl implements ChatService {
         // 차후 확장을 위해 redis에 상품 주입하는건 남겨둠.
         chatCacheService.saveProductsBySession(sessionId, response.getProducts());
 
+        // product url보기 위한 로그
+        log.info("상품 이미지 url : {}", response.getProducts().get(0).getImage());
+
         return BasicChatResponseDTO.builder()
                 .sessionId(response.getSessionId())
                 .message(response.getMessage())

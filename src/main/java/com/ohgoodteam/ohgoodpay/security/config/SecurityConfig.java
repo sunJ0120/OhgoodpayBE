@@ -36,9 +36,10 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        
+
+        // 이미지 프록시 처리를 위해 "/api/image-proxy" 추가.
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/api/public/**","http://localhost:8000/ml/**").permitAll()
+            .requestMatchers("/auth/**", "/api/public/**","http://localhost:8000/ml/**", "/api/image-proxy/**").permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 요청 허용
             .anyRequest().authenticated());
         
