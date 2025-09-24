@@ -39,7 +39,7 @@ public class ShortsFeedController {
         log.info("전체 쇼츠 피드 조회 요청");
 
         List<ShortsFeedDataDTO> data = shortsFeedService.findAllFeeds(page,size,keyword,customerId );
-
+        System.out.println(data);
         ShortsCommonResponse res = ShortsCommonResponse.builder()
                 .resultCode("0000")
                 .resultMsg("성공")
