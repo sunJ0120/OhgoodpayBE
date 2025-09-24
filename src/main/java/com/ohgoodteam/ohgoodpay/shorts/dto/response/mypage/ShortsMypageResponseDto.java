@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShortsMypageResponseDto {
+public class ShortsMypageResponseDTO {
     // 4개는 미리보기 최종 응답
     private ChannelHeader header;
     private Shelf<UserCard> subscriptions;     
@@ -24,7 +24,6 @@ public class ShortsMypageResponseDto {
         private Long userId;
         private String displayName;   // 닉네임
         private String avatarUrl;
-        private String channelUrl;    // 사용자 페이지 링크
         private String introduce;
         private long subscribersCount; 
         private long videosCount;      

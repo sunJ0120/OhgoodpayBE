@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class ShortsProfileListDataDto {
+public class ShortsProfileListDataDTO {
     // 쇼츠 정보
     private Long shortsId;
     private Long likeCount;

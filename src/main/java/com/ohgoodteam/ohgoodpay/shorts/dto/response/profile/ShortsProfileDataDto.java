@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortsProfileDataDto {
+public class ShortsProfileDataDTO {
     // 프로필 정보
     private Long customerId;
     private String customerNickname;
@@ -25,7 +25,7 @@ public class ShortsProfileDataDto {
     private SubscriptionStatus isSubscribed; // 구독 여부
 
     // 쇼츠 리스트
-    private List<ShortsProfileListDataDto> shortsList;
+    private List<ShortsProfileListDataDTO> shortsList;
     private boolean hasNext; // 다음 페이지 여부
 
 }

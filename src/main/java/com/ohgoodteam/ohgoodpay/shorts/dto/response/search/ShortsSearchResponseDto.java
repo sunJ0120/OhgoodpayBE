@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class ShortsSearchResponseDto {
+public class ShortsSearchResponseDTO {
     public record LayoutItem(Long shortsId, String thumbnail, Long likeCount){};
     public record CursorResponse(
         List<LayoutItem> items,
