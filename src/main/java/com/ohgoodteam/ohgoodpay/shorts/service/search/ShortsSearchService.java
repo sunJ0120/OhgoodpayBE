@@ -2,7 +2,7 @@ package com.ohgoodteam.ohgoodpay.shorts.service.search;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDto.CursorResponse;
+import com.ohgoodteam.ohgoodpay.shorts.dto.response.search.ShortsSearchResponseDTO.CursorResponse;
 
 public interface ShortsSearchService {
     
