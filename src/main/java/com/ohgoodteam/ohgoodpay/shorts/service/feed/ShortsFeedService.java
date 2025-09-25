@@ -25,7 +25,7 @@ public interface ShortsFeedService {
     ShortsFeedDataDTO getSpecificShorts(Long shortsId);
 
     // 포인트 게이지 포인트 적립
-    ShortsPointEarnResponseDTO earnPoint(ShortsPointEarnRequestDTO requestDto);
+    ShortsPointEarnResponseDTO earnPoint(Long customerId, ShortsPointEarnRequestDTO requestDto);
 
     // 댓글 삭제
     ShortsCommentDeleteDataDTO deleteComment(Long shortsId, Long commentId, Long customerId);
