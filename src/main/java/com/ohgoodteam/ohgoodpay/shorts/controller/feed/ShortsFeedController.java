@@ -33,16 +33,20 @@ public class ShortsFeedController {
      * @param keyword 검색 키워드
      * @return
      */
-    @GetMapping("/shorts/feeds")
+    @GetMapping("/public/shorts/feeds")
     public ResponseEntity<ShortsCommonResponse> getAllFeed(
+            HttpServletRequest request,
             @RequestParam (value = "page") int page,
             @RequestParam (value = "size", defaultValue = "10", required = false) int size,
-            @RequestParam (value = "keyword", required = false) String keyword,
-            @RequestParam (value = "customerId", required = false) Long customerId
-    ) {
-        log.info("전체 쇼츠 피드 조회 요청");
+            @RequestParam (value = "keyword", required = false) String keyword
+    ) throws Exception {
+        String customerId = "0";
+        if (request.getHeader("Authorization") != null) {
+            customerId = jwtUtil.extractCustomerId(request);
+            log.info("전체 쇼츠 피드 조회 요청");
+        }
 
-        List<ShortsFeedDataDTO> data = shortsFeedService.findAllFeeds(page,size,keyword,customerId );
+        List<ShortsFeedDataDTO> data = shortsFeedService.findAllFeeds(page,size,keyword,Long.parseLong(customerId));
         System.out.println(data);
         ShortsCommonResponse res = ShortsCommonResponse.builder()
                 .resultCode("0000")
@@ -58,10 +62,11 @@ public class ShortsFeedController {
      * @param shortsId 쇼츠 아이디
      * @return
      */
-    @GetMapping("/shorts/feeds/{shortsId}/comments")
-    public ResponseEntity<ShortsCommonResponse> getAllComments(@PathVariable (value = "shortsId") Long shortsId){
+    @GetMapping("/public/shorts/feeds/{shortsId}/comments")
+    public ResponseEntity<ShortsCommonResponse> getAllComments(
+            @PathVariable (value = "shortsId") Long shortsId
+    ){
         log.info("특정 쇼츠 댓글 조회 요청");
-
         List<ShortsCommentDataDTO> data = shortsFeedService.findAllComments(shortsId);
 
         ShortsCommonResponse res = ShortsCommonResponse.builder()
@@ -82,10 +87,12 @@ public class ShortsFeedController {
     @PostMapping("/shorts/feeds/{shortsId}/comments")
     public ResponseEntity<Boolean> createComment(
             @RequestBody ShortsCommentRequestDTO requestDto,
-            @PathVariable (value = "shortsId") Long shortsId
-    ){
+            @PathVariable (value = "shortsId") Long shortsId,
+            HttpServletRequest request
+    ) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
         log.info("쇼츠 댓글 작성 요청: shortsId={}, requestDto={}", shortsId, requestDto);
-        boolean data = shortsFeedService.createComment(shortsId, requestDto);
+        boolean data = shortsFeedService.createComment(shortsId, requestDto, Long.parseLong(customerId));
 
         return ResponseEntity.status(HttpStatus.OK).body(data);
     }
@@ -116,11 +123,13 @@ public class ShortsFeedController {
     @PostMapping("/shorts/feeds/{shortsId}/reactions")
     public ApiResponseWrapper<ShortsReactionDataDTO> reactToShorts(
             @PathVariable (value ="shortsId") Long shortsId,
-            @RequestBody ShortsReactionRequestDTO requestDto
-    ){
-        log.info("쇼츠 반응(좋아요/싫어요) 요청: shortsId={}, requestDto={}", shortsId, requestDto);
+            @RequestBody ShortsReactionRequestDTO requestDto,
+            HttpServletRequest request
+    ) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        log.info("쇼츠 반응(좋아요/싫어요) 요청: shortsId={}, requestDto={}", shortsId, requestDto );
         try {
-            ShortsReactionDataDTO dto = shortsFeedService.reactToShorts(requestDto);
+            ShortsReactionDataDTO dto = shortsFeedService.reactToShorts(requestDto, Long.parseLong(customerId));
             return ApiResponseWrapper.ok(dto);
         } catch (IllegalArgumentException e){
             // 이미 반응한 쇼츠
@@ -132,18 +141,18 @@ public class ShortsFeedController {
      * 댓글 삭제
      * @param shortsId
      * @param commentId
-     * @param customerId
      * @return
      */
     @DeleteMapping("/shorts/feeds/{shortsId}/comments/{commentId}/delete")
     public ApiResponseWrapper<ShortsCommentDeleteDataDTO> deleteComment(
             @PathVariable (value="shortsId") Long shortsId,
             @PathVariable (value ="commentId" ) Long commentId,
-            @RequestParam (value="customerId") Long customerId
-    ){
-        log.info("댓글 삭제 요청: shortsId={}, commentId={}, customerId={}", shortsId, commentId, customerId);
+            HttpServletRequest request
+    ) throws Exception {
+        String customerId = jwtUtil.extractCustomerId(request);
+        log.info("댓글 삭제 요청: shortsId={}, commentId={}", shortsId, commentId);
         try {
-            ShortsCommentDeleteDataDTO dto = shortsFeedService.deleteComment(shortsId, commentId, customerId);
+            ShortsCommentDeleteDataDTO dto = shortsFeedService.deleteComment(shortsId, commentId, Long.parseLong(customerId));
             return ApiResponseWrapper.ok(dto);
         } catch (IllegalArgumentException e){
             return ApiResponseWrapper.error(400, e.getMessage());

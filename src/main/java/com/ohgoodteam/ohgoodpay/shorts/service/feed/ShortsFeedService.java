@@ -16,10 +16,10 @@ public interface ShortsFeedService {
     List<ShortsCommentDataDTO> findAllComments(Long shortsId);
 
     // 댓글 작성
-    boolean createComment(Long shortsId, ShortsCommentRequestDTO shortsCommentRequestDto);
+    boolean createComment(Long shortsId, ShortsCommentRequestDTO shortsCommentRequestDto, Long customerId);
 
     // 좋아요 반응 처리
-    ShortsReactionDataDTO reactToShorts(ShortsReactionRequestDTO shortsReactionRequestDto);
+    ShortsReactionDataDTO reactToShorts(ShortsReactionRequestDTO shortsReactionRequestDto, Long customerId);
 
     // 공유기능 -> 특정 영상에 대한 정보 반환
     ShortsFeedDataDTO getSpecificShorts(Long shortsId);

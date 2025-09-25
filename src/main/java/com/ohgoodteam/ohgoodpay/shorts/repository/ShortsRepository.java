@@ -53,6 +53,38 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
                                Pageable pageable);
 
 
+    @Query(value = """
+        SELECT 
+            s.shorts_id,
+            s.video_name,
+            s.thumbnail,
+            s.shorts_name,
+            s.shorts_explain,
+            s.date,
+            c.customer_id,
+            c.nickname,
+            c.profile_img,
+            s.like_count,
+            s.comment_count,
+            r.react as myReaction,
+            CAST(
+              (:wLike    * LOG(1 + s.like_count)) +
+              (:wComment * LOG(1 + s.comment_count)) +
+              (:wHashtag * (CASE WHEN s.shorts_explain REGEXP '#[0-9A-Za-z가-힣_]+' THEN 1 ELSE 0 END)) +
+              (:wRecency * EXP(- GREATEST(TIMESTAMPDIFF(HOUR, s.date, NOW()),0) / :tauHours))
+            AS DECIMAL(12,6)) AS score
+        FROM shorts s
+        LEFT JOIN reaction r ON s.shorts_id = r.shorts_id 
+        ORDER BY score DESC, s.date DESC, s.shorts_id DESC
+    """, nativeQuery = true)
+    Page<Object[]> findAllFeedsNoToken(@Param("wLike") double wLike,
+                                @Param("wComment") double wComment,
+                                @Param("wHashtag") double wHashtag,
+                                @Param("wRecency") double wRecency,
+                                @Param("tauHours") double tauHours,
+                                Pageable pageable);
+
+
     // 미사용
     /**
      * 전체 쇼츠 피드 조회 v2 (Page 객체 반환)
