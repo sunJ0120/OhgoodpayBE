@@ -63,9 +63,13 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     public List<ShortsFeedDataDTO> findAllFeeds(int page, int size, String keyword, Long customerId) {
         log.info("findAllFeeds 호출 : page={}, size={}, keyword={}, customerId={}", page, size, keyword, customerId);
 
+        Page<Object[]> results;
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Object[]> results = shortsRepository.findAllFeeds(wLike, wComment, wHashtag, wRecency, tauHours, customerId, pageable);
-
+        if("".equals(customerId)) {
+            results = shortsRepository.findAllFeedsNoToken(wLike, wComment, wHashtag, wRecency, tauHours, pageable);
+        } else {
+            results = shortsRepository.findAllFeeds(wLike, wComment, wHashtag, wRecency, tauHours, customerId, pageable);
+        }
         // Object[] 배열을 ShortsFeedDataDto로 변환
         List<ShortsFeedDataDTO> result = new ArrayList<>();
         for (Object[] row : results.getContent()) {
@@ -144,9 +148,9 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
      */
     @Override
     @Transactional
-    public boolean createComment(Long shortsId, ShortsCommentRequestDTO shortsCommentRequestDto) {
+    public boolean createComment(Long shortsId, ShortsCommentRequestDTO shortsCommentRequestDto, Long customerId) {
         // 1. 작성자 조회
-        CustomerEntity customer = customerRepository.findById(shortsCommentRequestDto.getCustomerId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        CustomerEntity customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         // 2. 쇼츠 조회
        ShortsEntity shorts =  shortsRepository.findById(shortsId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
@@ -179,9 +183,9 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
      */
     @Override
     @Transactional
-    public ShortsReactionDataDTO reactToShorts(ShortsReactionRequestDTO dto) {
+    public ShortsReactionDataDTO reactToShorts(ShortsReactionRequestDTO dto, Long customerId) {
         // 1. 작성자 조회
-        CustomerEntity customer = customerRepository.findById(dto.getCustomerId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        CustomerEntity customer = customerRepository.findById(customerId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         // 2. 쇼츠 조회
         ShortsEntity shorts = shortsRepository.findById(dto.getShortsId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쇼츠입니다."));
