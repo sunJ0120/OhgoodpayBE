@@ -21,7 +21,6 @@ public class ShortsProfileController {
 
     /**
      * 프로필 편집
-     * @param customerId
      * @param nickname
      * @param introduce
      * @param profileImg
@@ -50,10 +49,12 @@ public class ShortsProfileController {
     public ApiResponseWrapper<ShortsProfileDataDTO> getProfile(
             @RequestParam (value = "targetId") Long targetId,
             @RequestParam (value = "page") int page,
-            @RequestParam (value = "sortBy", defaultValue = "latest") String sortBy
-    ){
+            @RequestParam (value = "sortBy", defaultValue = "latest") String sortBy,
+            HttpServletRequest request
+    ) throws Exception {
         try {
-            ShortsProfileDataDTO dto =  shortsProfileService.getProfile(targetId,page,sortBy);
+            String customerId = jwtUtil.extractCustomerId(request);
+            ShortsProfileDataDTO dto =  shortsProfileService.getProfile(Long.parseLong(customerId),targetId,page,sortBy);
             return ApiResponseWrapper.ok(dto);
         }
         catch (IllegalArgumentException e){
@@ -66,16 +67,17 @@ public class ShortsProfileController {
      */
     @PostMapping("/shorts/subscribe/{targetId}")
     public ApiResponseWrapper<String> subscribe(
-        @PathVariable Long targetId
-    ){
-        Long cutomerId = 1L; // TODO: 인증 로직 후 수정
+        @PathVariable Long targetId,
+        HttpServletRequest request
+    ) throws Exception {
+        String cutomerId = jwtUtil.extractCustomerId(request);
         // + 자기 자신 구독 방지
         if(cutomerId.equals(targetId)){
             return ApiResponseWrapper.error(400, "자기 자신은 구독할 수 없습니다.");
         }
 
         try {
-            long result = shortsProfileService.subscribe(cutomerId, targetId);
+            long result = shortsProfileService.subscribe(Long.parseLong(cutomerId), targetId);
 
             if(result == 0){
                 return ApiResponseWrapper.error(400, "이미 구독한 사용자입니다.");
