@@ -1,5 +1,6 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.feed;
 
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsCommentRequestDTO;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsPointEarnRequestDTO;
 import com.ohgoodteam.ohgoodpay.shorts.dto.request.feed.ShortsReactionRequestDTO;
@@ -7,6 +8,8 @@ import com.ohgoodteam.ohgoodpay.shorts.dto.response.ApiResponseWrapper;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.feed.*;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ShortsCommonResponse;
 import com.ohgoodteam.ohgoodpay.shorts.service.feed.ShortsFeedService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,7 @@ import java.util.List;
 public class ShortsFeedController {
 
     private final ShortsFeedService shortsFeedService;
+    private final JWTUtil jwtUtil;
 
     /**
      * 전체 쇼츠 피드 조회
@@ -39,7 +43,7 @@ public class ShortsFeedController {
         log.info("전체 쇼츠 피드 조회 요청");
 
         List<ShortsFeedDataDTO> data = shortsFeedService.findAllFeeds(page,size,keyword,customerId );
-
+        System.out.println(data);
         ShortsCommonResponse res = ShortsCommonResponse.builder()
                 .resultCode("0000")
                 .resultMsg("성공")
@@ -93,10 +97,12 @@ public class ShortsFeedController {
      */
     @PostMapping("/shorts/point/earn")
     public ResponseEntity<ShortsPointEarnResponseDTO> earnPoint(
+        HttpServletRequest request,
         @RequestBody ShortsPointEarnRequestDTO requestDto
-    ) {
+    ) throws Exception {
+        String userId = jwtUtil.extractCustomerId(request);
         log.info("포인트 적립 요청 : requestDto={}", requestDto);
-        ShortsPointEarnResponseDTO response = shortsFeedService.earnPoint(requestDto);
+        ShortsPointEarnResponseDTO response = shortsFeedService.earnPoint(Long.parseLong(userId), requestDto);
         return ResponseEntity.ok(response);
     }
 

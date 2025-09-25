@@ -14,46 +14,28 @@ import java.util.Arrays;
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:8080")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+    public void addCorsMappings(@org.springframework.lang.NonNull CorsRegistry registry) {
+        registry.addMapping("/**")  // 모든 경로에 대해 CORS 허용
+                .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5500", "http://localhost:8000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(true)  // 인증 정보 포함 요청 허용
                 .maxAge(3600);
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // 허용할 Origin 설정
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",  // Vite 개발 서버
-            "http://localhost:3000",  // React 개발 서버
-            "http://localhost:8080",   // Spring Boot 서버
-                "http://192.168.0.127:5173",   // 와이파이
-                "http://192.168.2.1:5173"   // moo
-        ));
-        
-        // 허용할 HTTP 메서드 설정
-        configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
-        ));
-        
-        // 허용할 헤더 설정
+
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5500", "http://localhost:8000"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        
-        // 쿠키 및 인증 정보 허용
-        configuration.setAllowCredentials(true);
-        
-        // Preflight 요청 캐시 시간 (초)
+        configuration.setAllowCredentials(true);  // 인증 정보 포함 요청 허용
         configuration.setMaxAge(3600L);
         
-        // 모든 경로에 적용
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        
+        source.registerCorsConfiguration("/**", configuration);  // 모든 경로에 적용
+
         return source;
     }
 }

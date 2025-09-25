@@ -8,8 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.upload.ShortsUploadResponseDTO;
 import com.ohgoodteam.ohgoodpay.shorts.service.upload.ShortsUploadService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -17,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class ShortsUploadController {
     private final ShortsUploadService s3VideoService;
+    private final JWTUtil jwtUtil;
 
     /**
      * 쇼츠 업로드
@@ -28,13 +33,15 @@ public class ShortsUploadController {
      */
     @PostMapping("/upload")
     public ResponseEntity<ShortsUploadResponseDTO> upload(
+        HttpServletRequest request,
         @RequestPart("video") MultipartFile video, 
         @RequestPart(value="thumbnail", required = false) MultipartFile thumbnail,
         @RequestParam("title") String title,
         @RequestParam("content") String content
-    ) {
+    ) throws Exception {
         try {
-            ShortsUploadResponseDTO response = s3VideoService.upload(video, thumbnail, title, content);
+            String userId = jwtUtil.extractCustomerId(request);
+            ShortsUploadResponseDTO response = s3VideoService.upload(video, thumbnail, title, content, Long.parseLong(userId));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 공용 error dto 구현되면 그에 맞게

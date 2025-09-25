@@ -47,4 +47,5 @@ public class ShortsEntity {
     @Transient
     @Setter
     private String myReaction; // transient 필드 추가
+
 }

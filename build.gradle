@@ -27,7 +27,8 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	// implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -37,9 +38,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	// implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    // implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    // implementation 'io.jsonwebtoken:jjwt-gson:0.12.6'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-gson:0.12.6'
 
 	// QueryDSL 설정
 	implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
@@ -52,7 +53,22 @@ dependencies {
 
 	// AWS SDK 설정
 	implementation "software.amazon.awssdk:s3:2.25.54"
-    implementation "software.amazon.awssdk:sts:2.25.54" 
+  implementation "software.amazon.awssdk:sts:2.25.54" 
+
+	// FastAPI 호출(WebClient)
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// YAML 바인딩 자동완성/메타데이터
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	// .env 파일 지원
+	implementation 'me.paulschwarz:spring-dotenv:2.5.4'
+
+	// Qr Zing 라이브러리
+	implementation 'com.google.zxing:core:3.5.2'
+	implementation 'com.google.zxing:javase:3.5.2'
+
 }
 
 tasks.named('test') {
@@ -62,4 +78,5 @@ tasks.named('test') {
 // QueryDSL 설정, 한 번 비워주고 Q클래스가 생길 수 있도록 해야 한다.
 clean {
 	delete file('src/main/generated')
+	delete file('build/generated')
 }

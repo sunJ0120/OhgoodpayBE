@@ -8,4 +8,6 @@ public class OhgoodpayApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OhgoodpayApplication.class, args);
 	}
+
 }
+
