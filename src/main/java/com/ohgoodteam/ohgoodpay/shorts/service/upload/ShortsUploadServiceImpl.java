@@ -54,7 +54,7 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
      */
     @Override
     @Transactional
-    public ShortsUploadResponseDTO upload(MultipartFile file, MultipartFile thumbnail, String title, String content) throws IOException {
+    public ShortsUploadResponseDTO upload(MultipartFile file, MultipartFile thumbnail, String title, String content, Long customerId) throws IOException {
         if (file.isEmpty() || thumbnail.isEmpty()) throw new IllegalArgumentException("파일을 다시 업로드해주세요.");
         if (file.getSize() > 200L * 1024 * 1024) throw new IllegalArgumentException("허용용량이 초과되었습니다.");
 
@@ -117,7 +117,7 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
             }
 
             // DB 저장 
-            CustomerEntity ref = entityManager.getReference(CustomerEntity.class, 1L);
+            CustomerEntity ref = entityManager.getReference(CustomerEntity.class, customerId);
             ShortsEntity shortsEntity = ShortsEntity.builder()
                 .videoName(videoKey)
                 .thumbnail(thumbKey)

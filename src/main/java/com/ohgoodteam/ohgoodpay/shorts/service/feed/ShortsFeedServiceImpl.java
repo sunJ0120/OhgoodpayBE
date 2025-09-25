@@ -315,8 +315,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     // 포인트 게이지 적립
     @Override
     @Transactional
-    public ShortsPointEarnResponseDTO earnPoint(ShortsPointEarnRequestDTO requestDto) {
-        Long customerId = requestDto.customerId();
+    public ShortsPointEarnResponseDTO earnPoint(Long customerId, ShortsPointEarnRequestDTO requestDto) {
         int watchedSeconds = requestDto.watchedSeconds();
         
         // 1. 오늘 적립된 포인트 합계 조회

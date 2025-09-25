@@ -1,4 +1,5 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.profile;
+import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.ApiResponseWrapper;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.profile.ShortsProfileDataDTO;
 import org.springframework.http.ResponseEntity;
@@ -6,14 +7,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.ohgoodteam.ohgoodpay.shorts.dto.response.profile.ShortsProfileEditResponseDTO;
 import com.ohgoodteam.ohgoodpay.shorts.service.profile.ShortsProfileService;
-
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ShortsProfileController {
     private final ShortsProfileService shortsProfileService;
+    private final JWTUtil jwtUtil;
 
     /**
      * 프로필 편집
@@ -25,12 +29,13 @@ public class ShortsProfileController {
      */
     @PostMapping("/shorts/profile/edit")
     public ResponseEntity<ShortsProfileEditResponseDTO> editProfile(
-        @RequestParam("customerId") Long customerId,
+        HttpServletRequest request,
         @RequestParam("nickname") String nickname,
         @RequestParam("introduce") String introduce,
         @RequestPart(value = "profileImg", required = false) MultipartFile profileImg
-    ) {
-        return ResponseEntity.ok(shortsProfileService.editProfile(customerId, nickname, introduce, profileImg));
+    ) throws Exception {
+        String userId = jwtUtil.extractCustomerId(request);
+        return ResponseEntity.ok(shortsProfileService.editProfile(Long.parseLong(userId), nickname, introduce, profileImg));
     }
 
 
