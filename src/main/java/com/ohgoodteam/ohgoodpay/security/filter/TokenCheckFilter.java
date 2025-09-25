@@ -43,7 +43,8 @@ public class TokenCheckFilter extends OncePerRequestFilter {
         
         // /api/public/** 경로는 토큰 검증 제외
         // + image-proxy의 경우도 검증 제외해야 해서 추가
-        if (path.startsWith("/api/public/") || path.startsWith("/api/image-proxy")) {
+        // + swagger 설정 추가
+        if (path.startsWith("/api/public/") || path.startsWith("/api/image-proxy") || path.startsWith("/swagger-ui")) {
             filterChain.doFilter(request, response);
             return;
         }
