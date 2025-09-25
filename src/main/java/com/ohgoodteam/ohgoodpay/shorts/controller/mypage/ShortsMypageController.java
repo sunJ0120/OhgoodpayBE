@@ -35,10 +35,8 @@ public class ShortsMypageController {
      */
     @GetMapping("/shorts/mypage/overview")
     public ShortsMypageResponseDTO getOverview(HttpServletRequest request, @RequestParam(defaultValue="8") Integer limit) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        log.info("userId: " + userId);
-        log.info("request: " + request);
-        return shortsMypageService.getOverview(Long.parseLong(userId), limit);
+        String customerId = jwtUtil.extractCustomerId(request);
+        return shortsMypageService.getOverview(Long.parseLong(customerId), limit);
     }
 
     /**
@@ -54,8 +52,8 @@ public class ShortsMypageController {
         @RequestParam(required=false) String cursor,
         @RequestParam(defaultValue="8") Integer limit
     ) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        return shortsMypageService.getSubscriptions(Long.parseLong(userId), cursor, limit);
+        String customerId = jwtUtil.extractCustomerId(request);
+        return shortsMypageService.getSubscriptions(Long.parseLong(customerId), cursor, limit);
     }
 
     /**
@@ -71,8 +69,8 @@ public class ShortsMypageController {
         @RequestParam(required=false) String cursor,
         @RequestParam(defaultValue="8") Integer limit
     ) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        return shortsMypageService.getLikedVideos(Long.parseLong(userId), cursor, limit);
+        String customerId = jwtUtil.extractCustomerId(request);
+        return shortsMypageService.getLikedVideos(Long.parseLong(customerId), cursor, limit);
     }
 
     /**
@@ -88,8 +86,8 @@ public class ShortsMypageController {
         @RequestParam(required=false) String cursor,
         @RequestParam(defaultValue="8") Integer limit
     ) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        return shortsMypageService.getCommentedVideos(Long.parseLong(userId), cursor, limit);
+        String customerId = jwtUtil.extractCustomerId(request);
+        return shortsMypageService.getCommentedVideos(Long.parseLong(customerId), cursor, limit);
     }
 
     /**
@@ -100,8 +98,8 @@ public class ShortsMypageController {
      */
     @DeleteMapping("/shorts/mypage/subscription")
     public ResponseEntity<Void> deleteSubscription(HttpServletRequest request, @RequestParam Long targetId) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        long result = shortsMypageService.deleteSubscription(Long.parseLong(userId), targetId);
+        String customerId = jwtUtil.extractCustomerId(request);
+        long result = shortsMypageService.deleteSubscription(Long.parseLong(customerId), targetId);
         if(result > 0) {
             return ResponseEntity.ok().build();
         }

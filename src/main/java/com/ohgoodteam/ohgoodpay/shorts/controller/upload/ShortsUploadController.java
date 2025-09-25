@@ -40,8 +40,8 @@ public class ShortsUploadController {
         @RequestParam("content") String content
     ) throws Exception {
         try {
-            String userId = jwtUtil.extractCustomerId(request);
-            ShortsUploadResponseDTO response = s3VideoService.upload(video, thumbnail, title, content, Long.parseLong(userId));
+            String customerId = jwtUtil.extractCustomerId(request);
+            ShortsUploadResponseDTO response = s3VideoService.upload(video, thumbnail, title, content, Long.parseLong(customerId));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 공용 error dto 구현되면 그에 맞게

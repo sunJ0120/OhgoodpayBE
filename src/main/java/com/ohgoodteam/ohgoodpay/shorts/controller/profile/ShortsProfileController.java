@@ -34,8 +34,8 @@ public class ShortsProfileController {
         @RequestParam("introduce") String introduce,
         @RequestPart(value = "profileImg", required = false) MultipartFile profileImg
     ) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
-        return ResponseEntity.ok(shortsProfileService.editProfile(Long.parseLong(userId), nickname, introduce, profileImg));
+        String customerId = jwtUtil.extractCustomerId(request);
+        return ResponseEntity.ok(shortsProfileService.editProfile(Long.parseLong(customerId), nickname, introduce, profileImg));
     }
 
 

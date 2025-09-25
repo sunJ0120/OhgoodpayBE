@@ -100,9 +100,9 @@ public class ShortsFeedController {
         HttpServletRequest request,
         @RequestBody ShortsPointEarnRequestDTO requestDto
     ) throws Exception {
-        String userId = jwtUtil.extractCustomerId(request);
+        String customerId = jwtUtil.extractCustomerId(request);
         log.info("포인트 적립 요청 : requestDto={}", requestDto);
-        ShortsPointEarnResponseDTO response = shortsFeedService.earnPoint(Long.parseLong(userId), requestDto);
+        ShortsPointEarnResponseDTO response = shortsFeedService.earnPoint(Long.parseLong(customerId), requestDto);
         return ResponseEntity.ok(response);
     }
 
