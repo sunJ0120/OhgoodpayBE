@@ -32,11 +32,18 @@ public class ChatController {
     public ApiResponseWrapper<BasicChatResponseDTO> chat( @RequestBody ChatStartRequestDTO chatRequest, HttpServletRequest request) {
         try {
             Long customerId = Long.parseLong(jwtUtil.extractCustomerId(request));
+
+            log.info("-------서버로 들어온 플로우 : {}---------",chatRequest.getFlow());
+
             BasicChatResponseDTO response = chatService.chat(
                     customerId,
                     chatRequest.getSessionId(),
-                    chatRequest.getInputMessage()
+                    chatRequest.getInputMessage(),
+                    chatRequest.getFlow()
             );
+
+            log.info("-------서버에서 나가는 플로우 : {}---------",response.getFlow());
+
             return ApiResponseWrapper.ok(response);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
