@@ -1,6 +1,7 @@
 package com.ohgoodteam.ohgoodpay.shorts.controller.upload;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import com.ohgoodteam.ohgoodpay.shorts.service.upload.ShortsUploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -40,11 +42,14 @@ public class ShortsUploadController {
         @RequestParam("content") String content
     ) throws Exception {
         try {
+            log.info("쇼츠 업로드 요청 video name: {}, size: {}", video.getOriginalFilename(), video.getSize());
             String customerId = jwtUtil.extractCustomerId(request);
             ShortsUploadResponseDTO response = s3VideoService.upload(video, thumbnail, title, content, Long.parseLong(customerId));
+            log.info("쇼츠 업로드 성공: {}", response.getMessage());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // 공용 error dto 구현되면 그에 맞게
+            log.info("쇼츠 업로드 실패: {}", e.getMessage());
             return ResponseEntity.<ShortsUploadResponseDTO>status(500)
                 .body(ShortsUploadResponseDTO.builder()
                 .success(false)
