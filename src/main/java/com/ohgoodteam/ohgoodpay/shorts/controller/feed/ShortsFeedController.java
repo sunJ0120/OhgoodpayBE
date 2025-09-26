@@ -164,7 +164,7 @@ public class ShortsFeedController {
      * @param shortsId
      * @return
      */
-    @GetMapping("/shorts/{shortsId}")
+    @GetMapping("/public/shorts/{shortsId}")
     public ResponseEntity<ShortsFeedDataDTO> getSpecificShorts(
         @PathVariable (value = "shortsId") Long shortsId
     ){
