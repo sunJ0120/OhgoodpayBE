@@ -72,7 +72,7 @@ public class ShortsProfileController {
     ) throws Exception {
         String cutomerId = jwtUtil.extractCustomerId(request);
         // + 자기 자신 구독 방지
-        if(cutomerId.equals(targetId)){
+        if(targetId.equals(Long.parseLong(cutomerId))){
             return ApiResponseWrapper.error(400, "자기 자신은 구독할 수 없습니다.");
         }
 

@@ -64,10 +64,15 @@ public class ShortsFeedController {
      */
     @GetMapping("/public/shorts/feeds/{shortsId}/comments")
     public ResponseEntity<ShortsCommonResponse> getAllComments(
-            @PathVariable (value = "shortsId") Long shortsId
-    ){
+            @PathVariable (value = "shortsId") Long shortsId,
+            HttpServletRequest request
+    ) throws Exception {
+        String customerId = "0";
+        if(request.getHeader("Authorization") != null) {
+            customerId = jwtUtil.extractCustomerId(request);
+        }
         log.info("특정 쇼츠 댓글 조회 요청");
-        List<ShortsCommentDataDTO> data = shortsFeedService.findAllComments(shortsId);
+        List<ShortsCommentDataDTO> data = shortsFeedService.findAllComments(shortsId, Long.parseLong(customerId));
 
         ShortsCommonResponse res = ShortsCommonResponse.builder()
                 .resultCode("0000")
