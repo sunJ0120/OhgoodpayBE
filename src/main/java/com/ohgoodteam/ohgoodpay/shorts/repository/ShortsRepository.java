@@ -66,7 +66,7 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
             c.profile_img,
             s.like_count,
             s.comment_count,
-            r.react as myReaction,
+            null as MyReaction,
             CAST(
               (:wLike    * LOG(1 + s.like_count)) +
               (:wComment * LOG(1 + s.comment_count)) +
@@ -74,7 +74,7 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
               (:wRecency * EXP(- GREATEST(TIMESTAMPDIFF(HOUR, s.date, NOW()),0) / :tauHours))
             AS DECIMAL(12,6)) AS score
         FROM shorts s
-        LEFT JOIN reaction r ON s.shorts_id = r.shorts_id 
+        LEFT JOIN customer c ON s.customer_id = c.customer_id
         ORDER BY score DESC, s.date DESC, s.shorts_id DESC
     """, nativeQuery = true)
     Page<Object[]> findAllFeedsNoToken(@Param("wLike") double wLike,

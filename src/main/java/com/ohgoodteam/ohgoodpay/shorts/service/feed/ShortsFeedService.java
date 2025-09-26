@@ -13,7 +13,7 @@ public interface ShortsFeedService {
     List<ShortsFeedDataDTO> findAllFeeds(int page, int size, String keyword, Long customerId);
 
     // 댓글 조회
-    List<ShortsCommentDataDTO> findAllComments(Long shortsId);
+    List<ShortsCommentDataDTO> findAllComments(Long shortsId, Long customerId);
 
     // 댓글 작성
     boolean createComment(Long shortsId, ShortsCommentRequestDTO shortsCommentRequestDto, Long customerId);
