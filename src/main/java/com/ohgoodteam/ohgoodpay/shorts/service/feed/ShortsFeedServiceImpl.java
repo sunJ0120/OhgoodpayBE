@@ -31,6 +31,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -69,7 +70,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     public List<ShortsFeedDataDTO> findAllFeeds(int page, int size, String keyword, Long customerId) {
         log.info("findAllFeeds 호출 : page={}, size={}, keyword={}, customerId={}", page, size, keyword, customerId);
 
-        Page<Object[]> results;
+        Page<Map<String, Object>> results;
         Pageable pageable = PageRequest.of(page - 1, size);
         if(customerId < 1) {
             results = shortsRepository.findAllFeedsNoToken(wLike, wComment, wHashtag, wRecency, tauHours, pageable);
@@ -79,7 +80,7 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
 
         // Object[] 배열을 ShortsFeedDataDto로 변환
         List<ShortsFeedDataDTO> result = new ArrayList<>();
-        for (Object[] row : results.getContent()) {
+        for (Map<String, Object> row : results.getContent()) {
             result.add(convertToShortsFeedDataDto(row,customerId));
         }
 
@@ -94,21 +95,21 @@ public class ShortsFeedServiceImpl implements ShortsFeedService {
     /**
      * Object[] 배열을 ShortsFeedDataDto로 변환
      */
-    private ShortsFeedDataDTO convertToShortsFeedDataDto(Object[] row, Long targetId) {
+    private ShortsFeedDataDTO convertToShortsFeedDataDto(Map<String, Object> row, Long targetId) {
         // 각 컬럼을 의미있는 변수명으로 추출
-        Long shortsId = (Long) row[0];
-        String videoName = (String) row[1];
-        String thumbnail = (String) row[2];
-        String shortsName = (String) row[3];
-        String shortsExplain = (String) row[4];
-        LocalDateTime date = ((Timestamp) row[5]).toLocalDateTime();
-        Long customerId = Long.parseLong(String.valueOf(row[6]));
-        String customerNickname = (String) row[7];
-        String profileImg = (String) row[8];
-        int likeCount = ((Number) row[9]).intValue();
-        int commentCount = ((Number) row[10]).intValue();
-        String myReaction = (String) row[11];
-        Double score = ((Number) row[12]).doubleValue(); // score는 12번째 인덱스
+        Long shortsId = (Long) row.get("shortsId");
+        String videoName = (String) row.get("videoName");
+        String thumbnail = (String) row.get("thumbnail");
+        String shortsName = (String) row.get("shortsName");
+        String shortsExplain = (String) row.get("shortsExplain");
+        LocalDateTime date = ((Timestamp) row.get("date")).toLocalDateTime();
+        Long customerId = Long.parseLong(String.valueOf(row.get("customerId")));
+        String customerNickname = (String) row.get("nickname");
+        String profileImg = (String) row.get("profileImg");
+        int likeCount = ((Number) row.get("likeCount")).intValue();
+        int commentCount = ((Number) row.get("commentCount")).intValue();
+        String myReaction = (String) row.get("myReaction"); // myReaction는 11번째 인덱스
+        Double score = ((Number) row.get("score")).doubleValue(); // score는 12번째 인덱스
 
         if(targetId == 0) {
             myReaction = null; // 비로그인 사용자는 myReaction 무조건 null

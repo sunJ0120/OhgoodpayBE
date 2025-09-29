@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, ShortsRepositoryCustom {
@@ -44,7 +45,7 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
         LEFT JOIN reaction r ON s.shorts_id = r.shorts_id AND r.customer_id = :customerId
         ORDER BY score DESC, s.date DESC, s.shorts_id DESC
     """, nativeQuery = true)
-    Page<Object[]> findAllFeeds(@Param("wLike") double wLike,
+    Page<Map<String,Object>> findAllFeeds(@Param("wLike") double wLike,
                                  @Param("wComment") double wComment,
                                 @Param("wHashtag") double wHashtag,
                                 @Param("wRecency") double wRecency,
@@ -77,12 +78,12 @@ public interface ShortsRepository extends JpaRepository<ShortsEntity, Long>, Sho
         LEFT JOIN customer c ON s.customer_id = c.customer_id
         ORDER BY score DESC, s.date DESC, s.shorts_id DESC
     """, nativeQuery = true)
-    Page<Object[]> findAllFeedsNoToken(@Param("wLike") double wLike,
-                                @Param("wComment") double wComment,
-                                @Param("wHashtag") double wHashtag,
-                                @Param("wRecency") double wRecency,
-                                @Param("tauHours") double tauHours,
-                                Pageable pageable);
+    Page<Map<String,Object>> findAllFeedsNoToken(@Param("wLike") double wLike,
+                                          @Param("wComment") double wComment,
+                                          @Param("wHashtag") double wHashtag,
+                                          @Param("wRecency") double wRecency,
+                                          @Param("tauHours") double tauHours,
+                                          Pageable pageable);
 
 
     // 미사용
