@@ -22,16 +22,14 @@ public class ChatService {
 
     public ChatResponse chat(String sessionId, String message) {
         String key = CacheSpec.HISTORY.key(sessionId);
-        // 1. 히스토리 가져오기
+
         List<ChatMessage> history = cacheStore.getList(key, ChatMessage.class);
-        // 2. FastAPI(LLM) 호출 - 히스토리 + 새 메시지 전달
         LlmResponse llmResponse = fastApiClient.chat(history, message);
-        // 3. LLM 응답 분기 처리
-        // 4. 히스토리 업데이트
+
         history.add(ChatMessage.userContent(message));
         history.add(ChatMessage.assistantContent(llmResponse.message()));
         cacheStore.save(key, history, CacheSpec.HISTORY.getTtl());
-        // 5. 응답 반환
+
         return new ChatResponse(
                 sessionId,
                 llmResponse.message(),
