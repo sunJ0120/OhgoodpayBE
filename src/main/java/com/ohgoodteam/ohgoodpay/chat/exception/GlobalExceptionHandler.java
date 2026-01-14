@@ -17,13 +17,6 @@ public class GlobalExceptionHandler {
                         .body(ApiResponseWrapper.error(400, e.getMessage()));
     }
 
-    @ExceptionHandler(value = LlmServerException.class)
-    public ResponseEntity<ApiResponseWrapper<?>> handleLlmServerException(LlmServerException e) {
-        log.warn("LLM 서버 오류: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponseWrapper.error(503, "AI 서비스가 일시적으로 불안정합니다"));
-    }
-
     @ExceptionHandler(value = NaverApiException.class)
     public ResponseEntity<ApiResponseWrapper<?>> handleNaverApiException(NaverApiException e) {
         log.warn("네이버 API 오류: {}", e.getMessage());
