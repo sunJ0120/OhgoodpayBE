@@ -1,6 +1,7 @@
 package com.ohgoodteam.ohgoodpay.chat.util;
 
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
+import com.ohgoodteam.ohgoodpay.chat.exception.LlmServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -26,11 +27,20 @@ public class LlmApiClient {
         List<Message> messages = buildPrompt(history, message, systemPrompt);
         Prompt prompt = new Prompt(messages);
 
-        ChatResponse response = chatModel.call(prompt);
+        try {
+            ChatResponse response = chatModel.call(prompt);
 
-        return response.getResult()
-                .getOutput()
-                .getText();
+            if (response == null || response.getResult() == null) {
+                throw new LlmServerException("LLM 응답이 비어있습니다");
+            }
+
+            return response.getResult()
+                    .getOutput()
+                    .getText();
+        } catch (Exception e) {
+            log.error("LLM API 호출 실패: {}", e.getMessage(), e);
+            throw new LlmServerException("LLM 서비스 호출 중 오류가 발생했습니다");
+        }
     }
 
     private List<Message> buildPrompt(List<ChatMessage> history, String message, String systemPrompt) {
