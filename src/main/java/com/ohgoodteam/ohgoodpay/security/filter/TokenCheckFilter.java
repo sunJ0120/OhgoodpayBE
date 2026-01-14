@@ -38,12 +38,17 @@ public class TokenCheckFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
-        if (!path.startsWith("/api") || path.startsWith("/v3/api-docs")) { // /api 주소가 아니면(일반접속이면) 통과
+        if (!path.startsWith("/api") ||
+                path.contains("swagger") ||
+                path.contains("api-docs") ||
+                path.startsWith("/favicon.ico")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
         if (path.startsWith("/api/public/") ||
+                path.startsWith("/api/chat") ||
                 path.startsWith("/api/image-proxy") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/swagger-resources") ||
