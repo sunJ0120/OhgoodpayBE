@@ -1,6 +1,8 @@
-package com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto;
+package com.ohgoodteam.ohgoodpay.chat.dto;
 
 public record ChatRequest(
-        
+        Long customerId,
+        String sessionId,
+        String message
 ) {
 }
