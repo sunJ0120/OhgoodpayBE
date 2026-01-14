@@ -40,7 +40,6 @@ out/
 .cursor/
 
 ### 환경 설정 ###
-*.env
 application.properties
 /src/main/resources/application.properties
 
