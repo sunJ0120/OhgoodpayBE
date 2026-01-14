@@ -19,21 +19,21 @@ public class RecommendationService {
 
     private final LlmApiClient llmApiClient;
     private final PromptProvider promptProvider;
-    private final ProductService productService;
+//    private final ProductService productService;
 
     public LlmResponse chat(String sessionId, List<ChatMessage> history, String userMessage, String userName) {
         String systemPrompt = promptProvider.getBasePrompt(userName);
 
         String response = llmApiClient.chat(history, userMessage, systemPrompt);
 
-        if(response.contains(SEARCH_KEYWORD_PREFIX)){
-            String keyword = extractKeyword(response);
-            String cleanMessage = response.split(SEARCH_KEYWORD_PREFIX)[0].trim();
-
-            List<ProductDto> products = productService.searchAndCache(keyword);
-
-            return new LlmResponse(sessionId, cleanMessage, products);
-        }
+//        if(response.contains(SEARCH_KEYWORD_PREFIX)){
+//            String keyword = extractKeyword(response);
+//            String cleanMessage = response.split(SEARCH_KEYWORD_PREFIX)[0].trim();
+//
+//            List<ProductDto> products = productService.searchAndCache(keyword);
+//
+//            return new LlmResponse(sessionId, cleanMessage, products);
+//        }
         return new LlmResponse(sessionId, response, null);
     }
 
