@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.controller;
+package com.ohgoodteam.ohgoodpay.chat.controller;
 
 import com.ohgoodteam.ohgoodpay.common.dto.ClearSessionRequestDTO;
 import com.ohgoodteam.ohgoodpay.recommend.dto.ChatStartRequestDTO;
@@ -35,8 +35,6 @@ public class ChatController {
         try {
             Long customerId = Long.parseLong(jwtUtil.extractCustomerId(request));
 
-            log.info("-------서버로 들어온 플로우 : {}---------",chatRequest.getFlow());
-
             BasicChatResponseDTO response = chatService.chat(
                     customerId,
                     chatRequest.getSessionId(),
@@ -44,17 +42,12 @@ public class ChatController {
                     chatRequest.getFlow()
             );
 
-            log.info("-------서버에서 나가는 플로우 : {}---------",response.getFlow());
-
             return ApiResponseWrapper.ok(response);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
         } catch (RuntimeException e) {
-            // 로깅만 추가해서 추적 가능하도록 설정
-            log.warn("Chat service runtime error: {}", e.getMessage());
             return ApiResponseWrapper.error(500, "일시적인 서비스 오류가 발생했습니다");
         } catch (Exception e) {
-            log.error("Unexpected error in chat controller", e);
             return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
         }
     }
@@ -64,19 +57,14 @@ public class ChatController {
     public ApiResponseWrapper<Void> clearSession(@RequestBody ClearSessionRequestDTO clearSessionRequest, HttpServletRequest request) {
         try {
             Long customerId = Long.parseLong(jwtUtil.extractCustomerId(request));
-
-            log.info("-------서버로 들어온 세션 아이디 : {}---------",clearSessionRequest.getSessionId());
             chatCacheService.clearSessionCache(clearSessionRequest.getSessionId());
 
             return ApiResponseWrapper.ok(null);
         } catch (IllegalArgumentException e) {
             return ApiResponseWrapper.error(400, e.getMessage());
         } catch (RuntimeException e) {
-            // 로깅만 추가해서 추적 가능하도록 설정
-            log.warn("Chat service runtime error: {}", e.getMessage());
             return ApiResponseWrapper.error(500, "일시적인 서비스 오류가 발생했습니다");
         } catch (Exception e) {
-            log.error("Unexpected error in chat controller", e);
             return ApiResponseWrapper.error(500, "서버 내부 오류가 발생했습니다");
         }
     }
