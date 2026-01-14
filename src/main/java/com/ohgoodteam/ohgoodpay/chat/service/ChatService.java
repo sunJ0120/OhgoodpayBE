@@ -6,7 +6,6 @@ import com.ohgoodteam.ohgoodpay.chat.dto.LlmResponse;
 import com.ohgoodteam.ohgoodpay.chat.util.CacheSpec;
 import com.ohgoodteam.ohgoodpay.chat.util.CacheStore;
 import com.ohgoodteam.ohgoodpay.chat.util.FastApiClient;
-import com.ohgoodteam.ohgoodpay.recommend.dto.datadto.llmdto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
