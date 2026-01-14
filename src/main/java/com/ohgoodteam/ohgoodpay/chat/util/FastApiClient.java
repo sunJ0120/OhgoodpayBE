@@ -39,7 +39,12 @@ public class FastApiClient {
                     LlmResponse.class
             );
 
-            return responseEntity.getBody();
+            LlmResponse body = responseEntity.getBody();
+            if (body == null) {
+                throw new LlmServerException("AI 서버 응답이 비어있습니다");
+            }
+
+            return body;
         } catch (RestClientException e) {
             log.error("fast api 호출 실패 : {}", e.getMessage());
             throw new LlmServerException("AI 서버 통신 실패", e);
