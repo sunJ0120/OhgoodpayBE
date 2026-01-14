@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.util;
+package com.ohgoodteam.ohgoodpay.chat.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
