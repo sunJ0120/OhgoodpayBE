@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -21,8 +22,8 @@ public class LlmApiClient {
 
     private final ChatModel chatModel;
 
-    public String chat(List<ChatMessage> history, String message) {
-        List<Message> messages = buildPrompt(history, message);
+    public String chat(List<ChatMessage> history, String message, String systemPrompt) {
+        List<Message> messages = buildPrompt(history, message, systemPrompt);
         Prompt prompt = new Prompt(messages);
 
         ChatResponse response = chatModel.call(prompt);
@@ -32,8 +33,10 @@ public class LlmApiClient {
                 .getText();
     }
 
-    private List<Message> buildPrompt(List<ChatMessage> history, String message) {
+    private List<Message> buildPrompt(List<ChatMessage> history, String message, String systemPrompt) {
         List<Message> messages = new ArrayList<>();
+
+        messages.add(new SystemMessage(systemPrompt));
 
         for (ChatMessage chatMessage : history) {
             if ("user".equals(chatMessage.role())) {
