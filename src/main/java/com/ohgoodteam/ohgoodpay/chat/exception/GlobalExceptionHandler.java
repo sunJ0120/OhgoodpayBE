@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.chat.exception;
 
-import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
+import com.ohgoodteam.ohgoodpay.chat.util.ApiResponseWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
