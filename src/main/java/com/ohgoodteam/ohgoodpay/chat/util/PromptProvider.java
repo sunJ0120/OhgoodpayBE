@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PromptProvider {
-    public String getShoppingPrompt(String userName) {
+    public String getBasePrompt(String userName) {
         return """
             【IDENTITY】
             - 이름: 레이 (사용자: %s)
