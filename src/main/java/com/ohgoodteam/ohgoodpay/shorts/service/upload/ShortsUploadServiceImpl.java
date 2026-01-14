@@ -37,10 +37,10 @@ public class ShortsUploadServiceImpl implements ShortsUploadService {
     private final ShortsUploadRepository videoUploadRepository;
     private final EntityManager entityManager;
 
-    @Value("${aws.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${aws.region}")
+    @Value("${cloud.aws.region.static}")
     private String region;
 
     // 변환 타임아웃
