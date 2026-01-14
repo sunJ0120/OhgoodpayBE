@@ -1,0 +1,43 @@
+package com.ohgoodteam.ohgoodpay.chat.service;
+
+import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
+import com.ohgoodteam.ohgoodpay.chat.dto.ChatResponse;
+import com.ohgoodteam.ohgoodpay.chat.dto.LlmResponse;
+import com.ohgoodteam.ohgoodpay.chat.util.CacheSpec;
+import com.ohgoodteam.ohgoodpay.chat.util.CacheStore;
+import com.ohgoodteam.ohgoodpay.chat.util.FastApiClient;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ChatService {
+    private final FastApiClient fastApiClient;
+    private final CacheStore cacheStore;
+
+    public ChatResponse chat(String sessionId, String message) {
+        String key = CacheSpec.HISTORY.key(sessionId);
+
+        List<ChatMessage> history = cacheStore.getList(key, ChatMessage.class);
+        LlmResponse llmResponse = fastApiClient.chat(history, message);
+
+        history.add(ChatMessage.userContent(message));
+        history.add(ChatMessage.assistantContent(llmResponse.message()));
+        cacheStore.save(key, history, CacheSpec.HISTORY.getTtl());
+
+        return new ChatResponse(
+                sessionId,
+                llmResponse.message(),
+                llmResponse.products()
+        );
+    }
+
+    // 세션 종료
+    public void clearSession(String sessionId) {
+        cacheStore.delete(CacheSpec.HISTORY.key(sessionId));
+    }
+}

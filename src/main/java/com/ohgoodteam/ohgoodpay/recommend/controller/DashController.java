@@ -6,7 +6,7 @@ import com.ohgoodteam.ohgoodpay.recommend.service.DashAdviceService;
 import com.ohgoodteam.ohgoodpay.recommend.service.PayThisMonthService;
 import com.ohgoodteam.ohgoodpay.recommend.service.SayMyNameService;
 import com.ohgoodteam.ohgoodpay.recommend.service.SpendingAnalyzeService;
-import com.ohgoodteam.ohgoodpay.recommend.util.ApiResponseWrapper;
+import com.ohgoodteam.ohgoodpay.chat.util.ApiResponseWrapper;
 import com.ohgoodteam.ohgoodpay.security.util.JWTUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
