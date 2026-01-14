@@ -5,7 +5,7 @@ public class LlmServerException extends RuntimeException {
         super(message);
     }
 
-    public  LlmServerException(String message, Throwable cause) {
+    public LlmServerException(String message, Throwable cause) {
         super(message, cause);
     }
 }

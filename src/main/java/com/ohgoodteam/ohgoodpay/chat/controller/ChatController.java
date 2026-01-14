@@ -19,7 +19,8 @@ public class ChatController {
 
     @PostMapping
     public ApiResponseWrapper<ChatResponse> chat(@RequestBody ChatRequest chatRequest) {
-        ChatResponse response = chatService.chat(chatRequest.sessionId(), chatRequest.message());
+        String userName = "오선정";
+        ChatResponse response = chatService.chat(chatRequest.sessionId(), chatRequest.message(), userName);
 
         return ApiResponseWrapper.ok(response);
     }

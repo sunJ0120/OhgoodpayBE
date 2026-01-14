@@ -136,7 +136,7 @@ public class ShortsProfileServiceImpl implements ShortsProfileService {
         return subscriptionEntity.getSubscriptionId();
     }
 
-    @Value("${aws.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     /**
