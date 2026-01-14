@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.dto.cache;
+package com.ohgoodteam.ohgoodpay.chat.dto;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDTO {
+public class ProductDto {
     private int rank;
     private String name;
     private int price;
