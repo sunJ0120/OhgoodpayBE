@@ -1,60 +1,56 @@
 package com.ohgoodteam.ohgoodpay.chat.util;
 
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
-import com.ohgoodteam.ohgoodpay.chat.dto.ChatToLlmRequest;
-import com.ohgoodteam.ohgoodpay.chat.dto.LlmResponse;
-import com.ohgoodteam.ohgoodpay.chat.exception.LlmServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class FastApiClient {
+public class LlmApiClient {
 
-    private final RestTemplate restTemplate;
-    // TODO : 차후 YML 수정 후에 @ConfigurationProperties로 변경 예정
-    private final String baseUrl = "http://localhost:8000";
+    private final ChatModel chatModel;
 
-    public LlmResponse chat(List<ChatMessage> history, String message) {
-        String url = baseUrl + "/api/chat";
+    public String chat(List<ChatMessage> history, String message) {
+        List<Message> messages = buildPrompt(history, message);
+        Prompt prompt = new Prompt(messages);
 
-        ChatToLlmRequest request = new ChatToLlmRequest(history, message);
-        HttpEntity<ChatToLlmRequest> entity = createRequestEntity(request);
+        ChatResponse response = chatModel.call(prompt);
 
-        try {
-            // LlmResponse로 자동 변환
-            ResponseEntity<LlmResponse> responseEntity = restTemplate.postForEntity(
-                    url,
-                    entity,
-                    LlmResponse.class
-            );
-
-            LlmResponse body = responseEntity.getBody();
-            if (body == null) {
-                throw new LlmServerException("AI 서버 응답이 비어있습니다");
-            }
-
-            return body;
-        } catch (RestClientException e) {
-            log.error("fast api 호출 실패 : {}", e.getMessage());
-            throw new LlmServerException("AI 서버 통신 실패", e);
-        }
+        return response.getResult()
+                .getOutput()
+                .getText();
     }
 
-    private <T> HttpEntity<T> createRequestEntity(T request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    private List<Message> buildPrompt(List<ChatMessage> history, String message) {
+        List<Message> messages = new ArrayList<>();
 
-        return new HttpEntity<>(request, headers);
+        for (ChatMessage chatMessage : history) {
+            if ("user".equals(chatMessage.role())) {
+                messages.add(new UserMessage(
+                        chatMessage.content()
+                ));
+            }
+
+            if ("assistant".equals(chatMessage.role())) {
+                messages.add(new AssistantMessage(
+                        chatMessage.content()
+                ));
+            }
+        }
+
+        // 마지막 사용자 입력
+        messages.add(new UserMessage(message));
+        return messages;
     }
 }
