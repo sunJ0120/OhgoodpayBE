@@ -1,4 +1,4 @@
-package com.ohgoodteam.ohgoodpay.recommend.util;
+package com.ohgoodteam.ohgoodpay.chat.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +18,15 @@ public class ApiResponseWrapper<T> {
     private int code;
     private String message;
     private T data;
+
+    public static <T> ApiResponseWrapper<T> ok() {
+        return ApiResponseWrapper.<T>builder()
+                .success(true)
+                .code(200)
+                .message("OK")
+                .data(null)
+                .build();
+    }
 
     public static <T> ApiResponseWrapper<T> ok(T data) {
         return ApiResponseWrapper.<T>builder()
