@@ -2,7 +2,6 @@ package com.ohgoodteam.ohgoodpay.chat.service;
 
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatResponse;
-import com.ohgoodteam.ohgoodpay.chat.dto.LlmResponse;
 import com.ohgoodteam.ohgoodpay.chat.util.CacheSpec;
 import com.ohgoodteam.ohgoodpay.chat.util.CacheStore;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +21,13 @@ public class ChatService {
         String key = CacheSpec.HISTORY.key(sessionId);
 
         List<ChatMessage> history = cacheStore.getList(key, ChatMessage.class);
-        LlmResponse llmResponse = recommendationService.chat(sessionId, history, message, userName);
+        ChatResponse response = recommendationService.chat(sessionId, history, message, userName);
 
         history.add(ChatMessage.userContent(message));
-        history.add(ChatMessage.assistantContent(llmResponse.message()));
+        history.add(ChatMessage.assistantContent(response.message()));
         cacheStore.save(key, history, CacheSpec.HISTORY.getTtl());
 
-        return new ChatResponse(
-                sessionId,
-                llmResponse.message(),
-                llmResponse.products()
-        );
+        return response;
     }
 
     // 세션 종료
