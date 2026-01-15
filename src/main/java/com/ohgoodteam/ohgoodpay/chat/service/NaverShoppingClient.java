@@ -42,7 +42,12 @@ public class NaverShoppingClient {
                     NaverSearchResponse.class
             );
 
-            return response.getBody();
+            NaverSearchResponse body = response.getBody();
+            if (body == null) {
+                throw new NaverApiException("빈 응답 수신");
+            }
+
+            return body;
         } catch (RestClientException e) {
             log.error("네이버 API 호출 실패: {}", e.getMessage());
             throw new NaverApiException("상품 검색 실패", e);
