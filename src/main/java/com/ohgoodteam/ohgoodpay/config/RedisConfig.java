@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -18,7 +18,7 @@ public class RedisConfig {
 
         //Key는 String, value는 json으로 직렬화
         StringRedisSerializer stringSer = new StringRedisSerializer();
-        GenericJacksonJsonRedisSerializer jsonSer = GenericJacksonJsonRedisSerializer.builder().build();
+        GenericJackson2JsonRedisSerializer jsonSer = new GenericJackson2JsonRedisSerializer();
 
         //기본 설정 되어있는 redis 바이너리를 변경
         template.setKeySerializer(stringSer);

@@ -2,19 +2,28 @@ package com.ohgoodteam.ohgoodpay.chat.dto;
 
 import lombok.*;
 
-/**
- * FAST API - product에 들어가는 DTO
- */
-@Getter
-@ToString
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ProductDto {
-    private int rank;
-    private String name;
-    private int price;
-    private String image;
-    private String url;
-    private String category;
+public record ProductDto(
+        String name,
+        int lprice,
+        String image,
+        String url,
+        String category
+) {
+    public static ProductDto of(NaverProduct product) {
+        int price;
+
+        try {
+            price = Integer.parseInt(product.lprice());
+        } catch (NumberFormatException | NullPointerException e) {
+            price = 30000;    // 기본값 설정
+        }
+
+        return new ProductDto(
+                product.title().replaceAll("<[^>]*>", ""),  // HTML 태그 제거
+                price,
+                product.image(),
+                product.link(),
+                product.category1()
+        );
+    }
 }

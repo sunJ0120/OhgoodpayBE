@@ -33,3 +33,8 @@ cloud:
       auto: false
     s3:
       bucket: ${AWS_S3_BUCKET:your_bucket_name}
+
+
+naver-search:
+  client-id: ${NAVER_CLIENT_ID}
+  client-secret: ${NAVER_CLIENT_SECRET}
