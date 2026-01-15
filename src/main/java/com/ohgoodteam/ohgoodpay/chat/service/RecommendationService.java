@@ -27,7 +27,7 @@ public class RecommendationService {
 
         String response = llmApiClient.chat(history, userMessage, systemPrompt);
 
-        if(response.contains(SEARCH_KEYWORD_PREFIX)){
+        if (response.contains(SEARCH_KEYWORD_PREFIX)) {
             String keyword = extractKeyword(response);
             Integer maxPrice = extractMaxPrice(response);
             String cleanMessage = extractCleanMessage(response);
@@ -67,7 +67,8 @@ public class RecommendationService {
         String[] lines = text.split("\n");
         for (String line : lines) {
             if (line.contains(SEARCH_KEYWORD_PREFIX)) {
-                return line.split(SEARCH_KEYWORD_PREFIX)[1].trim();
+                int idx = line.indexOf(SEARCH_KEYWORD_PREFIX);
+                return line.substring(idx + SEARCH_KEYWORD_PREFIX.length()).trim();
             }
         }
         return "";    // 키워드가 없을 경우 빈칸
@@ -82,7 +83,10 @@ public class RecommendationService {
         for (String line : lines) {
             if (line.contains(MAX_PRICE_PREFIX)) {
                 try {
-                    return Integer.parseInt(line.split(MAX_PRICE_PREFIX)[1].trim());    // 뒤에 있는 것을 얻기 위함이다.
+                    int idx = line.indexOf(MAX_PRICE_PREFIX);
+                    String value = line.substring(idx + MAX_PRICE_PREFIX.length()).trim();
+                    if (value.isEmpty()) return null;
+                    return Integer.parseInt(value);
                 } catch (NumberFormatException e) {
                     return null;
                 }
@@ -94,7 +98,7 @@ public class RecommendationService {
     private String simplfyKeyword(String keyword) {
         String[] words = keyword.split(" ");
         if (words.length > 2) {
-            return words[0] + " " + words[words.length-1];    // 앞 뒤 두 개만 붙여서 간단한 키워드 생성
+            return words[0] + " " + words[words.length - 1];    // 앞 뒤 두 개만 붙여서 간단한 키워드 생성
         }
         return keyword;
     }
