@@ -45,7 +45,7 @@ public class RecommendationService {
             List<ProductDto> products = productService.searchAndCache(keyword, maxPrice);
 
             if (products.isEmpty()) {    // 검색 결과가 없을 경우, 단축 키워드로 한 번더 연결
-                String simpleKeyword = simplfyKeyword(keyword);
+                String simpleKeyword = simplifyKeyword(keyword);
                 products = productService.searchAndCache(simpleKeyword, maxPrice);
             }
 
@@ -95,7 +95,7 @@ public class RecommendationService {
         return null;
     }
 
-    private String simplfyKeyword(String keyword) {
+    private String simplifyKeyword(String keyword) {
         String[] words = keyword.split(" ");
         if (words.length > 2) {
             return words[0] + " " + words[words.length - 1];    // 앞 뒤 두 개만 붙여서 간단한 키워드 생성
