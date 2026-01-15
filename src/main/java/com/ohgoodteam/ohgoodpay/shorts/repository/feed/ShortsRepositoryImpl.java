@@ -39,7 +39,7 @@ public class ShortsRepositoryImpl implements ShortsRepositoryCustom {
     @Override
     public int sumTodayPoints(Long customerId, String reason, LocalDateTime start, LocalDateTime end) {
         Integer result = queryFactory
-            .select(pointHistory.point.sum())
+            .select(pointHistory.point.sumAggregate())
             .from(pointHistory)
             .where(pointHistory.customer.customerId.eq(customerId)
                 .and(pointHistory.pointExplain.eq(reason))
