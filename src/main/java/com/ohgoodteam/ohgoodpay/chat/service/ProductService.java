@@ -22,9 +22,19 @@ public class ProductService {
         NaverSearchResponse response = naverShoppingClient.search(keyword, MAX_CHECK_CNT);
 
         return response.items().stream()
-                .filter(item -> Integer.parseInt(item.lprice()) <= maxPrice)
+                .filter(item -> isPriceInRange(item.lprice(), maxPrice))
                 .limit(MAX_DISPLAY_CNT)
                 .map(ProductDto::of)
                 .toList();
+    }
+
+    private boolean isPriceInRange(String lprice, Integer maxPrice) {
+        if (maxPrice == null) return true;
+        try {
+            return Integer.parseInt(lprice) <= maxPrice;
+        } catch (NumberFormatException e) {
+            log.warn("가격 파싱 실패: {}", lprice);
+            return false;
+        }
     }
 }
