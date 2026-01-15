@@ -1,8 +1,7 @@
 package com.ohgoodteam.ohgoodpay.chat.service;
 
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
-import com.ohgoodteam.ohgoodpay.chat.dto.LlmResponse;
-import com.ohgoodteam.ohgoodpay.chat.dto.ProductDto;
+import com.ohgoodteam.ohgoodpay.chat.dto.ChatResponse;
 import com.ohgoodteam.ohgoodpay.chat.util.LlmApiClient;
 import com.ohgoodteam.ohgoodpay.chat.util.PromptProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class RecommendationService {
     private final PromptProvider promptProvider;
 //    private final ProductService productService;
 
-    public LlmResponse chat(String sessionId, List<ChatMessage> history, String userMessage, String userName) {
+    public ChatResponse chat(String sessionId, List<ChatMessage> history, String userMessage, String userName) {
         String systemPrompt = promptProvider.getBasePrompt(userName);
 
         String response = llmApiClient.chat(history, userMessage, systemPrompt);
@@ -34,7 +33,7 @@ public class RecommendationService {
 //
 //            return new LlmResponse(sessionId, cleanMessage, products);
 //        }
-        return new LlmResponse(sessionId, response, null);
+        return new ChatResponse(sessionId, response, null);
     }
 
     private String extractKeyword(String text) {
