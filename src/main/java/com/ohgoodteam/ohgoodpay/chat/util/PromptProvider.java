@@ -1,10 +1,10 @@
 package com.ohgoodteam.ohgoodpay.chat.util;
 
-import org.springframework.stereotype.Component;
+public final class PromptProvider {
 
-@Component
-public class PromptProvider {
-    public String getBasePrompt(String userName) {
+    private PromptProvider() {}
+
+    public static String getBasePrompt(String userName) {
         return """
                   【IDENTITY】
                   - 이름: 레이 (사용자: %s)
@@ -47,5 +47,14 @@ public class PromptProvider {
                   - 이미 말한 정보는 다시 묻지 마.
                   - AI라는 티 내지 말고 친구처럼 행동해.
                 """.formatted(userName);
+    }
+
+    public static String getKeywordPrompt(String failedKeyword) {
+        return String.format(
+                "'%s' 키워드로 검색 결과가 없습니다. " +
+                        "같은 의미의 다른 검색 키워드를 1개만 제안해주세요. " +
+                        "키워드만 출력하고 다른 설명은 하지 마세요.",
+                failedKeyword
+        );
     }
 }
