@@ -3,6 +3,7 @@ package com.ohgoodteam.ohgoodpay.chat.service;
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatMessage;
 import com.ohgoodteam.ohgoodpay.chat.dto.ChatResponse;
 import com.ohgoodteam.ohgoodpay.chat.dto.ProductDto;
+import com.ohgoodteam.ohgoodpay.chat.exception.LlmServerException;
 import com.ohgoodteam.ohgoodpay.chat.util.LlmApiClient;
 import com.ohgoodteam.ohgoodpay.chat.util.PromptProvider;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +12,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.ohgoodteam.ohgoodpay.chat.util.PromptProvider.getKeywordPrompt;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class RecommendationService {
     private static final String SEARCH_KEYWORD_PREFIX = "SEARCH_KEYWORD:";
     private static final String MAX_PRICE_PREFIX = "MAX_PRICE:";
+    private static final int MAX_RETRY_COUNT = 2;
 
     private final LlmApiClient llmApiClient;
     private final PromptProvider promptProvider;
@@ -32,30 +36,27 @@ public class RecommendationService {
             Integer maxPrice = extractMaxPrice(response);
             String cleanMessage = extractCleanMessage(response);
 
-            // 키워드 자체가 없는 경우 : 다시 키워드를 받을 수 있도록 준비
             if (keyword.isEmpty()) {
-                log.warn("LLM 응답에서 키워드 추출 실패: {}", response);
-                return new ChatResponse(
-                        sessionId,
-                        "앗, 잠깐 혼선이 생겼어! 😅 다시 한 번 어떤 상품 찾는지 말해줄래?",
-                        List.of()
-                );
+                return createRetryResponse(sessionId);
             }
 
+            // 1차 : 원본 키워드
             List<ProductDto> products = productService.searchAndCache(keyword, maxPrice);
 
-            if (products.isEmpty()) {    // 검색 결과가 없을 경우, 단축 키워드로 한 번더 연결
+            // 2차 : 단순 키워드
+            if (products.isEmpty()) {
                 String simpleKeyword = simplifyKeyword(keyword);
                 products = productService.searchAndCache(simpleKeyword, maxPrice);
             }
 
-            // 단축 키워드로 했는데도 결과가 없을 경우, 다른 키워드 받기
+            // 3차 : LLM에게 키워드 재생성 요청 (최대 2회)
             if (products.isEmpty()) {
-                return new ChatResponse(
-                        sessionId,
-                        cleanMessage + "\n\n근데 아쉽게도 조건에 딱 맞는 상품을 못 찾았어 😢 다른 키워드나 예산으로 다시 얘기해줄래?",
-                        List.of()
-                );
+                products = retryWithNewKeyword(keyword, maxPrice);
+            }
+
+            // 4차 : 최종 실패
+            if (products.isEmpty()) {
+                return createFailResponse(sessionId, cleanMessage);
             }
 
             return new ChatResponse(sessionId, cleanMessage, products);
@@ -101,5 +102,52 @@ public class RecommendationService {
             return words[0] + " " + words[words.length - 1];    // 앞 뒤 두 개만 붙여서 간단한 키워드 생성
         }
         return keyword;
+    }
+
+    private ChatResponse createRetryResponse(String sessionId) {
+        return new ChatResponse(
+                sessionId,
+                "앗, 잠깐 혼선이 생겼어! 😅 다시 한 번 어떤 상품 찾는지 말해줄래?",
+                List.of()
+        );
+    }
+
+    private ChatResponse createFailResponse(String sessionId, String cleanMessage) {
+        return new ChatResponse(
+                sessionId,
+                cleanMessage + "\n\n근데 아쉽게도 조건에 딱 맞는 상품을 못 찾았어 😢 다른 키워드나 예산으로 다시 얘기해줄래?",
+                List.of()
+        );
+    }
+
+    private List<ProductDto> retryWithNewKeyword(String failedKeyword, Integer maxPrice) {
+        for (int i = 0; i < MAX_RETRY_COUNT; i++) {
+            String newKeyword = requestNewKeyword(failedKeyword, i);
+
+            if (newKeyword == null || newKeyword.isEmpty()) {
+                continue;
+            }
+
+            List<ProductDto> products = productService.searchAndCache(newKeyword, maxPrice);
+            if (!products.isEmpty()) {
+                return products;
+            }
+
+            failedKeyword = newKeyword;
+        }
+
+        return List.of();    // 두 번 돌아도 없는 경우
+    }
+
+    private String requestNewKeyword(String failedKeyword, int attemptCount) {
+        String prompt = getKeywordPrompt(failedKeyword);
+
+        try {
+            String response = llmApiClient.chat(List.of(), prompt, "너는 검색 키워드 생성 전문가야");
+            return response.trim();
+        } catch (LlmServerException e) {
+            log.warn("키워드 재생성 실패 ({}회차): {}", attemptCount, e.getMessage());
+            return null;
+        }
     }
 }
