@@ -1,9 +1,9 @@
 package com.ohgoodteam.ohgoodpay.chat.util;
 
-import org.springframework.stereotype.Component;
+public final class PromptProvider {
 
-@Component
-public class PromptProvider {
+    private PromptProvider() {}
+
     public static String getBasePrompt(String userName) {
         return """
                   【IDENTITY】
