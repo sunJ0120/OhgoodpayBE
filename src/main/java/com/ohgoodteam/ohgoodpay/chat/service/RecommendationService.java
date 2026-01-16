@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.ohgoodteam.ohgoodpay.chat.util.PromptProvider.getBasePrompt;
 import static com.ohgoodteam.ohgoodpay.chat.util.PromptProvider.getKeywordPrompt;
 
 @Service
@@ -23,11 +24,10 @@ public class RecommendationService {
     private static final int MAX_RETRY_COUNT = 2;
 
     private final LlmApiClient llmApiClient;
-    private final PromptProvider promptProvider;
     private final ProductService productService;
 
     public ChatResponse chat(String sessionId, List<ChatMessage> history, String userMessage, String userName) {
-        String systemPrompt = promptProvider.getBasePrompt(userName);
+        String systemPrompt = getBasePrompt(userName);
 
         String response = llmApiClient.chat(history, userMessage, systemPrompt);
 
