@@ -18,6 +18,7 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>,
     /**
      * 고객 취미 업데이트 (DDD Command 패턴)
      */
+    @Transactional
     @Modifying
     @Query("UPDATE CustomerEntity c SET c.hobby = :hobby WHERE c.customerId = :customerId")
     int updateHobbyByCustomerId(@Param("customerId") Long customerId, @Param("hobby") String hobby);

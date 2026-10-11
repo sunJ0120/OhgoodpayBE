@@ -1,6 +1,6 @@
 package com.ohgoodteam.ohgoodpay.chat.dto;
 
-import lombok.*;
+import com.ohgoodteam.ohgoodpay.llm.dto.MlProduct;
 
 public record ProductDto(
         String name,
@@ -9,21 +9,13 @@ public record ProductDto(
         String url,
         String category
 ) {
-    public static ProductDto of(NaverProduct product) {
-        int price;
-
-        try {
-            price = Integer.parseInt(product.lprice());
-        } catch (NumberFormatException | NullPointerException e) {
-            price = 30000;    // 기본값 설정
-        }
-
+    public static ProductDto of(MlProduct product) {
         return new ProductDto(
-                product.title().replaceAll("<[^>]*>", ""),  // HTML 태그 제거
-                price,
+                product.name(),
+                product.price(),
                 product.image(),
-                product.link(),
-                product.category1()
+                product.url(),
+                product.category()
         );
     }
 }

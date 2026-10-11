@@ -1,0 +1,1 @@
+CREATE TABLE legacy_probe (id BIGINT PRIMARY KEY);
