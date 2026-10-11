@@ -11,4 +11,6 @@ fastapi:
     sayMyName: /dash/saymyname
     analyzeSpending: /dash/analyze
     advice: /dash/advice
+    chat: /chat
+    chatValidation: /chat/validation
   server-port: "8080"

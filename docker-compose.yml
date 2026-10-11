@@ -15,8 +15,26 @@ services:
     networks:
       - ohgoodpay-network
 
+  mysql:
+    image: mysql:8.4
+    container_name: ohgoodpay-mysql
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-ohgood}
+      MYSQL_DATABASE: ohgoodpay
+      TZ: Asia/Seoul
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - ohgoodpay-network
+
 volumes:
   redis_data:
+    driver: local
+  mysql_data:
     driver: local
 
 networks:

@@ -37,6 +37,15 @@ public class ApiResponseWrapper<T> {
                 .build();
     }
 
+    public static <T> ApiResponseWrapper<T> error(int code, String message, T data) {
+        return ApiResponseWrapper.<T>builder()
+                .success(false)
+                .code(code)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
     public static <T> ApiResponseWrapper<T> error(int code, String message) {
         return ApiResponseWrapper.<T>builder()
                 .success(false)

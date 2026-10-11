@@ -1,22 +1,21 @@
 spring:
   config:
-    import: optional:file:.env[.properties]
+    # fastapi.yml 은 @PropertySource 로는 YAML 이 읽히지 않아 여기서 import 한다 (FastApiConfig 바인딩)
+    import: optional:file:.env[.properties],classpath:fastapi.yml
   datasource:
-    url: jdbc:h2:mem:paydb # 테스트용 메모리 DB (실제 운영시 MySQL 등으로 변경)
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ohgoodpay?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&createDatabaseIfNotExist=true}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
   jpa:
-      database-platform: org.hibernate.dialect.H2Dialect
       hibernate:
         ddl-auto: update # 테이블 자동 생성
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY}
-      chat:
-        options:
-          model: gpt-4o-mini
-          temperature: 0.7
+  flyway:
+    # 프롬프트 버전·호출 기록 테이블(prompt_version, llm_call_log)만 Flyway 가 관리한다. 기존 JPA 테이블은 ddl-auto 그대로.
+    # 이미 JPA 테이블이 있는 DB 라서 baseline-on-migrate 가 필요하다 (히스토리 테이블이 없어도 첫 실행 가능).
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
 
 jwt:
   secret:
@@ -34,7 +33,3 @@ cloud:
     s3:
       bucket: ${AWS_S3_BUCKET:your_bucket_name}
 
-
-naver-search:
-  client-id: ${NAVER_CLIENT_ID}
-  client-secret: ${NAVER_CLIENT_SECRET}

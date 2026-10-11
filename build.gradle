@@ -5,6 +5,9 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
+// Docker Engine 29(최소 API 1.44)와 호환되는 Testcontainers (Boot 3.5.3 기본 1.21.2는 Docker 29 를 인식하지 못한다)
+ext['testcontainers.version'] = '1.21.4'
+
 group = 'com.ohgoodteam'
 version = '0.0.1-SNAPSHOT'
 description = 'BNPL Service for Spring Boot'
@@ -67,11 +70,18 @@ dependencies {
 	implementation 'com.google.zxing:core:3.5.2'
 	implementation 'com.google.zxing:javase:3.5.2'
 
-    // spring ai : 1.1.x
-    implementation 'org.springframework.ai:spring-ai-model:1.1.2'
-    implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.1.2'
+    // DB 마이그레이션 (llm 스키마: 프롬프트 버전·호출 기록). 프롬프트는 Flyway INSERT 로만 추가한다.
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
+    // 레거시 테스트(H2)용
     runtimeOnly 'com.h2database:h2'
+
+    // DB 테스트 (MySQL Testcontainers)
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:mysql'
 }
 
 tasks.named('test') {
